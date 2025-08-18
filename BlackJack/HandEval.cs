@@ -1,6 +1,6 @@
 ﻿namespace BlackJack;
 
-internal readonly struct HandEval
+public readonly struct HandEval
 {
     public int Total { get; }
     public bool IsSoft { get; }
@@ -14,7 +14,7 @@ internal readonly struct HandEval
     }
 }
 
-internal static class HandEvaluator
+public static class HandEvaluator
 {
     public static HandEval Evaluate(IReadOnlyList<Card> hand, bool treatTwoCard21AsBlackjack)
     {

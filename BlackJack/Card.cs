@@ -1,6 +1,6 @@
 ﻿namespace BlackJack;
 
-internal class Card
+public class Card
 {
     public Card(string value, string suit)
     {

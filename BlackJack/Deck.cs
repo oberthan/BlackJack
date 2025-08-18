@@ -1,11 +1,15 @@
 ﻿namespace BlackJack;
 
-internal class Deck
+public static class Rnd
+{
+    public static Random Rng = new();
+}
+
+public class Deck
 {
     private readonly int numDecks;
     private readonly int penetrationCut; // remaining-card threshold to reshuffle
-    private readonly Random rng = new();
-    private List<Card> cards;
+    public List<Card> Cards { get; private set; }
 
     public Deck(int numDecks = 8, double penetration = 0.7)
     {
@@ -20,36 +24,37 @@ internal class Deck
         string[] suits = { "Hearts", "Diamonds", "Clubs", "Spades" };
         string[] values = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
 
-        cards = new List<Card>(numDecks * 52);
+        Cards = new List<Card>(numDecks * 52);
 
         for (var n = 0; n < numDecks; n++)
             foreach (var suit in suits)
             foreach (var value in values)
-                cards.Add(new Card(value, suit));
+                Cards.Add(new Card(value, suit));
         Shuffle();
     }
 
     public void Shuffle()
     {
-        var n = cards.Count;
+        var n = Cards.Count;
+        // Fisher-Yates shuffle algorithm (Knuth / Durstenfeld swap shuffle version https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
         for (var i = n - 1; i > 0; i--)
         {
-            var j = rng.Next(i + 1);
-            (cards[i], cards[j]) = (cards[j], cards[i]);
+            var j = Rnd.Rng.Next(i + 1);
+            (Cards[i], Cards[j]) = (Cards[j], Cards[i]);
         }
     }
 
 
     public Card DrawCard()
     {
-        if (cards.Count == 0) throw new InvalidOperationException("Deck is empty!");
-        var card = cards[0];
-        cards.RemoveAt(0);
+        if (Cards.Count == 0) throw new InvalidOperationException("Deck is empty!");
+        var card = Cards[0];
+        Cards.RemoveAt(0);
         return card;
     }
 
     public void EndOfGame()
     {
-        if (cards.Count < penetrationCut) SetupShoe();
+        if (Cards.Count < penetrationCut) SetupShoe();
     }
 }

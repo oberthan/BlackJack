@@ -10,7 +10,7 @@ internal class Program
         var rounds = 10000000;
 
         int wins = 0, losses = 0, pushes = 0;
-        long units = 0;
+        double units = 0;
         long blackjacks = 0;
         long splits = 0;
         long doubles = 0;

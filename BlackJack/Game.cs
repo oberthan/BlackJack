@@ -7,10 +7,10 @@ internal enum Outcome
     Push
 }
 
-internal readonly struct RoundResult(Outcome o, int units, int stake, bool blackjack, bool split, bool doubled)
+internal readonly struct RoundResult(Outcome o,double units, int stake, bool blackjack, bool split, bool doubled)
 {
     public Outcome Outcome { get; } = o;
-    public int UnitsWonOrLost { get; } = units;
+    public double UnitsWonOrLost { get; } = units;
     public int Stake { get; } = stake;
     public bool Blackjack { get; } = blackjack;
     public bool Split { get; } = split;
@@ -60,7 +60,7 @@ internal class Game
                 return new RoundResult(Outcome.Push, 0, player.Bet, player.DidBlackjack, player.DidSplit,
                     player.DidDouble);
             // REQUIREMENT: Blackjack pays 3:2
-            var units = (int)Math.Round(player.Bet * Rules.BlackjackPayout);
+            var units = player.Bet * Rules.BlackjackPayout;
             return new RoundResult(Outcome.PlayerWin, units, player.Bet, player.DidBlackjack, player.DidSplit,
                 player.DidDouble);
         }
@@ -109,14 +109,19 @@ internal class Game
         if (player.SplitHandPlayer != null)
             netUnits += SettleAgainstDealer(player.SplitHandPlayer, true);
 
+
+        int totalStake = player.Bet; // original hand (already doubled if double down)
+        if (player.SplitHandPlayer != null)
+            totalStake += player.SplitHandPlayer.Bet;
+
         // summarize
         if (netUnits > 0)
-            return new RoundResult(Outcome.PlayerWin, netUnits, player.Bet, player.DidBlackjack, player.DidSplit,
+            return new RoundResult(Outcome.PlayerWin, netUnits, totalStake, player.DidBlackjack, player.DidSplit,
                 player.DidDouble);
         if (netUnits < 0)
-            return new RoundResult(Outcome.DealerWin, netUnits, player.Bet, player.DidBlackjack, player.DidSplit,
+            return new RoundResult(Outcome.DealerWin, netUnits, totalStake, player.DidBlackjack, player.DidSplit,
                 player.DidDouble);
-        return new RoundResult(Outcome.Push, 0, player.Bet, player.DidBlackjack, player.DidSplit, player.DidDouble);
+        return new RoundResult(Outcome.Push, 0, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
     }
 
     private void DealerPlay()
