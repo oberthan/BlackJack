@@ -1,6 +1,6 @@
 ﻿namespace BlackJack;
 
-internal static class Rules
+public static class Rules
 {
     // REQUIREMENT: Dealer stands on ALL 17s (including soft 17)
     public const bool DealerStandsOnSoft17 = true;

@@ -97,7 +97,7 @@ namespace BlackJackTest
                 var hand = new List<Card> { Ace, Ace, Ten, Nine };
                 var eval = HandEvaluator.Evaluate(hand, treatTwoCard21AsBlackjack: false);
 
-                Assert.That(eval.Total, Is.EqualTo(31));
+                Assert.That(eval.Total, Is.EqualTo(21));
                 Assert.That(eval.IsSoft, Is.False);
                 Assert.That(eval.IsBlackjack, Is.False);
             }

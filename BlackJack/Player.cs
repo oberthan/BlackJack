@@ -1,6 +1,6 @@
 ﻿namespace BlackJack;
 
-internal class Player
+public class Player
 {
     public List<Card> Hand { get; } = new();
     public int Bet { get; set; } = 1;
@@ -122,7 +122,7 @@ internal class Player
     }
 }
 
-internal class SplitPlayer : Player
+public class SplitPlayer : Player
 {
     public SplitPlayer(int originalBet)
     {

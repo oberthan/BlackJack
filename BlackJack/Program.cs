@@ -7,7 +7,7 @@ internal class Program
     private static void Main()
     {
         var game = new Game();
-        var rounds = 100000000;
+        var rounds = 10000000;
 
         int wins = 0, losses = 0, pushes = 0;
         double units = 0;
@@ -16,7 +16,7 @@ internal class Program
         long doubles = 0;
         long stake = 0;
 
-        var nTasks = 6;
+        var nTasks = Environment.ProcessorCount;
 
         var tasks = new Task[nTasks];
         var simulators = new BlackjackSimulator[nTasks];
@@ -128,7 +128,12 @@ internal class Program
                 switch (res.Outcome)
                 {
                     case Outcome.PlayerWin: wins++; break;
+                    case Outcome.DealerBlackjack: losses++; break;
+                    case Outcome.Bust: losses++; break;
+                    case Outcome.PlayerBlackjack: wins++; break;
+                    case Outcome.DealerBust: wins++; break;
                     case Outcome.DealerWin: losses++; break;
+                    case Outcome.PlayerWinWithCharlie: wins++; break;
                     default: pushes++; break;
                 }
 

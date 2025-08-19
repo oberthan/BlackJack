@@ -1,0 +1,200 @@
+using NUnit.Framework;
+using BlackJack;
+using System.Collections.Generic;
+using System.Reflection;
+
+namespace BlackJack.Tests
+{
+    [TestFixture]
+    public class GameTests
+    {
+
+
+        [Test]
+        public void PlayOneRound_PlayerBlackjack_DealerNoBlackjack_PlayerWinsWithBlackjackPayout()
+        {
+            var game = new Game();
+            var deck = game.deck;
+            var player = game.player;
+            player.Reset();
+            var dealer = game.dealer;
+            dealer.Reset();
+
+
+            player.AddCard(new Card("A", "S")); 
+            player.AddCard(new Card("K", "D")); 
+
+            dealer.AddCard(new Card("9", "H")); 
+            dealer.AddCard(new Card("7", "C")); 
+            
+            var result = game.PlayOneRoundWithHand();
+
+            Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerBlackjack));
+            Assert.That(result.UnitsWonOrLost, Is.EqualTo(1 * Rules.BlackjackPayout));
+            Assert.That(result.Blackjack, Is.True);
+        }
+
+        [Test]
+        public void PlayOneRound_BothBlackjack_Push()
+        {
+            var game = new Game();
+            var deck = game.deck;
+            var player = game.player;
+            player.Reset();
+            var dealer = game.dealer;
+            dealer.Reset();
+
+
+            player.AddCard(new Card("A", "S"));
+            player.AddCard(new Card("K", "D"));
+
+            dealer.AddCard(new Card("A", "H"));
+            dealer.AddCard(new Card("K", "C"));
+
+            var result = game.PlayOneRoundWithHand();
+
+
+
+            Assert.That(result.Outcome, Is.EqualTo(Outcome.Push));
+            Assert.That(result.UnitsWonOrLost, Is.EqualTo(0));
+            Assert.That(result.Blackjack, Is.True);
+        }
+
+        [Test]
+        public void PlayOneRound_DealerBlackjack_PlayerNoBlackjack_DealerWins()
+        {
+            var game = new Game();
+            var deck = game.deck;
+            var player = game.player;
+            player.Reset();
+            var dealer = game.dealer;
+            dealer.Reset();
+
+
+            player.AddCard(new Card("9", "S"));
+            dealer.AddCard(new Card("A", "H"));
+            player.AddCard(new Card("K", "D"));
+            dealer.AddCard(new Card("K", "C"));
+            
+
+            var result = game.PlayOneRoundWithHand();
+
+            Assert.That(result.Outcome, Is.EqualTo(Outcome.DealerBlackjack));
+            Assert.That(result.UnitsWonOrLost, Is.EqualTo(-1));
+            Assert.That(result.Blackjack, Is.False);
+
+        }
+
+        [Test]
+        public void PlayOneRound_PlayerBust_DealerWins()
+        {
+            Rnd.Rng = new Random(1232); // Ensure consistent shuffling for testing
+
+            var game = new Game();
+            var deck = game.deck;
+            var player = game.player;
+            player.Reset();
+            var dealer = game.dealer;
+            dealer.Reset();
+
+
+            player.AddCard(new Card("9", "S"));
+            player.AddCard(new Card("9", "D"));
+            dealer.AddCard(new Card("7", "H"));
+            player.AddCard(new Card("8", "D"));
+            dealer.AddCard(new Card("6", "C"));
+
+
+            var result = game.PlayOneRoundWithHand();
+
+            TestContext.Out.WriteLine("Player Hand:");
+            foreach (Card card in player.Hand)
+            {
+                TestContext.Out.WriteLine(card.ToString());
+
+            }
+            TestContext.Out.WriteLine("\n\nDealer Hand:");
+            foreach (Card card in dealer.Hand)
+            {
+                TestContext.Out.WriteLine(card.ToString());
+
+            }
+
+            Assert.That(result.Outcome, Is.EqualTo(Outcome.Bust));
+            Assert.That(result.UnitsWonOrLost, Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void PlayOneRound_PlayerCharlieWin_PlayerWins()
+        {
+            var game = new Game();
+            var deck = game.deck;
+            var player = game.player;
+            player.Reset();
+            var dealer = game.dealer;
+            dealer.Reset();
+
+
+            player.AddCard(new Card("2", "S"));
+            player.AddCard(new Card("2", "S"));
+            player.AddCard(new Card("2", "S"));
+            player.AddCard(new Card("2", "S"));
+            player.AddCard(new Card("2", "S"));
+            dealer.AddCard(new Card("7", "H"));
+            player.AddCard(new Card("2", "D"));
+            dealer.AddCard(new Card("6", "C"));
+
+            var result = game.PlayOneRoundWithHand();
+
+
+           Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerWinWithCharlie));
+            Assert.That(result.UnitsWonOrLost, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void PlayOneRound_SplitWithBetAndReturn()
+        {
+            Rnd.Rng = new Random(123456); // Ensure consistent shuffling for testing
+
+            var game = new Game();
+            var deck = game.deck;
+            var player = game.player;
+            player.Reset();
+            var dealer = game.dealer;
+            dealer.Reset();
+
+
+            player.AddCard(new Card("8", "S"));
+            dealer.AddCard(new Card("7", "H"));
+            player.AddCard(new Card("8", "D"));
+            dealer.AddCard(new Card("6", "C"));
+
+            var result = game.PlayOneRoundWithHand();
+
+            TestContext.Out.WriteLine("Player Hand 1:");
+            foreach (Card card in player.Hand)
+            {
+                TestContext.Out.WriteLine(card.ToString());
+
+            }
+            TestContext.Out.WriteLine("\nPlayer Hand 2:");
+            foreach (Card card in player.SplitHandPlayer.Hand)
+            {
+                TestContext.Out.WriteLine(card.ToString());
+
+            }
+            TestContext.Out.WriteLine("\n\nDealer Hand:");
+            foreach (Card card in dealer.Hand)
+            {
+                TestContext.Out.WriteLine(card.ToString());
+
+            }
+
+            Assert.That(player.SplitHandPlayer, Is.Not.EqualTo(null));
+            Assert.That(result.Outcome, Is.EqualTo(Outcome.DealerBust));
+            Assert.That(result.Stake, Is.EqualTo(3));
+            Assert.That(result.UnitsWonOrLost, Is.EqualTo(3)); // Player wins both hands
+
+        }
+    }
+}

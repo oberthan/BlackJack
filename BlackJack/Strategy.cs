@@ -38,12 +38,13 @@ internal static class Strategy
             switch (total)
             {
                 case 20: return Move.Stand;
-                case 19: return up == 6 ? Move.Double : Move.Stand;
+                case 19: return Move.Stand;
                 case 18:
-                    if (up >= 2 && up <= 6) return Move.Double;
+                    if (up >= 3 && up <= 6) return Move.Double;
                     if (up == 9 || up == 10 || up == 11) return Move.Hit;
                     return Move.Stand;
                 case 17:
+                    return up >= 3 && up <= 6 ? Move.Double : Move.Hit;
                 case 16:
                 case 15:
                     return up >= 4 && up <= 6 ? Move.Double : Move.Hit;
@@ -60,7 +61,7 @@ internal static class Strategy
                 return up >= 2 && up <= 6 ? Move.Stand : Move.Hit;
             if (total == 12)
                 return up >= 4 && up <= 6 ? Move.Stand : Move.Hit;
-            if (total == 11) return Move.Double;
+            if (total == 11) return up <= 10 ? Move.Double : Move.Hit;
             if (total == 10) return up <= 9 ? Move.Double : Move.Hit;
             if (total == 9) return up >= 3 && up <= 6 ? Move.Double : Move.Hit;
             if (total <= 8) return Move.Hit;

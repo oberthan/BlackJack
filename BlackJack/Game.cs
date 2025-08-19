@@ -1,13 +1,19 @@
 ﻿namespace BlackJack;
 
-internal enum Outcome
+public enum Outcome
 {
     PlayerWin,
+    Bust, // player busts
     DealerWin,
-    Push
+    Push,
+    DealerBust, // dealer busts
+    PlayerBlackjack, // player has blackjack
+    DealerBlackjack, // dealer has blackjack
+    PlayerWinWithCharlie // player wins with Charlie
+    
 }
 
-internal readonly struct RoundResult(Outcome o,double units, int stake, bool blackjack, bool split, bool doubled)
+public readonly struct RoundResult(Outcome o,double units, int stake, bool blackjack, bool split, bool doubled)
 {
     public Outcome Outcome { get; } = o;
     public double UnitsWonOrLost { get; } = units;
@@ -17,11 +23,11 @@ internal readonly struct RoundResult(Outcome o,double units, int stake, bool bla
     public bool Double { get; } = doubled;
 }
 
-internal class Game
+public class Game
 {
-    private readonly Player dealer = new(); // dealer uses same Player class but different flow
-    private readonly Deck deck = new(); // 8-deck shoe with 0.7 penetration by default
-    private readonly Player player = new();
+    public readonly Player dealer = new(); // dealer uses same Player class but different flow
+    public readonly Deck deck = new(); // 8-deck shoe with 0.7 penetration by default
+    public readonly Player player = new();
 
 
     public RoundResult PlayOneRound()
@@ -36,11 +42,15 @@ internal class Game
         player.AddCard(deck.DrawCard());
         dealer.AddCard(deck.DrawCard()); // dealer hole card
 
+        return PlayOneRoundWithHand();
+    }
+
+    public RoundResult PlayOneRoundWithHand()
+    {
         // evaluate blackjacks (initial only)
         var pEval = HandEvaluator.Evaluate(player.Hand, true);
         var dEval = HandEvaluator.Evaluate(dealer.Hand, true);
         if (pEval.IsBlackjack) player.DidBlackjack = true; // track for later
-
 
         // REQUIREMENT: Dealer peeks for blackjack when showing Ace
         if (Rules.DealerPeeksOnAce && dealer.Hand[0].Value == "A")
@@ -49,7 +59,7 @@ internal class Game
                 if (pEval.IsBlackjack)
                     return new RoundResult(Outcome.Push, 0, player.Bet, player.DidBlackjack, player.DidSplit,
                         player.DidDouble); // REQUIREMENT: push if both BJ
-                return new RoundResult(Outcome.DealerWin, -player.Bet, player.Bet, player.DidBlackjack, player.DidSplit,
+                return new RoundResult(Outcome.DealerBlackjack, -player.Bet, player.Bet, player.DidBlackjack, player.DidSplit,
                     player.DidDouble); // dealer BJ ends round
             }
 
@@ -61,12 +71,12 @@ internal class Game
                     player.DidDouble);
             // REQUIREMENT: Blackjack pays 3:2
             var units = player.Bet * Rules.BlackjackPayout;
-            return new RoundResult(Outcome.PlayerWin, units, player.Bet, player.DidBlackjack, player.DidSplit,
+            return new RoundResult(Outcome.PlayerBlackjack, units, player.Bet, player.DidBlackjack, player.DidSplit,
                 player.DidDouble);
         }
 
         if (dEval.IsBlackjack)
-            return new RoundResult(Outcome.DealerWin, -player.Bet, player.Bet, player.DidBlackjack, player.DidSplit,
+            return new RoundResult(Outcome.DealerBlackjack, -player.Bet, player.Bet, player.DidBlackjack, player.DidSplit,
                 player.DidDouble);
 
         // PLAYER TURN(s)
@@ -105,16 +115,32 @@ internal class Game
         if (dEvalPre.Total < 17) DealerPlay();
 
         // Resolve outcomes for hands that need comparing
+        int mainResult = GetHandOutcome(player, false);
         netUnits += SettleAgainstDealer(player, false);
-        if (player.SplitHandPlayer != null)
-            netUnits += SettleAgainstDealer(player.SplitHandPlayer, true);
+        Outcome mainOutcome = GetOutcomeFromResult(mainResult, player, dealer);
 
+        Outcome? splitOutcome = null;
+        if (player.SplitHandPlayer != null)
+        {
+            int splitResult = GetHandOutcome(player.SplitHandPlayer, true);
+            netUnits += SettleAgainstDealer(player.SplitHandPlayer, true);
+            splitOutcome = GetOutcomeFromResult(splitResult, player.SplitHandPlayer, dealer);
+        }
 
         int totalStake = player.Bet; // original hand (already doubled if double down)
         if (player.SplitHandPlayer != null)
             totalStake += player.SplitHandPlayer.Bet;
 
         // summarize
+        if (mainOutcome == Outcome.PlayerWinWithCharlie || splitOutcome == Outcome.PlayerWinWithCharlie)
+            return new RoundResult(Outcome.PlayerWinWithCharlie, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
+
+        if (mainOutcome == Outcome.Bust || splitOutcome == Outcome.Bust)
+            return new RoundResult(Outcome.Bust, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
+
+        if (mainOutcome == Outcome.DealerBust || splitOutcome == Outcome.DealerBust)
+            return new RoundResult(Outcome.DealerBust, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
+
         if (netUnits > 0)
             return new RoundResult(Outcome.PlayerWin, netUnits, totalStake, player.DidBlackjack, player.DidSplit,
                 player.DidDouble);
@@ -122,6 +148,39 @@ internal class Game
             return new RoundResult(Outcome.DealerWin, netUnits, totalStake, player.DidBlackjack, player.DidSplit,
                 player.DidDouble);
         return new RoundResult(Outcome.Push, 0, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
+    }
+
+    // Helper to determine hand outcome for all enum values
+    private int GetHandOutcome(Player handOwner, bool isSplitHand)
+    {
+        var pEval = HandEvaluator.Evaluate(handOwner.Hand, !isSplitHand);
+        var dEval = HandEvaluator.Evaluate(dealer.Hand, false);
+
+        // Six Card Charlie
+        if (handOwner.Hand.Count >= Rules.SixCardCharlieCount && pEval.Total <= 21)
+            return 1000; // special code for Charlie
+
+        if (pEval.Total > 21) return -1000; // bust
+        if (dEval.Total > 21) return 100; // dealer bust
+
+        if (pEval.IsBlackjack && !isSplitHand) return 500; // player blackjack
+        if (dEval.IsBlackjack) return -500; // dealer blackjack
+
+        if (pEval.Total > dEval.Total) return 1;
+        if (pEval.Total < dEval.Total) return -1;
+        return 0;
+    }
+
+    private Outcome GetOutcomeFromResult(int result, Player handOwner, Player dealer)
+    {
+        if (result == 1000) return Outcome.PlayerWinWithCharlie;
+        if (result == -1000) return Outcome.Bust;
+        if (result == 100) return Outcome.DealerBust;
+        if (result == 500) return Outcome.PlayerBlackjack;
+        if (result == -500) return Outcome.DealerBlackjack;
+        if (result == 1) return Outcome.PlayerWin;
+        if (result == -1) return Outcome.DealerWin;
+        return Outcome.Push;
     }
 
     private void DealerPlay()
@@ -199,47 +258,4 @@ internal class Game
         return 0;
     }
 
-
-/*
-        public string PlayGame()
-        {
-            player.Reset();
-            dealer.Reset();
-
-            // Initial deal
-            player.AddCard(deck.DrawCard());
-            player.AddCard(deck.DrawCard());
-
-            dealer.AddCard(deck.DrawCard());
-            dealer.AddCard(deck.DrawCard());
-
-            // Player auto strategy: hit until 17 or higher
-            var counter = 0;
-            while (player.GetHandValue() < 17)
-            {
-                player.AddCard(deck.DrawCard());
-                if (counter >= 13) throw new InvalidOperationException("Too many cards drawn!");
-
-            }
-
-            // Dealer turn
-            dealer.Play(deck);
-
-            deck.EndOfGame();
-
-
-            // Determine outcome
-            if (player.IsBusted()) return "Dealer";
-            if (dealer.IsBusted()) return "Player";
-
-            int playerTotal = player.GetHandValue();
-            int dealerTotal = dealer.GetHandValue();
-
-            if (playerTotal > dealerTotal) return "Player";
-            if (dealerTotal > playerTotal) return "Dealer";
-
-
-            return "Push";
-        }
-*/
 }
