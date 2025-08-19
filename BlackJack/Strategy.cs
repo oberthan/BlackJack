@@ -8,7 +8,7 @@ public enum Move
     Split
 }
 
-internal static class Strategy
+public static class Strategy
 {
     public static Move Decide(Player player, Card dealerUp, bool afterSplit)
     {
@@ -19,7 +19,7 @@ internal static class Strategy
         var cards = player.Hand;
 
         // --- Pair Splitting ---
-        if (cards.Count == 2 && cards[0].PipValue == cards[1].PipValue)
+        if (!afterSplit && cards.Count == 2 && cards[0].PipValue == cards[1].PipValue)
         {
             var pairVal = cards[0].PipValue;
 
@@ -34,6 +34,7 @@ internal static class Strategy
         }
 
         // --- Soft Totals (A + something) ---
+        var canDouble = player.CanDouble(afterSplit, player.IsSplitAces);
         if (isSoft)
             switch (total)
             {
@@ -44,13 +45,13 @@ internal static class Strategy
                     if (up == 9 || up == 10 || up == 11) return Move.Hit;
                     return Move.Stand;
                 case 17:
-                    return up >= 3 && up <= 6 ? Move.Double : Move.Hit;
+                    return up >= 3 && up <= 6 && canDouble ? Move.Double : Move.Hit;
                 case 16:
                 case 15:
-                    return up >= 4 && up <= 6 ? Move.Double : Move.Hit;
+                    return up >= 4 && up <= 6 && canDouble ? Move.Double : Move.Hit;
                 case 14:
                 case 13:
-                    return up == 5 || up == 6 ? Move.Double : Move.Hit;
+                    return up == 5 || up == 6 && canDouble ? Move.Double : Move.Hit;
             }
 
         // --- Hard Totals ---
@@ -61,9 +62,9 @@ internal static class Strategy
                 return up >= 2 && up <= 6 ? Move.Stand : Move.Hit;
             if (total == 12)
                 return up >= 4 && up <= 6 ? Move.Stand : Move.Hit;
-            if (total == 11) return up <= 10 ? Move.Double : Move.Hit;
-            if (total == 10) return up <= 9 ? Move.Double : Move.Hit;
-            if (total == 9) return up >= 3 && up <= 6 ? Move.Double : Move.Hit;
+            if (total == 11) return up <= 10 && canDouble ? Move.Double : Move.Hit;
+            if (total == 10) return up <= 9 && canDouble ? Move.Double : Move.Hit;
+            if (total == 9) return up >= 3 && up <= 6 && canDouble ? Move.Double : Move.Hit;
             if (total <= 8) return Move.Hit;
         }
 

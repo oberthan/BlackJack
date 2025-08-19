@@ -8,7 +8,31 @@ namespace BlackJack.Tests
     [TestFixture]
     public class GameTests
     {
+        List<bool> BoolArray_from_String(string fromString)
+        {
+            var list = new List<bool>();
+            foreach (char c in fromString)
+            {
+                list.Add(c == 'y' ? true : false);
+            }
 
+            return list;
+        }
+        List<List<Move>> MoveArray_from_String(string[] fromList)
+        {
+            List<List<Move>> array = new List<List<Move>>();
+            foreach (string fromString in fromList)
+            {
+                var list = new List<Move>();
+                foreach (char c in fromString)
+                {
+                    list.Add(c=='h'?Move.Hit:c=='s'?Move.Stand:Move.Double);
+                }
+                array.Add(list);
+            }
+
+            return array;
+        }
 
         [Test]
         public void PlayOneRound_PlayerBlackjack_DealerNoBlackjack_PlayerWinsWithBlackjackPayout()
@@ -151,73 +175,179 @@ namespace BlackJack.Tests
             Assert.That(result.UnitsWonOrLost, Is.EqualTo(1));
         }
 
-        [TestCase("2", true)]
-        [TestCase("3", true)]
-        [TestCase("4", false)]
-        [TestCase("5", false)]
-        [TestCase("6", false)]
-        [TestCase("7", true)]
-        [TestCase("8", true)]
-        [TestCase("9", false)]
-        [TestCase("10", false)]
-        [TestCase("J", false)]
-        [TestCase("Q", false)]
-        [TestCase("K", false)]
-        [TestCase("A", true)]
-        public void PlayOneRound_SplitWithBetAndReturn(String splitCard, bool shouldSplit, String upCard = "7")
+
+
+        [TestCase("2", "yyyyyynnnn")]
+        [TestCase("3", "yyyyyynnnn")]
+        [TestCase("4", "nnnyynnnnn")]
+        [TestCase("5", "nnnnnnnnnn")]
+        [TestCase("6", "yyyyynnnnn")]
+        [TestCase("7", "yyyyyynnnn")]
+        [TestCase("8", "yyyyyyyyyy")]
+        [TestCase("9", "yyyyynyynn")]
+        [TestCase("10", "nnnnnnnnnn")]
+        [TestCase("10", "nnnnnnnnnn", "J")]
+        [TestCase("10", "nnnnnnnnnn", "Q")]
+        [TestCase("10", "nnnnnnnnnn", "K")]
+        [TestCase("J", "nnnnnnnnnn")]
+        [TestCase("J", "nnnnnnnnnn", "Q")]
+        [TestCase("J", "nnnnnnnnnn", "K")]
+        [TestCase("Q", "nnnnnnnnnn")]
+        [TestCase("Q", "nnnnnnnnnn", "K")]
+        [TestCase("K", "nnnnnnnnnn")]
+        [TestCase("A", "yyyyyyyyyy")]
+        public void PlayOneRound_Split(string splitCard, string splitsString, string secondSplitCard = "")
         {
-            Rnd.Rng = new Random(123456); // Ensure consistent shuffling for testing
-
-            var game = new Game();
-            var deck = game.deck;
-            var player = game.player;
-            player.Reset();
-            var dealer = game.dealer;
-            dealer.Reset();
-
-
-            player.AddCard(new Card(splitCard, "S"));
-            dealer.AddCard(new Card(upCard, "H"));
-            player.AddCard(new Card(splitCard, "D"));
-            dealer.AddCard(new Card("6", "C"));
-
-            var result = game.PlayOneRoundWithHand();
-
-            TestContext.Out.WriteLine("Player Hand 1:");
-            foreach (Card card in player.Hand)
+            //Rnd.Rng = new Random(123456); // Ensure consistent shuffling for testing
+            secondSplitCard = secondSplitCard == "" ? splitCard : secondSplitCard;
+            string[] values = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "A" };
+            List<bool> pairSplits = BoolArray_from_String(splitsString);
+            int i = 0;
+            foreach (bool shouldSplit in pairSplits)
             {
-                TestContext.Out.WriteLine(card.ToString());
+                var game = new Game();
+                var deck = game.deck;
+                var player = game.player;
+                player.Reset();
+                var dealer = game.dealer;
+                dealer.Reset();
 
-            }
 
-            if (player.SplitHandPlayer != null)
-            {
-                TestContext.Out.WriteLine("\nPlayer Hand 2:");
-                foreach (Card card in player.SplitHandPlayer.Hand)
+                player.AddCard(new Card(splitCard, "S"));
+                dealer.AddCard(new Card(values[i], "H"));
+                player.AddCard(new Card(secondSplitCard, "D"));
+                dealer.AddCard(new Card("6", "C"));
+
+                var result = game.PlayOneRoundWithHand();
+
+                TestContext.Out.WriteLine($"\n\n\n\nGame {i}");
+                TestContext.Out.WriteLine("Player Hand 1:");
+                foreach (Card card in player.Hand)
                 {
                     TestContext.Out.WriteLine(card.ToString());
 
                 }
+
+                if (player.SplitHandPlayer != null)
+                {
+                    TestContext.Out.WriteLine("\nPlayer Hand 2:");
+                    foreach (Card card in player.SplitHandPlayer.Hand)
+                    {
+                        TestContext.Out.WriteLine(card.ToString());
+
+                    }
+                }
+
+                TestContext.Out.WriteLine("\n\nDealer Hand:");
+                foreach (Card card in dealer.Hand)
+                {
+                    TestContext.Out.WriteLine(card.ToString());
+
+                }
+
+                Assert.That(player.SplitHandPlayer, shouldSplit ? Is.Not.EqualTo(null) : Is.EqualTo(null));
+                Assert.That(result.Stake, Is.GreaterThanOrEqualTo(shouldSplit ? 2:1));
+                /*            Assert.That(result.Outcome, Is.EqualTo(Outcome.DealerBust));
+                            Assert.That(result.UnitsWonOrLost, Is.EqualTo(3)); // Player wins both hands*/
+                i++;
+
             }
-
-            TestContext.Out.WriteLine("\n\nDealer Hand:");
-            foreach (Card card in dealer.Hand)
-            {
-                TestContext.Out.WriteLine(card.ToString());
-
-            }
-
-            Assert.That(player.SplitHandPlayer, shouldSplit?Is.Not.EqualTo(null):Is.EqualTo(null));
-/*            Assert.That(result.Outcome, Is.EqualTo(Outcome.DealerBust));
-            Assert.That(result.Stake, Is.EqualTo(3));
-            Assert.That(result.UnitsWonOrLost, Is.EqualTo(3)); // Player wins both hands*/
 
         }
 
-        [Test]
-        public void PlayOneRound_HandChecker(List<Card> hand)
-        {
 
+
+
+        [Test]
+        public void StrategyDecide_SoftDouble()
+        {
+            string[] expectedMoves =
+            [
+                "hhhddhhhhhhhh",
+                "hhhddhhhhhhhh",
+                "hhdddhhhhhhhh",
+                "hhdddhhhhhhhh",
+                "hddddhhhhhhhh",
+                "sddddsshhhhhh",
+                "sssssssssssss",
+                "sssssssssssss"
+            ];
+            var parsedMoves = MoveArray_from_String(expectedMoves);
+
+            string[] playerValues = { "2", "3", "4", "5", "6", "7", "8", "9"};
+            string[] dealerValues = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
+
+            for (int i = 0; i<playerValues.Length; i++)
+            {
+                string playerValue = playerValues[i];
+                for (int k = 0; k < dealerValues.Length; k++)
+                {
+                    string dealerValue = dealerValues[k];
+                    var player = new Player();
+                    player.AddCard(new Card("A", "S"));
+                    player.AddCard(new Card(playerValue, "D"));
+                    var dealerUp = new Card(dealerValue, "H");
+                    var move = Strategy.Decide(player, dealerUp, false);
+                    
+                    Assert.That(move, Is.EqualTo(parsedMoves[i][k]));
+                }
+            }
+
+        }
+        
+        
+        [Test]
+        public void StrategyDecide_HardDouble_FromCards()
+        {
+            string[] expectedMoves =
+            [
+                "hhhhhhhhhhhhh",
+                "hddddhhhhhhhh",
+                "ddddddddhhhhh",
+                "ddddddddddddh",
+                "hhssshhhhhhhh",
+                "ssssshhhhhhhh",
+                "ssssshhhhhhhh",
+                "ssssshhhhhhhh",
+                "ssssshhhhhhhh",
+                "sssssssssssss"
+            ];
+            var parsedMoves = MoveArray_from_String(expectedMoves);
+
+            string[] playerValues = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
+            string[] dealerValues = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
+
+            for (int i = 0; i < playerValues.Length; i++)
+            {
+                string playerValueOne = playerValues[i];
+
+                for (int g = 0; g < playerValues.Length; g++)
+                {
+                    string playerValueTwo = playerValues[g];
+
+                    var evaluation = HandEvaluator.Evaluate(new List<Card>
+                    {
+                        new Card(playerValueOne, "S"),
+                        new Card(playerValueTwo, "D")
+                    }, false);
+                    if (!evaluation.IsSoft)
+                    {
+
+
+                        for (int k = 0; k < dealerValues.Length; k++)
+                        {
+                            string dealerValue = dealerValues[k];
+                            var player = new Player();
+                            player.AddCard(new Card(playerValueOne, "S"));
+                            player.AddCard(new Card(playerValueTwo, "D"));
+                            var dealerUp = new Card(dealerValue, "H");
+                            var move = Strategy.Decide(player, dealerUp, false);
+
+                            Assert.That(move, Is.EqualTo(parsedMoves[evaluation.Total-8][k]));
+                        }
+                    }
+                }
+            }
         }
     }
 }

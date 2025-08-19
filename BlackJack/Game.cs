@@ -88,19 +88,18 @@ public class Game
 
 
         // Play a single hand and (optionally) the split hand
-        var unitsMain = PlaySingleHand(player, afterSplit, player.IsOriginalAces);
+        var unitsMain = PlaySingleHand(player, afterSplit, false);
         if (player.SplitHandPlayer != null)
         {
             var unitsSplit = PlaySingleHand(player.SplitHandPlayer, true,
-                player.SplitHandPlayer.Hand.Count == 2 &&
                 player.SplitHandPlayer.Hand[0].Value == "A");
             // Dealer plays once for both hands (standard shoe game): delay dealer play until both hands done.
             netUnits += unitsSplit; // will be combined after dealer plays
         }
 
         // DEALER TURN (only if at least one player hand hasn't already resolved to Charlie bust/win)
-        var dEvalPre = HandEvaluator.Evaluate(dealer.Hand, false);
-        if (dEvalPre.Total < 17) DealerPlay();
+
+        dealer.Play(deck);
 
         // Resolve outcomes for hands that need comparing
         int mainResult = GetHandOutcome(player, false);
@@ -226,9 +225,10 @@ public class Game
 
                         if (handOwner.Hand[0].Value == "A")
                         {
-                            // REQUIREMENT: Split Aces cannot be hit further (and usually not blackjack-qualified later)
-                            return 0; // no further play on this hand
+                            isSplitAces = true;
                         }
+
+                        afterSplit = true;
                     }
 
                     break;

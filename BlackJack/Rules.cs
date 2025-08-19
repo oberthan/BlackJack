@@ -16,6 +16,7 @@ public static class Rules
 
     // REQUIREMENT: Double after split allowed except on split Aces
     public const bool DoubleAfterSplit = true;
+    public const bool DoubleAfterSplit11 = false; // 11 = total,
     public const bool DoubleAfterSplitAces = false;
 
     // REQUIREMENT: Six Card Charlie – player wins if reaches 6 cards <= 21

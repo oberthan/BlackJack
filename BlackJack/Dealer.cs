@@ -2,14 +2,14 @@
 
 internal class Dealer : Player
 {
-    public void Play(Deck deck)
+    public new void Play(Deck deck)
     {
-        var counter = 0;
-        while (GetHandValue() < 17)
+        while (true)
         {
-            AddCard(deck.DrawCard());
-            counter++;
-            if (counter >= 13) throw new InvalidOperationException("Too many cards drawn!");
+            var eval = HandEvaluator.Evaluate(Hand, false);
+            if (eval.Total < 17) Hand.Add(deck.DrawCard());
+            else if (eval.Total == 17 && !Rules.DealerStandsOnSoft17 && eval.IsSoft) AddCard(deck.DrawCard());
+            else break; // REQUIREMENT: dealer stands on ALL 17s (including soft)
         }
     }
 }

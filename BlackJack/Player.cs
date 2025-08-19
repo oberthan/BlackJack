@@ -67,6 +67,7 @@ public class Player
         if (Hand.Count != 2) return false;
         if (!Rules.DoubleOnAnyTwo) return false;
         if (afterSplit && !Rules.DoubleAfterSplit) return false;
+        if (afterSplit && !Rules.DoubleAfterSplit11 && GetHandValue() == 11) return false;
         if (afterSplit && thisHandIsSplitAces && !Rules.DoubleAfterSplitAces) return false;
         return true;
     }
