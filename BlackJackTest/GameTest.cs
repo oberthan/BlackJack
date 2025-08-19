@@ -246,7 +246,7 @@ namespace BlackJack.Tests
                 }
 
                 Assert.That(player.SplitHandPlayer, shouldSplit ? Is.Not.EqualTo(null) : Is.EqualTo(null));
-                Assert.That(result.Stake, Is.GreaterThanOrEqualTo(shouldSplit ? 2:1));
+                Assert.That(result.Stake, Is.EqualTo(shouldSplit ? ((player.DidDouble ? 2 : 1)+ (player.SplitHandPlayer.DidDouble ? 2 : 1)) :(player.DidDouble?2:1)));
                 /*            Assert.That(result.Outcome, Is.EqualTo(Outcome.DealerBust));
                             Assert.That(result.UnitsWonOrLost, Is.EqualTo(3)); // Player wins both hands*/
                 i++;

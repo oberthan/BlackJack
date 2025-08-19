@@ -41,7 +41,7 @@ public static class Strategy
                 case 20: return Move.Stand;
                 case 19: return Move.Stand;
                 case 18:
-                    if (up >= 3 && up <= 6) return Move.Double;
+                    if (up >= 3 && up <= 6 && canDouble) return Move.Double;
                     if (up == 9 || up == 10 || up == 11) return Move.Hit;
                     return Move.Stand;
                 case 17:

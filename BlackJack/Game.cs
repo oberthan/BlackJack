@@ -25,7 +25,7 @@ public readonly struct RoundResult(Outcome o,double units, int stake, bool black
 
 public class Game
 {
-    public readonly Player dealer = new(); // dealer uses same Player class but different flow
+    public readonly Dealer dealer = new(); // dealer uses same Player class but different flow
     public readonly Deck deck = new(); // 8-deck shoe with 0.7 penetration by default
     public readonly Player player = new();
 
@@ -97,8 +97,7 @@ public class Game
             netUnits += unitsSplit; // will be combined after dealer plays
         }
 
-        // DEALER TURN (only if at least one player hand hasn't already resolved to Charlie bust/win)
-
+        // DEALER TURN
         dealer.Play(deck);
 
         // Resolve outcomes for hands that need comparing
