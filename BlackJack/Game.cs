@@ -85,19 +85,7 @@ public class Game
 
         // Optional very-simple strategy:
         // - Split Aces always; otherwise split only equal 8s; no resplit allowed by design.
-        if (player.CanSplit())
-        {
-            var shouldSplit =
-                player.IsOriginalAces ||
-                (player.Hand[0].PipValue == 8 && player.Hand[1].PipValue == 8);
 
-            if (shouldSplit)
-            {
-                player.Split(deck);
-                player.DidSplit = true; // track for later
-                afterSplit = true;
-            }
-        }
 
         // Play a single hand and (optionally) the split hand
         var unitsMain = PlaySingleHand(player, afterSplit, player.IsOriginalAces);
@@ -231,8 +219,19 @@ public class Game
                     return 0; // after doubling you always stop
 
                 case Move.Split:
-                    // handled before PlaySingleHand — skip here
-                    return 0;
+                    if (handOwner.CanSplit())
+                    {
+                        handOwner.Split(deck);
+                        handOwner.DidSplit = true; // track for later
+
+                        if (handOwner.Hand[0].Value == "A")
+                        {
+                            // REQUIREMENT: Split Aces cannot be hit further (and usually not blackjack-qualified later)
+                            return 0; // no further play on this hand
+                        }
+                    }
+
+                    break;
             }
         }
     }

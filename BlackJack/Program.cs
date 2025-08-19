@@ -74,7 +74,7 @@ internal class Program
             Console.WriteLine($"Net units: {units:n0}");
             Console.WriteLine($"Average Bet: {(stake / (float)rounds):n5}");
             Console.WriteLine($"Blackjacks: {blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
-            Console.WriteLine($"RTP: {((units + rounds) / (float)rounds):n9}");
+            Console.WriteLine($"RTP: {((units + stake) / (float)stake):n9}");
             Console.WriteLine("\n|-------- Technical Statistics --------|");
             Console.WriteLine($"Elapsed time: {(stopwatch.Elapsed)}");
             Console.WriteLine($"Average time per round: {(stopwatch.Elapsed.TotalMilliseconds / rounds):n9} ms");

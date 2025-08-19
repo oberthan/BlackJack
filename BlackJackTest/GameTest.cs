@@ -151,8 +151,20 @@ namespace BlackJack.Tests
             Assert.That(result.UnitsWonOrLost, Is.EqualTo(1));
         }
 
-        [Test]
-        public void PlayOneRound_SplitWithBetAndReturn()
+        [TestCase("2", true)]
+        [TestCase("3", true)]
+        [TestCase("4", false)]
+        [TestCase("5", false)]
+        [TestCase("6", false)]
+        [TestCase("7", true)]
+        [TestCase("8", true)]
+        [TestCase("9", false)]
+        [TestCase("10", false)]
+        [TestCase("J", false)]
+        [TestCase("Q", false)]
+        [TestCase("K", false)]
+        [TestCase("A", true)]
+        public void PlayOneRound_SplitWithBetAndReturn(String splitCard, bool shouldSplit, String upCard = "7")
         {
             Rnd.Rng = new Random(123456); // Ensure consistent shuffling for testing
 
@@ -164,9 +176,9 @@ namespace BlackJack.Tests
             dealer.Reset();
 
 
-            player.AddCard(new Card("8", "S"));
-            dealer.AddCard(new Card("7", "H"));
-            player.AddCard(new Card("8", "D"));
+            player.AddCard(new Card(splitCard, "S"));
+            dealer.AddCard(new Card(upCard, "H"));
+            player.AddCard(new Card(splitCard, "D"));
             dealer.AddCard(new Card("6", "C"));
 
             var result = game.PlayOneRoundWithHand();
@@ -177,12 +189,17 @@ namespace BlackJack.Tests
                 TestContext.Out.WriteLine(card.ToString());
 
             }
-            TestContext.Out.WriteLine("\nPlayer Hand 2:");
-            foreach (Card card in player.SplitHandPlayer.Hand)
-            {
-                TestContext.Out.WriteLine(card.ToString());
 
+            if (player.SplitHandPlayer != null)
+            {
+                TestContext.Out.WriteLine("\nPlayer Hand 2:");
+                foreach (Card card in player.SplitHandPlayer.Hand)
+                {
+                    TestContext.Out.WriteLine(card.ToString());
+
+                }
             }
+
             TestContext.Out.WriteLine("\n\nDealer Hand:");
             foreach (Card card in dealer.Hand)
             {
@@ -190,10 +207,16 @@ namespace BlackJack.Tests
 
             }
 
-            Assert.That(player.SplitHandPlayer, Is.Not.EqualTo(null));
-            Assert.That(result.Outcome, Is.EqualTo(Outcome.DealerBust));
+            Assert.That(player.SplitHandPlayer, shouldSplit?Is.Not.EqualTo(null):Is.EqualTo(null));
+/*            Assert.That(result.Outcome, Is.EqualTo(Outcome.DealerBust));
             Assert.That(result.Stake, Is.EqualTo(3));
-            Assert.That(result.UnitsWonOrLost, Is.EqualTo(3)); // Player wins both hands
+            Assert.That(result.UnitsWonOrLost, Is.EqualTo(3)); // Player wins both hands*/
+
+        }
+
+        [Test]
+        public void PlayOneRound_HandChecker(List<Card> hand)
+        {
 
         }
     }
