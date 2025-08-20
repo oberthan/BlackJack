@@ -1,0 +1,97 @@
+﻿using BlackJack;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BlackJackWpf.ViewModels
+{
+    public class SettingsViewModel
+    {
+        public bool DealerStandsOnSoft17
+        {
+            get => _dealerStandsOnSoft17;
+            set { _dealerStandsOnSoft17 = value; OnPropertyChanged(nameof(DealerStandsOnSoft17)); }
+        }
+        private bool _dealerStandsOnSoft17 = Rules.Instance.DealerStandsOnSoft17;
+
+        public double BlackjackPayout
+        {
+            get => _blackjackPayout;
+            set { _blackjackPayout = value; OnPropertyChanged(nameof(BlackjackPayout)); }
+        }
+        private double _blackjackPayout = Rules.Instance.BlackjackPayout;
+
+        public bool AllowResplit
+        {
+            get => _allowResplit;
+            set { _allowResplit = value; OnPropertyChanged(nameof(AllowResplit)); }
+        }
+        private bool _allowResplit = Rules.Instance.AllowResplit;
+
+        public bool DoubleOnAnyTwo
+        {
+            get => _doubleOnAnyTwo;
+            set { _doubleOnAnyTwo = value; OnPropertyChanged(nameof(DoubleOnAnyTwo)); }
+        }
+        private bool _doubleOnAnyTwo = Rules.Instance.DoubleOnAnyTwo;
+
+        public bool DoubleAfterSplit
+        {
+            get => _doubleAfterSplit;
+            set { _doubleAfterSplit = value; OnPropertyChanged(nameof(DoubleAfterSplit)); }
+        }
+        private bool _doubleAfterSplit = Rules.Instance.DoubleAfterSplit;
+
+        public bool DoubleAfterSplit11
+        {
+            get => _doubleAfterSplit11;
+            set { _doubleAfterSplit11 = value; OnPropertyChanged(nameof(DoubleAfterSplit11)); }
+        }
+        private bool _doubleAfterSplit11 = Rules.Instance.DoubleAfterSplit11;
+
+        public bool DoubleAfterSplitAces
+        {
+            get => _doubleAfterSplitAces;
+            set { _doubleAfterSplitAces = value; OnPropertyChanged(nameof(DoubleAfterSplitAces)); }
+        }
+        private bool _doubleAfterSplitAces = Rules.Instance.DoubleAfterSplitAces;
+
+        public int SixCardCharlieCount
+        {
+            get => _sixCardCharlieCount;
+            set { _sixCardCharlieCount = value; OnPropertyChanged(nameof(SixCardCharlieCount)); }
+        }
+        private int _sixCardCharlieCount = Rules.Instance.SixCardCharlieCount;
+
+        public long Rounds
+        {
+            get => _rounds;
+            set { _rounds = value; OnPropertyChanged(nameof(Rounds)); }
+        }
+        private long _rounds = 0;
+
+        public double Penetration
+        {
+            get => _penetration;
+            set { _penetration = value; OnPropertyChanged(nameof(Penetration)); }
+        }
+        private double _penetration = Rules.Instance.Penetration;
+
+        public bool DealerPeeksOnAce
+        {
+            get => _dealerPeeksOnAce;
+            set { _dealerPeeksOnAce = value; OnPropertyChanged(nameof(DealerPeeksOnAce)); }
+        }
+        private bool _dealerPeeksOnAce = Rules.Instance.DealerPeeksOnAce;
+
+        // Implement INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged(string propertyName) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    }
+}

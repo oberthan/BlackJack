@@ -53,7 +53,7 @@ public class Game
         if (pEval.IsBlackjack) player.DidBlackjack = true; // track for later
 
         // REQUIREMENT: Dealer peeks for blackjack when showing Ace
-        if (Rules.DealerPeeksOnAce && dealer.Hand[0].Value == "A")
+        if (Rules.Instance.DealerPeeksOnAce && dealer.Hand[0].Value == "A")
             if (dEval.IsBlackjack)
             {
                 if (pEval.IsBlackjack)
@@ -70,14 +70,11 @@ public class Game
                 return new RoundResult(Outcome.Push, 0, player.Bet, player.DidBlackjack, player.DidSplit,
                     player.DidDouble);
             // REQUIREMENT: Blackjack pays 3:2
-            var units = player.Bet * Rules.BlackjackPayout;
+            var units = player.Bet * Rules.Instance.BlackjackPayout;
             return new RoundResult(Outcome.PlayerBlackjack, units, player.Bet, player.DidBlackjack, player.DidSplit,
                 player.DidDouble);
         }
 
-        if (dEval.IsBlackjack)
-            return new RoundResult(Outcome.DealerBlackjack, -player.Bet, player.Bet, player.DidBlackjack, player.DidSplit,
-                player.DidDouble);
 
         // PLAYER TURN(s)
         var netUnits = 0;
@@ -98,6 +95,10 @@ public class Game
         }
 
         // DEALER TURN
+        if (dEval.IsBlackjack)
+            return new RoundResult(Outcome.DealerBlackjack, -player.Bet, player.Bet, player.DidBlackjack, player.DidSplit,
+                player.DidDouble);
+
         dealer.Play(deck);
 
         // Resolve outcomes for hands that need comparing
@@ -143,7 +144,7 @@ public class Game
         var dEval = HandEvaluator.Evaluate(dealer.Hand, false);
 
         // Six Card Charlie
-        if (handOwner.Hand.Count >= Rules.SixCardCharlieCount && pEval.Total <= 21)
+        if (handOwner.Hand.Count >= Rules.Instance.SixCardCharlieCount && pEval.Total <= 21)
             return 1000; // special code for Charlie
 
         if (pEval.Total > 21) return -1000; // bust
@@ -175,7 +176,7 @@ public class Game
         {
             var eval = HandEvaluator.Evaluate(dealer.Hand, false);
             if (eval.Total < 17) dealer.AddCard(deck.DrawCard());
-            else if (eval.Total == 17 && !Rules.DealerStandsOnSoft17 && eval.IsSoft) dealer.AddCard(deck.DrawCard());
+            else if (eval.Total == 17 && !Rules.Instance.DealerStandsOnSoft17 && eval.IsSoft) dealer.AddCard(deck.DrawCard());
             else break; // REQUIREMENT: dealer stands on ALL 17s (including soft)
         }
     }
@@ -190,11 +191,11 @@ public class Game
             var eval = HandEvaluator.Evaluate(handOwner.Hand, false);
 
             // Six Card Charlie
-            if (handOwner.Hand.Count >= Rules.SixCardCharlieCount && eval.Total <= 21)
+            if (handOwner.Hand.Count >= Rules.Instance.SixCardCharlieCount && eval.Total <= 21)
                 return 0;
 
             // Get strategy action
-            var action = Strategy.Decide(handOwner, dealer.Hand[0], afterSplit);
+            var action = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
 
             switch (action)
             {
@@ -241,7 +242,7 @@ public class Game
             !isSplitHand); // 2-card 21 after split is NOT blackjack
 
         // Charlie win first
-        if (handOwner.Hand.Count >= Rules.SixCardCharlieCount && pEval.Total <= 21)
+        if (handOwner.Hand.Count >= Rules.Instance.SixCardCharlieCount && pEval.Total <= 21)
             return +handOwner.Bet; // REQUIREMENT: wins over everything
 
         var dEval = HandEvaluator.Evaluate(dealer.Hand, false);

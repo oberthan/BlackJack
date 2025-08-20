@@ -1,4 +1,6 @@
-﻿namespace BlackJack;
+﻿using System.ComponentModel;
+
+namespace BlackJack;
 
 public enum Move
 {
@@ -8,9 +10,47 @@ public enum Move
     Split
 }
 
-public static class Strategy
+public  class Strategy
 {
-    public static Move Decide(Player player, Card dealerUp, bool afterSplit)
+    public static Strategy Instance { get; set; } = new Strategy();
+    public List<PairStrategyRow> PairStrategy { get; set; } = new();
+    public List<SoftStrategyRow> SoftStrategy { get; set; } = new();
+    public List<HardStrategyRow> HardStrategy { get; set; } = new();
+    public Move Decide(Player player, Card dealerUp, bool afterSplit)
+    {
+        var eval = HandEvaluator.Evaluate(player.Hand, false);
+        var total = eval.Total;
+        var isSoft = eval.IsSoft;
+        var cards = player.Hand;
+
+        // --- Pair Splitting ---
+        if (!afterSplit && cards.Count == 2 && cards[0].PipValue == cards[1].PipValue)
+        {
+            var pair = $"{cards[0].PipValue},{cards[1].PipValue}";
+            var row = PairStrategy.FirstOrDefault(r => r.Pair == pair);
+            if (row != null)
+                return ParseMove(LookupAction(row, dealerUp.PipValue));
+        }
+
+        // --- Soft Totals ---
+        if (isSoft)
+        {
+            var row = SoftStrategy.FirstOrDefault(r => r.Total == total);
+            if (row != null)
+                return ParseMove(LookupAction(row, dealerUp.PipValue));
+        }
+
+        // --- Hard Totals ---
+        if (!isSoft)
+        {
+            var row = HardStrategy.FirstOrDefault(r => r.Total == total);
+            if (row != null)
+                return ParseMove(LookupAction(row, dealerUp.PipValue));
+        }
+
+        return Move.Hit;
+    }
+    public static Move DecideOld(Player player, Card dealerUp, bool afterSplit)
     {
         var eval = HandEvaluator.Evaluate(player.Hand, false);
         var total = eval.Total;
@@ -70,4 +110,28 @@ public static class Strategy
 
         return Move.Stand; // fallback
     }
+    private static string LookupAction(dynamic row, int up) =>
+        up switch
+        {
+            2 => row.Vs2,
+            3 => row.Vs3,
+            4 => row.Vs4,
+            5 => row.Vs5,
+            6 => row.Vs6,
+            7 => row.Vs7,
+            8 => row.Vs8,
+            9 => row.Vs9,
+            10 => row.Vs10,
+            11 => row.VsA,
+            _ => "H"
+        };
+
+    private static Move ParseMove(string action) => action switch
+    {
+        "H" => Move.Hit,
+        "S" => Move.Stand,
+        "D" => Move.Double,
+        "P" => Move.Split,
+        _ => Move.Hit
+    };
 }

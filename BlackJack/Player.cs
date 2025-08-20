@@ -37,7 +37,7 @@ public class Player
     public bool CanSplit()
     {
         if (Hand.Count != 2 || SplitHandPlayer != null) return false;
-        return Rules.CanSplitPair(Hand[0], Hand[1]);
+        return Rules.Instance.CanSplitPair(Hand[0], Hand[1]);
     }
 
     public void Split(Deck deck)
@@ -65,10 +65,10 @@ public class Player
     public bool CanDouble(bool afterSplit, bool thisHandIsSplitAces)
     {
         if (Hand.Count != 2) return false;
-        if (!Rules.DoubleOnAnyTwo) return false;
-        if (afterSplit && !Rules.DoubleAfterSplit) return false;
-        if (afterSplit && !Rules.DoubleAfterSplit11 && GetHandValue() == 11) return false;
-        if (afterSplit && thisHandIsSplitAces && !Rules.DoubleAfterSplitAces) return false;
+        if (!Rules.Instance.DoubleOnAnyTwo) return false;
+        if (afterSplit && !Rules.Instance.DoubleAfterSplit) return false;
+        if (afterSplit && !Rules.Instance.DoubleAfterSplit11 && GetHandValue() == 11) return false;
+        if (afterSplit && thisHandIsSplitAces && !Rules.Instance.DoubleAfterSplitAces) return false;
         return true;
     }
 

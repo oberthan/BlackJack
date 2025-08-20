@@ -54,7 +54,7 @@ namespace BlackJack.Tests
             var result = game.PlayOneRoundWithHand();
 
             Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerBlackjack));
-            Assert.That(result.UnitsWonOrLost, Is.EqualTo(1 * Rules.BlackjackPayout));
+            Assert.That(result.UnitsWonOrLost, Is.EqualTo(1 * Rules.Instance.BlackjackPayout));
             Assert.That(result.Blackjack, Is.True);
         }
 

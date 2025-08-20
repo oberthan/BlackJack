@@ -1,38 +1,41 @@
 ﻿namespace BlackJack;
 
-public static class Rules
+public class Rules
 {
+    public static Rules Instance { get; set; } = new Rules();
     // REQUIREMENT: Dealer stands on ALL 17s (including soft 17)
-    public const bool DealerStandsOnSoft17 = true;
+    public bool DealerStandsOnSoft17 { get; set; } = true;
 
     // REQUIREMENT: Blackjack pays 3:2
-    public const double BlackjackPayout = 1.5;
+    public double BlackjackPayout { get; set; } = 1.5;
+
+    public double Penetration { get; set; } = 0.7; // 70% penetration
 
     // REQUIREMENT: No resplit allowed
-    public const bool AllowResplit = false;
+    public bool AllowResplit { get; set; } = false;
 
     // REQUIREMENT: Double allowed on any first two cards
-    public const bool DoubleOnAnyTwo = true;
+    public bool DoubleOnAnyTwo { get; set; } = true;
 
     // REQUIREMENT: Double after split allowed except on split Aces
-    public const bool DoubleAfterSplit = true;
-    public const bool DoubleAfterSplit11 = false; // 11 = total,
-    public const bool DoubleAfterSplitAces = false;
+    public bool DoubleAfterSplit { get; set; } = true;
+    public bool DoubleAfterSplit11 { get; set; } = false; // 11 = total,
+    public bool DoubleAfterSplitAces { get; set; } = false;
 
     // REQUIREMENT: Six Card Charlie – player wins if reaches 6 cards <= 21
-    public const int SixCardCharlieCount = 6;
+    public int SixCardCharlieCount { get; set; } = 6;
 
     // Dealer peek rule: dealer checks for blackjack when showing Ace
-    public const bool DealerPeeksOnAce = true;
+    public bool DealerPeeksOnAce { get; set; } = true;
 
     // REQUIREMENT: Split only on first two cards of equal value
-    public static bool CanSplitPair(Card a, Card b)
+    public bool CanSplitPair(Card a, Card b)
     {
         return CardValueForSplit(a) == CardValueForSplit(b);
     }
 
     // Face cards are same value (J/Q/K = 10) for “same value” comparisons
-    private static int CardValueForSplit(Card c)
+    private int CardValueForSplit(Card c)
     {
         return c.Value switch
         {

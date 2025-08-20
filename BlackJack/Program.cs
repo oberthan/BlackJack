@@ -2,14 +2,23 @@
 
 namespace BlackJack;
 
-internal class Program
+public class Program
 {
     private static void Main()
     {
         var game = new Game();
-        var rounds = 10000000;
+        long rounds = 100000000;
+        Console.Write($"Enter the number of simulations to run or leave blank to run {rounds} simulations: ");
+        var input = Console.ReadLine();
+        if (input != "")
+        {
+            rounds = long.Parse(input);
+        }
+        Console.Clear();
 
-        int wins = 0, losses = 0, pushes = 0;
+        Console.WriteLine($"Running {rounds:n0} rounds of Blackjack simulation on {Environment.ProcessorCount} threads...\n");
+
+        long wins = 0, losses = 0, pushes = 0;
         double units = 0;
         long blackjacks = 0;
         long splits = 0;
@@ -37,7 +46,8 @@ internal class Program
                 simulators[taskIndex].RunSimulation();
             });
         }
-
+        long previousRounds = 0;
+        var previousTime = stopwatch.Elapsed;
         while (!tasks.All(x => x.IsCompleted))
         {
             var sum = BlackjackSimulator.Sum(simulators);
@@ -50,7 +60,11 @@ internal class Program
             doubles = sum.doubles;
             stake = sum.stake;
 
-            DisplayInformation(sum.i);
+
+
+            DisplayInformation(sum.i, previousRounds);
+            previousRounds = sum.i;
+            previousTime = stopwatch.Elapsed;
 
             var progress = 30 * (float)sum.i / rounds;
             Console.WriteLine($"\n[{new string('#', (int)progress)}{new string('-', (int)(30 - progress))}] {100f * sum.i / rounds:F1}%");
@@ -60,12 +74,13 @@ internal class Program
         Task.WaitAll(tasks);
         stopwatch.Stop();
 
-        DisplayInformation(rounds);
+        previousTime = new TimeSpan(0);
+        DisplayInformation(rounds, 0);
 
-        void DisplayInformation(int rounds)
+        void DisplayInformation(long rounds, long previous = 0)
         {
             //Console.Clear();
-            Console.SetCursorPosition(0, 0);
+            Console.SetCursorPosition(0, 1);
             Console.WriteLine("|---- Blackjack Simulation Results ----|");
             Console.WriteLine($"Rounds: {rounds:n0}");
             Console.WriteLine($"Player wins: {wins:n0}, Dealer wins: {losses:n0}, Pushes: {pushes:n0}");
@@ -79,22 +94,22 @@ internal class Program
             Console.WriteLine("\n|-------- Technical Statistics --------|");
             Console.WriteLine($"Elapsed time: {(stopwatch.Elapsed)}");
             Console.WriteLine($"Average time per round: {(stopwatch.Elapsed.TotalMilliseconds / rounds):n9} ms");
-            Console.WriteLine($"Rounds per sec: {(rounds / stopwatch.Elapsed.TotalSeconds):n1} / Second");
+            Console.WriteLine($"Rounds per sec: {((rounds-previous) / (stopwatch.Elapsed.TotalSeconds-previousTime.TotalSeconds)):n1} / Second");
         }
     }
 
     public class BlackjackSimulator
     {
-        public int Rounds { get; set; } = 10000000;
+        public long Rounds { get; set; } = 10000000;
         public Game Game { get; } = new();
 
-        public int wins = 0, losses = 0, pushes = 0;
+        public long wins = 0, losses = 0, pushes = 0;
         public double units = 0;
         public long blackjacks = 0;
         public long splits = 0;
         public long doubles = 0;
         public long stake = 0;
-        public int i;
+        public long i;
 
         public static BlackjackSimulator Sum(IEnumerable<BlackjackSimulator> simulators)
         {
