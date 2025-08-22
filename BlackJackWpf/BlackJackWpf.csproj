@@ -12,4 +12,8 @@
     <ProjectReference Include="..\BlackJack\BlackJack.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="PublishFiles\" />
+  </ItemGroup>
+
 </Project>
