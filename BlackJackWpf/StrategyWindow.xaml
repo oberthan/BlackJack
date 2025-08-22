@@ -1,4 +1,4 @@
-﻿    <Window x:Class="BlackJackWpf.StrategyWindow"
+﻿<Window x:Class="BlackJackWpf.StrategyWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,66 +6,31 @@
         xmlns:local="clr-namespace:BlackJackWpf"
         mc:Ignorable="d"
         Title="StrategyWindow" Height="450" Width="800">
+
     <StackPanel Margin="20">
         <TabControl>
             <TabItem Header="Pairs">
-                <DataGrid ItemsSource="{Binding PairStrategy}" AutoGenerateColumns="False" >
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Pair" Binding="{Binding Pair}" Width="50"/>
-                        <DataGridTextColumn Header="Vs2" Binding="{Binding Vs2}" Width="50"/>
-                        <DataGridTextColumn Header="Vs3" Binding="{Binding Vs3}" Width="50"/>
-                        <DataGridTextColumn Header="Vs4" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs5" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs6" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs7" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs8" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs9" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs10" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="VsA" Binding="{Binding Vs4}" Width="50"/>
-                        
-                    </DataGrid.Columns>
-                </DataGrid>
+                <DataGrid x:Name="PairGrid" 
+                          ItemsSource="{Binding PairStrategy}" 
+                          AutoGenerateColumns="True" 
+                          AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"/>
             </TabItem>
 
             <TabItem Header="Soft Totals">
-                <DataGrid ItemsSource="{Binding SoftStrategy}" AutoGenerateColumns="False" >
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Total" Binding="{Binding Total}" Width="50"/>
-                        <DataGridTextColumn Header="Vs2" Binding="{Binding Vs2}" Width="50"/>
-                        <DataGridTextColumn Header="Vs3" Binding="{Binding Vs3}" Width="50"/>
-                        <DataGridTextColumn Header="Vs4" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs5" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs6" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs7" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs8" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs9" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs10" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="VsA" Binding="{Binding Vs4}" Width="50"/>
-
-                    </DataGrid.Columns>
-                </DataGrid>
+                <DataGrid x:Name="SoftGrid" 
+                          ItemsSource="{Binding SoftStrategy}" 
+                          AutoGenerateColumns="True" 
+                          AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"/>
             </TabItem>
 
             <TabItem Header="Hard Totals">
-                <DataGrid ItemsSource="{Binding HardStrategy}" AutoGenerateColumns="False" >
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Total" Binding="{Binding Total}" Width="50"/>
-                        <DataGridTextColumn Header="Vs2" Binding="{Binding Vs2}" Width="50"/>
-                        <DataGridTextColumn Header="Vs3" Binding="{Binding Vs3}" Width="50"/>
-                        <DataGridTextColumn Header="Vs4" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs5" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs6" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs7" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs8" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs9" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="Vs10" Binding="{Binding Vs4}" Width="50"/>
-                        <DataGridTextColumn Header="VsA" Binding="{Binding Vs4}" Width="50"/>
-
-                    </DataGrid.Columns>
-                </DataGrid>
+                <DataGrid x:Name="HardGrid" 
+                          ItemsSource="{Binding HardStrategy}" 
+                          AutoGenerateColumns="True" 
+                          AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"/>
             </TabItem>
         </TabControl>
-        <!-- Add DataGrids for Soft and Hard hands similarly -->
+
         <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
             <Button Margin="3" IsDefault="True" Click="Button_Click">Ok</Button>
             <Button Margin="3" IsCancel="True">Cancel</Button>

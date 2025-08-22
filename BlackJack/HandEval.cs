@@ -39,7 +39,7 @@ public static class HandEvaluator
             aces--;
         }
 
-        var isSoft = aces > 0 && total <= 21;
+        var isSoft = aces > 0 && total <= 20;
         var isBJ = treatTwoCard21AsBlackjack && hand.Count == 2 && total == 21;
 
         return new HandEval(total, isSoft, isBJ);

@@ -183,11 +183,12 @@ public class Game
 
     private int PlaySingleHand(Player handOwner, bool afterSplit, bool isSplitAces)
     {
-        if (isSplitAces)
-            return 0; // only one card dealt, no further play
+       
 
         while (true)
         {
+            if (isSplitAces)
+                return 0; // only one card dealt, no further play
             var eval = HandEvaluator.Evaluate(handOwner.Hand, false);
 
             // Six Card Charlie
@@ -195,7 +196,13 @@ public class Game
                 return 0;
 
             // Get strategy action
-            var action = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
+            var action = Strategy.Instance.Decide(handOwner, dealer.Hand[0], afterSplit);
+            /*var oldAction = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
+            if (action != oldAction)
+            {
+                throw new InvalidOperationException(
+                    $"Strategy mismatch: {action} vs {oldAction} for hand {handOwner.Hand[0]} and dealer upcard {dealer.Hand[0]}");
+            }*/
 
             switch (action)
             {

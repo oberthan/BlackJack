@@ -6,7 +6,7 @@ using System.Reflection;
 namespace BlackJack.Tests
 {
     [TestFixture]
-    public class GameTests
+    public class GameTest
     {
         List<bool> BoolArray_from_String(string fromString)
         {
@@ -287,7 +287,7 @@ namespace BlackJack.Tests
                     player.AddCard(new Card("A", "S"));
                     player.AddCard(new Card(playerValue, "D"));
                     var dealerUp = new Card(dealerValue, "H");
-                    var move = Strategy.Decide(player, dealerUp, false);
+                    var move = Strategy.Instance.Decide(player, dealerUp, false);
                     
                     Assert.That(move, Is.EqualTo(parsedMoves[i][k]));
                 }
@@ -341,7 +341,7 @@ namespace BlackJack.Tests
                             player.AddCard(new Card(playerValueOne, "S"));
                             player.AddCard(new Card(playerValueTwo, "D"));
                             var dealerUp = new Card(dealerValue, "H");
-                            var move = Strategy.Decide(player, dealerUp, false);
+                            var move = Strategy.Instance.Decide(player, dealerUp, false);
 
                             Assert.That(move, Is.EqualTo(parsedMoves[evaluation.Total-8][k]));
                         }
