@@ -9,11 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BlackJack\BlackJack.csproj" />
+    <Compile Remove="PublishFiles\**" />
+    <EmbeddedResource Remove="PublishFiles\**" />
+    <None Remove="PublishFiles\**" />
+    <Page Remove="PublishFiles\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="PublishFiles\" />
+    <ProjectReference Include="..\BlackJack\BlackJack.csproj" />
   </ItemGroup>
 
 </Project>

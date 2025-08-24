@@ -42,24 +42,28 @@
         <TextBlock Text="Blackjack Payout:" Grid.Row="4" Grid.Column="0" Margin="0,0,0,5" VerticalAlignment="Center"/>
         <TextBox Text="{Binding BlackjackPayout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="4" Grid.Column="1" Width="100" Margin="0,0,0,10"/>
 
+        <CheckBox Content="Allow Split"
+                  IsChecked="{Binding AllowSplit, Mode=TwoWay}" Grid.Row="5" Grid.Column="0" Margin="0,0,0,10"/>
         <CheckBox Content="Allow Resplit"
-                  IsChecked="{Binding AllowResplit, Mode=TwoWay}" Grid.Row="5" Grid.Column="0" Margin="0,0,0,10"/>
+                  IsChecked="{Binding AllowResplit, Mode=TwoWay}" Grid.Row="6" Grid.Column="0" Margin="0,0,0,10"/>
+        <CheckBox Content="Allow Double"
+                  IsChecked="{Binding AllowDouble, Mode=TwoWay}" Grid.Row="7" Grid.Column="0" Margin="0,0,0,10"/>
         <CheckBox Content="Double On Any Two"
-                  IsChecked="{Binding DoubleOnAnyTwo, Mode=TwoWay}" Grid.Row="6" Grid.Column="0" Margin="0,0,0,10"/>
+                  IsChecked="{Binding DoubleOnAnyTwo, Mode=TwoWay}" Grid.Row="8" Grid.Column="0" Margin="0,0,0,10"/>
         <CheckBox Content="Double After Split"
-                  IsChecked="{Binding DoubleAfterSplit, Mode=TwoWay}" Grid.Row="7" Grid.Column="0" Margin="0,0,0,10"/>
+                  IsChecked="{Binding DoubleAfterSplit, Mode=TwoWay}" Grid.Row="9" Grid.Column="0" Margin="0,0,0,10"/>
         <CheckBox Content="Double After Split 11"
-                  IsChecked="{Binding DoubleAfterSplit11, Mode=TwoWay}" Grid.Row="8" Grid.Column="0" Margin="0,0,0,10"/>
+                  IsChecked="{Binding DoubleAfterSplit11, Mode=TwoWay}" Grid.Row="10" Grid.Column="0" Margin="0,0,0,10"/>
         <CheckBox Content="Double After Split Aces"
-                  IsChecked="{Binding DoubleAfterSplitAces, Mode=TwoWay}" Grid.Row="9" Grid.Column="0" Margin="0,0,0,10"/>
+                  IsChecked="{Binding DoubleAfterSplitAces, Mode=TwoWay}" Grid.Row="11" Grid.Column="0" Margin="0,0,0,10"/>
 
-        <TextBlock Text="Six Card Charlie Count:" Grid.Row="10" Grid.Column="0" Margin="0,0,0,5" VerticalAlignment="Center"/>
-        <TextBox Text="{Binding SixCardCharlieCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="10" Grid.Column="1" Width="100" Margin="0,0,0,10"/>
+        <TextBlock Text="Six Card Charlie Count:" Grid.Row="12" Grid.Column="0" Margin="0,0,0,5" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding SixCardCharlieCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="12" Grid.Column="1" Width="100" Margin="0,0,0,10"/>
 
         <CheckBox Content="Dealer Peeks On Ace"
-                  IsChecked="{Binding DealerPeeksOnAce, Mode=TwoWay}" Grid.Row="11" Grid.Column="0" Margin="0,0,0,10"/>
+                  IsChecked="{Binding DealerPeeksOnAce, Mode=TwoWay}" Grid.Row="13" Grid.Column="0" Margin="0,0,0,10"/>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left">
+        <StackPanel Orientation="Horizontal" Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left">
             <Button Margin="3" IsDefault="True" Click="Button_Click">Ok</Button>
             <Button Margin="3" IsCancel="True">Cancel</Button>
         </StackPanel>
