@@ -1,9 +1,9 @@
 using NUnit.Framework;
-using BlackJack;
+using Blackjack;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace BlackJack.Tests
+namespace Blackjack.Tests
 {
     [TestFixture]
     public class GameTest

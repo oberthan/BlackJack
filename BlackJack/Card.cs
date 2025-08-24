@@ -1,4 +1,4 @@
-﻿namespace BlackJack;
+﻿namespace Blackjack;
 
 public class Card
 {

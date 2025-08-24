@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using NUnit.Framework;
 
-namespace BlackJackTest;
+namespace BlackjackTest;
 
 [TestFixture]
 public class DeckTest
@@ -10,13 +10,13 @@ public class DeckTest
     public void Setup()
     {
         // Reset the random number generator to ensure consistent shuffling
-        BlackJack.Rnd.Rng = new Random(12345);
+        Blackjack.Rnd.Rng = new Random(12345);
     }
 
     [Test]
     public void DeckContainsEightSetOfCards()
     {
-        var deck = new BlackJack.Deck();
+        var deck = new Blackjack.Deck();
         Assert.That(deck.Cards.Count, Is.EqualTo(8 * 52));
     }
 }

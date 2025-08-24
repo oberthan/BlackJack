@@ -1,4 +1,4 @@
-﻿namespace BlackJack;
+﻿namespace Blackjack;
 
 internal class Statistics
 {
@@ -13,13 +13,13 @@ internal class Statistics
     public double AverageBet => TotalRounds == 0 ? 0 : (double)TotalStake / TotalRounds;
     public double ROI => TotalStake == 0 ? 0 : (double)TotalReturn / TotalStake;
 
-    public void RecordRound(int stake, int result, bool blackjack, bool split, bool doubled)
+    public void RecordRound(int stake, int result, bool Blackjack, bool split, bool doubled)
     {
         TotalRounds++;
         TotalStake += stake;
         TotalReturn += result;
 
-        if (blackjack) NumBlackjacks++;
+        if (Blackjack) NumBlackjacks++;
         if (split) NumSplits++;
         if (doubled) NumDoubles++;
     }

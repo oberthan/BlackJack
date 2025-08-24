@@ -11,9 +11,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using BlackJackWpf.ViewModels;
+using BlackjackWpf.ViewModels;
 
-namespace BlackJackWpf
+namespace BlackjackWpf
 {
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml

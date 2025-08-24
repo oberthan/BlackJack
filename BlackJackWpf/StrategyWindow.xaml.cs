@@ -1,4 +1,4 @@
-﻿using BlackJackWpf.ViewModels;
+﻿using BlackjackWpf.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace BlackJackWpf
+namespace BlackjackWpf
 {
     /// <summary>
     /// Interaction logic for StrategyWindow.xaml

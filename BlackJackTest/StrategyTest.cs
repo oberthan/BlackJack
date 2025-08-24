@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlackJack.Tests
+namespace Blackjack.Tests
 {
     [TestFixture]
     public class StrategyTest

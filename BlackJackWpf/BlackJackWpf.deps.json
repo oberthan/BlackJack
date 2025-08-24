@@ -6,12 +6,12 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v9.0": {
-      "BlackJackWpf/1.0.0": {
+      "BlackjackWpf/1.0.0": {
         "dependencies": {
-          "BlackJack": "1.0.0"
+          "Blackjack": "1.0.0"
         },
         "runtime": {
-          "BlackJackWpf.dll": {}
+          "BlackjackWpf.dll": {}
         }
       },
       "NUnit/4.4.0": {
@@ -26,12 +26,12 @@
           }
         }
       },
-      "BlackJack/1.0.0": {
+      "Blackjack/1.0.0": {
         "dependencies": {
           "NUnit": "4.4.0"
         },
         "runtime": {
-          "BlackJack.dll": {
+          "Blackjack.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
@@ -40,7 +40,7 @@
     }
   },
   "libraries": {
-    "BlackJackWpf/1.0.0": {
+    "BlackjackWpf/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -52,7 +52,7 @@
       "path": "nunit/4.4.0",
       "hashPath": "nunit.4.4.0.nupkg.sha512"
     },
-    "BlackJack/1.0.0": {
+    "Blackjack/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

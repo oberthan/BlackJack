@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace BlackJack;
+namespace Blackjack;
 
 public class Program
 {
@@ -21,7 +21,7 @@ public class Program
         long wins = 0, losses = 0, pushes = 0;
         double units = 0;
         double unitsSquared = 0;
-        long blackjacks = 0;
+        long Blackjacks = 0;
         long splits = 0;
         long doubles = 0;
         long stake = 0;
@@ -57,7 +57,7 @@ public class Program
             pushes = sum.pushes;
             units = sum.units;
             unitsSquared = sum.unitsSquared; // Added
-            blackjacks = sum.blackjacks;
+            Blackjacks = sum.Blackjacks;
             splits = sum.splits;
             doubles = sum.doubles;
             stake = sum.stake;
@@ -90,7 +90,7 @@ public class Program
             Console.WriteLine($"Total return: {(units + stake):n0}");
             Console.WriteLine($"Net units: {units:n0}");
             Console.WriteLine($"Average Bet: {(stake / (float)rounds):n5}");
-            Console.WriteLine($"Blackjacks: {blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
+            Console.WriteLine($"Blackjacks: {Blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
             Console.WriteLine($"RTP: {((units + stake) / (float)stake):n9}");
             Console.WriteLine($"Net units per round + 1: {((units) / (float)rounds)+1:n9}");
             Console.WriteLine("\n|-------- Technical Statistics --------|");
@@ -109,7 +109,7 @@ public class Program
         public long wins = 0, losses = 0, pushes = 0;
         public double units = 0;
         public double unitsSquared = 0;
-        public long blackjacks = 0;
+        public long Blackjacks = 0;
         public long splits = 0;
         public long doubles = 0;
         public long stake = 0;
@@ -126,7 +126,7 @@ public class Program
                 result.pushes += sim.pushes;
                 result.units += sim.units;
                 result.unitsSquared += sim.unitsSquared;
-                result.blackjacks += sim.blackjacks;
+                result.Blackjacks += sim.Blackjacks;
                 result.splits += sim.splits;
                 result.doubles += sim.doubles;
                 result.stake += sim.stake;
@@ -144,7 +144,7 @@ public class Program
                 unitsSquared += res.UnitsWonOrLost * res.UnitsWonOrLost; // <-- Add this line
 
                 stake += res.Stake;
-                if (res.Blackjack) blackjacks++;
+                if (res.Blackjack) Blackjacks++;
                 if (res.Split) splits++;
                 if (res.Double) doubles++;
 

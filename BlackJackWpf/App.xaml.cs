@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace BlackJackWpf
+namespace BlackjackWpf
 {
     /// <summary>
     /// Interaction logic for App.xaml

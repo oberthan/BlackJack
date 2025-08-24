@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace BlackJack;
+namespace Blackjack;
 
 public enum Move
 {

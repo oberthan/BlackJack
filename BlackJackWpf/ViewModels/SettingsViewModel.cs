@@ -1,4 +1,4 @@
-﻿using BlackJack;
+﻿using Blackjack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlackJackWpf.ViewModels
+namespace BlackjackWpf.ViewModels
 {
     public class SettingsViewModel
     {
@@ -20,10 +20,10 @@ namespace BlackJackWpf.ViewModels
 
         public double BlackjackPayout
         {
-            get => _blackjackPayout;
-            set { _blackjackPayout = value; OnPropertyChanged(nameof(BlackjackPayout)); }
+            get => _BlackjackPayout;
+            set { _BlackjackPayout = value; OnPropertyChanged(nameof(BlackjackPayout)); }
         }
-        private double _blackjackPayout = Rules.Instance.BlackjackPayout;
+        private double _BlackjackPayout = Rules.Instance.BlackjackPayout;
 
         public bool AllowResplit
         {

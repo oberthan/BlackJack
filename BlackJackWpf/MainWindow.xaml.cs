@@ -1,5 +1,5 @@
-﻿using BlackJack; // Reference your core library
-using BlackJackWpf.ViewModels;
+﻿using Blackjack; // Reference your core library
+using BlackjackWpf.ViewModels;
 using System;
 using System.Diagnostics;
 using System.Text;
@@ -13,9 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using static BlackJack.Program;
+using static Blackjack.Program;
+using static System.Net.WebRequestMethods;
 
-namespace BlackJackWpf
+namespace BlackjackWpf
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -51,11 +52,13 @@ namespace BlackJackWpf
 
             long wins = 0, losses = 0, pushes = 0;
             double units = 0;
-            long blackjacks = 0;
+            long Blackjacks = 0;
             long splits = 0;
             long doubles = 0;
             long stake = 0;
             double unitsSquared = 0; // <-- Add this variable to store units squared
+
+            List<double> rtpHistory = new();
 
             var nTasks = Environment.ProcessorCount;
 
@@ -76,6 +79,7 @@ namespace BlackJackWpf
                 tasks[i] = Task.Run(() => { simulators[taskIndex].RunSimulation(); });
             }
 
+            double previousUnits = 0;
             long previousRounds = 0;
             var previousTime = stopwatch.Elapsed;
             while (!tasks.All(x => x.IsCompleted))
@@ -86,14 +90,17 @@ namespace BlackJackWpf
                 losses = sum.losses;
                 pushes = sum.pushes;
                 units = sum.units;
-                blackjacks = sum.blackjacks;
+                Blackjacks = sum.Blackjacks;
                 splits = sum.splits;
                 doubles = sum.doubles;
                 stake = sum.stake;
                 unitsSquared = sum.unitsSquared; // <-- Add this line
 
+                rtpHistory.Add((units - previousUnits) / (float)(sum.i - previousRounds) + 1);
+
                 UpdateResults(sum.i, previousRounds);
                 previousRounds = sum.i;
+                previousUnits = units;
                 previousTime = stopwatch.Elapsed;
 
                 var progress = 30 * (float)sum.i / rounds;
@@ -128,11 +135,12 @@ namespace BlackJackWpf
                 str.AppendLine($"Total return: {(units + stake):n0}");
                 str.AppendLine($"Net units: {units:n0}");
                 str.AppendLine($"Average Bet: {(stake / (float)simulatedRounds):n5}");
-                str.AppendLine($"Blackjacks: {blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
+                str.AppendLine($"Blackjacks: {Blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
                 str.AppendLine($"RTP: {((units + stake) / (float)stake):n9}");
                 //str.AppendLine($"Indledende RTP: {((units+stake) / (float)simulatedRounds):n9}");
                 str.AppendLine($"Net units per round + 1: {((units) / (float)simulatedRounds) + 1:n9}");
                 str.AppendLine($"Confidence 99.9%: ±{conf999:n9} [{((units) / (float)simulatedRounds) + 1 + conf999:n6}, {((units) / (float)simulatedRounds) + 1 - conf999:n6}]");
+                //str.AppendLine(PredictRTP(simulatedRounds));
                 str.AppendLine("\n|-------- Technical Statistics --------|");
                 str.AppendLine($"Elapsed time: {(stopwatch.Elapsed)}");
                 str.AppendLine(
@@ -141,6 +149,21 @@ namespace BlackJackWpf
                     $"Rounds per sec: {((simulatedRounds - previous) / (stopwatch.Elapsed.TotalSeconds - previousTime.TotalSeconds)):n1} / Second");
                 UpdateProgress((float)simulatedRounds / rounds);
                 ResultsText.Text = str.ToString();
+            }
+            string PredictRTP(long simulatedRounds)
+            {
+                if (rtpHistory.Count < 2) return "";
+
+                //double mean = rtpHistory.Average();
+                double mean = (units) / (float)simulatedRounds +1;
+                double stddev = Math.Sqrt(rtpHistory.Select(x => Math.Pow(x - mean, 2)).Average());
+                double stdError = stddev / Math.Sqrt(rtpHistory.Count);
+
+                // For prediction, assume error decreases with more rounds
+                double predictedRTP = mean;
+                double predictedError = stdError / Math.Sqrt(10); // 10x rounds
+
+                return $"\nPredicted RTP for {rounds * 10:n0} rounds: {predictedRTP:n9} ± {predictedError:n9}";
             }
         }
 

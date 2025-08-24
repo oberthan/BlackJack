@@ -1,4 +1,4 @@
-﻿namespace BlackJack;
+﻿namespace Blackjack;
 
 public readonly struct HandEval
 {

@@ -1,4 +1,4 @@
-﻿namespace BlackJack;
+﻿namespace Blackjack;
 
 public class Rules
 {
@@ -29,7 +29,7 @@ public class Rules
     // REQUIREMENT: Six Card Charlie – player wins if reaches 6 cards <= 21
     public int SixCardCharlieCount { get; set; } = 6;
 
-    // Dealer peek rule: dealer checks for blackjack when showing Ace
+    // Dealer peek rule: dealer checks for Blackjack when showing Ace
     public bool DealerPeeksOnAce { get; set; } = true;
 
     // REQUIREMENT: Split only on first two cards of equal value

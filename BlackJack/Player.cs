@@ -1,4 +1,4 @@
-﻿namespace BlackJack;
+﻿namespace Blackjack;
 
 public class Player
 {
@@ -56,7 +56,7 @@ public class Player
         AddCard(deck.DrawCard());
         SplitHandPlayer.AddCard(deck.DrawCard());
 
-        // REQUIREMENT: Split Aces cannot be hit further (and usually not blackjack-qualified later)
+        // REQUIREMENT: Split Aces cannot be hit further (and usually not Blackjack-qualified later)
         // We don't enforce here — Game will enforce “no hits after split A” when playing.
     }
 

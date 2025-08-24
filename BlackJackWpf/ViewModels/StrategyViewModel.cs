@@ -5,9 +5,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BlackJack;
+using Blackjack;
 
-namespace BlackJackWpf.ViewModels
+namespace BlackjackWpf.ViewModels
 {
     public class StrategyViewModel : INotifyPropertyChanged
     {
