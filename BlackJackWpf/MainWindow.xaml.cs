@@ -118,6 +118,7 @@ namespace BlackJackWpf
                 double variance = (unitsSquared / simulatedRounds) - (xbar * xbar);
                 double stddev = Math.Sqrt(variance);
                 double stdError = stddev / Math.Sqrt(simulatedRounds);
+                double conf95 = 1.96 * stdError;
                 double conf999 = 3.291 * stdError;
 
                 var str = new StringBuilder();
@@ -132,6 +133,7 @@ namespace BlackJackWpf
                 str.AppendLine($"RTP: {((units + stake) / (float)stake):n9}");
                 //str.AppendLine($"Indledende RTP: {((units+stake) / (float)simulatedRounds):n9}");
                 str.AppendLine($"Net units per round + 1: {((units) / (float)simulatedRounds) + 1:n9}");
+                str.AppendLine($"Confidence 95%: ±{conf95:n9} [{((units) / (float)simulatedRounds) + 1 + conf95:n6}, {((units) / (float)simulatedRounds) + 1 - conf95:n6}]");
                 str.AppendLine($"Confidence 99.9%: ±{conf999:n9} [{((units) / (float)simulatedRounds) + 1 + conf999:n6}, {((units) / (float)simulatedRounds) + 1 - conf999:n6}]");
                 str.AppendLine("\n|-------- Technical Statistics --------|");
                 str.AppendLine($"Elapsed time: {(stopwatch.Elapsed)}");
