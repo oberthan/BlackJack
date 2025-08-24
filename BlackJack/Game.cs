@@ -197,13 +197,13 @@ public class Game
 
             // Get strategy action
             var action = Strategy.Instance.Decide(handOwner, dealer.Hand[0], afterSplit);
-            /*var oldAction = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
+/*            var oldAction = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
             if (action != oldAction)
             {
                 throw new InvalidOperationException(
                     $"Strategy mismatch: {action} vs {oldAction} for hand {handOwner.Hand[0]} and dealer upcard {dealer.Hand[0]}");
-            }*/
-
+            }
+*/
             switch (action)
             {
                 case Move.Hit:

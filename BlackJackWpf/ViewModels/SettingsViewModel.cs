@@ -31,6 +31,18 @@ namespace BlackJackWpf.ViewModels
             set { _allowResplit = value; OnPropertyChanged(nameof(AllowResplit)); }
         }
         private bool _allowResplit = Rules.Instance.AllowResplit;
+        public bool AllowSplit
+        {
+            get => _allowSplit;
+            set { _allowSplit = value; OnPropertyChanged(nameof(AllowSplit)); }
+        }
+        private bool _allowSplit = Rules.Instance.AllowSplit;
+        public bool AllowDouble
+        {
+            get => _allowDouble;
+            set { _allowDouble= value; OnPropertyChanged(nameof(AllowDouble)); }
+        }
+        private bool _allowDouble= Rules.Instance.AllowDouble;
 
         public bool DoubleOnAnyTwo
         {

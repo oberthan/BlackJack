@@ -61,8 +61,9 @@ public  class Strategy
         var isSoft = eval.IsSoft;
         var cards = player.Hand;
 
+        var canSplit = player.CanSplit();
         // --- Pair Splitting ---
-        if (!afterSplit && cards.Count == 2 && cards[0].PipValue == cards[1].PipValue)
+        if (canSplit)
         {
             var pair = $"{cards[0].PipValue},{cards[1].PipValue}";
             var row = PairStrategy.FirstOrDefault(r => r.Pair == pair);
