@@ -54,6 +54,7 @@ namespace BlackJackWpf
             long splits = 0;
             long doubles = 0;
             long stake = 0;
+            double unitsSquared = 0; // <-- Add this variable to store units squared
 
             var nTasks = Environment.ProcessorCount;
 
@@ -87,6 +88,7 @@ namespace BlackJackWpf
                 splits = sum.splits;
                 doubles = sum.doubles;
                 stake = sum.stake;
+                unitsSquared = sum.unitsSquared; // <-- Add this line
 
                 UpdateResults(sum.i, previousRounds);
                 previousRounds = sum.i;
@@ -101,11 +103,21 @@ namespace BlackJackWpf
             await Task.WhenAll(tasks);
             stopwatch.Stop();
 
+
+
+
+
             previousTime = new TimeSpan(0);
             UpdateResults(rounds, 0);
 
             void UpdateResults(long simulatedRounds, long previous = 0)
             {
+                double xbar = units / simulatedRounds;
+                double variance = (unitsSquared / simulatedRounds) - (xbar * xbar);
+                double stddev = Math.Sqrt(variance);
+                double stdError = stddev / Math.Sqrt(simulatedRounds);
+                double conf999 = 3.291 * stdError;
+
                 var str = new StringBuilder();
                 str.AppendLine("|---- Blackjack Simulation Results ----|");
                 str.AppendLine($"Rounds: {simulatedRounds:n0}");
@@ -117,6 +129,7 @@ namespace BlackJackWpf
                 str.AppendLine($"Blackjacks: {blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
                 str.AppendLine($"RTP: {((units + stake) / (float)stake):n9}");
                 str.AppendLine($"Net units per round + 1: {((units) / (float)simulatedRounds) + 1:n9}");
+                str.AppendLine($"Confidence 99.9%: ±{conf999:n9} [{((units) / (float)simulatedRounds) + 1 + conf999:n6}, {((units) / (float)simulatedRounds) + 1 - conf999:n6}]");
                 str.AppendLine("\n|-------- Technical Statistics --------|");
                 str.AppendLine($"Elapsed time: {(stopwatch.Elapsed)}");
                 str.AppendLine(
