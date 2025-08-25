@@ -20,7 +20,7 @@ public class Deck
         SetupShoe();
     }
 
-    private void SetupShoe()
+    public void SetupShoe()
     {
         string[] suits = { "H", "D", "V", "S" };
         string[] values = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };

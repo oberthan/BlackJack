@@ -29,7 +29,12 @@ public class Game
     public readonly Deck deck = new(); // 8-deck shoe with 0.7 penetration by default
     public readonly Player player = new();
 
-
+    public void Reset()
+    {
+        deck.SetupShoe();
+        dealer.Reset();
+        player.Reset();
+    }
     public RoundResult PlayOneRound()
     {
         player.Reset();
