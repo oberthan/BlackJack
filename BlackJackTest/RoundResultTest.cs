@@ -1,6 +1,6 @@
 using NUnit.Framework;
 
-namespace BlackJack.Tests
+namespace Blackjack.Tests
 {
     [TestFixture]
     public class RoundResultTest
@@ -12,7 +12,7 @@ namespace BlackJack.Tests
                 Outcome.PlayerWin,
                 1.5,
                 100,
-                blackjack: true,
+                Blackjack: true,
                 split: false,
                 doubled: true);
 
@@ -31,16 +31,16 @@ namespace BlackJack.Tests
             Outcome outcome,
             double units,
             int stake,
-            bool blackjack,
+            bool Blackjack,
             bool split,
             bool doubled)
         {
-            var result = new RoundResult(outcome, units, stake, blackjack, split, doubled);
+            var result = new RoundResult(outcome, units, stake, Blackjack, split, doubled);
 
             Assert.That(result.Outcome, Is.EqualTo(outcome));
             Assert.That(result.UnitsWonOrLost, Is.EqualTo(units));
             Assert.That(result.Stake, Is.EqualTo(stake));
-            Assert.That(result.Blackjack, Is.EqualTo(blackjack));
+            Assert.That(result.Blackjack, Is.EqualTo(Blackjack));
             Assert.That(result.Split, Is.EqualTo(split));
             Assert.That(result.Double, Is.EqualTo(doubled));
         }

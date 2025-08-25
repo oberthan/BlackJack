@@ -1,7 +1,7 @@
-using BlackJack;
+using Blackjack;
 using NUnit.Framework;
 
-namespace BlackJackTest
+namespace BlackjackTest
 {
     [TestFixture]
     public class HandEvaluatorTest
