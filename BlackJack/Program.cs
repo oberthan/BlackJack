@@ -114,6 +114,7 @@ public class Program
         public long doubles = 0;
         public long stake = 0;
         public long i;
+        public Dictionary<double, int> limitOverShoots = new();
 
         public static BlackjackSimulator Sum(IEnumerable<BlackjackSimulator> simulators)
         {
@@ -130,17 +131,27 @@ public class Program
                 result.splits += sim.splits;
                 result.doubles += sim.doubles;
                 result.stake += sim.stake;
+
+                // Sum up the dictionary limitOverShoots
+                foreach (var kvp in sim.limitOverShoots)
+                {
+                    if (!result.limitOverShoots.TryAdd(kvp.Key, kvp.Value))
+                        result.limitOverShoots[kvp.Key] += kvp.Value;
+                }
             }
             return result;
         }
 
+
         public void RunSimulation()
         {
+            double localUnits = 0;
             for (i = 0; i < Rounds; i++)
             {
                 var res = Game.PlayOneRound();
 
                 units += res.UnitsWonOrLost;
+
                 unitsSquared += res.UnitsWonOrLost * res.UnitsWonOrLost; // <-- Add this line
 
                 stake += res.Stake;
@@ -159,7 +170,18 @@ public class Program
                     case Outcome.PlayerWinWithCharlie: wins++; break;
                     default: pushes++; break;
                 }
+
+                localUnits += res.UnitsWonOrLost;
+
+                if(localUnits <= Rules.Instance.LowerLimit || localUnits >= Rules.Instance.UpperLimit)
+                {
+                    if (!limitOverShoots.TryAdd(localUnits, 1))
+                        limitOverShoots[localUnits]++;
+
+                    localUnits = 0;
+                }
             }
         }
+
     }
 }

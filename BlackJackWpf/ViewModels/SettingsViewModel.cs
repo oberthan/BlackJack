@@ -79,6 +79,19 @@ namespace BlackJackWpf.ViewModels
         }
         private int _sixCardCharlieCount = Rules.Instance.SixCardCharlieCount;
 
+        public double UpperCashback
+        {
+            get => _upperCashback;
+            set { _upperCashback = value; OnPropertyChanged(nameof(UpperCashback)); }
+        }
+        private double _upperCashback = Rules.Instance.UpperLimit;
+        public double LowerCashback
+        {
+            get => _lowerCashback;
+            set { _lowerCashback = value; OnPropertyChanged(nameof(LowerCashback)); }
+        }
+        private double _lowerCashback = Rules.Instance.LowerLimit;
+
         public long Rounds
         {
             get => _rounds;

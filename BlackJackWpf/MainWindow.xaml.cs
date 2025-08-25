@@ -1,6 +1,7 @@
 ﻿using BlackJack; // Reference your core library
 using BlackJackWpf.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,6 +57,7 @@ namespace BlackJackWpf
             long doubles = 0;
             long stake = 0;
             double unitsSquared = 0; // <-- Add this variable to store units squared
+            Dictionary<double, int> dict = new();
 
             var nTasks = Environment.ProcessorCount;
 
@@ -91,6 +93,7 @@ namespace BlackJackWpf
                 doubles = sum.doubles;
                 stake = sum.stake;
                 unitsSquared = sum.unitsSquared; // <-- Add this line
+                dict = sum.limitOverShoots;
 
                 UpdateResults(sum.i, previousRounds);
                 previousRounds = sum.i;
@@ -122,7 +125,15 @@ namespace BlackJackWpf
                 double conf999 = 3.291 * stdError;
 
                 var str = new StringBuilder();
-                str.AppendLine("|---- Blackjack Simulation Results ----|");
+                str.AppendLine("\n|-------- Technical Statistics --------|");
+                str.AppendLine($"Elapsed time: {(stopwatch.Elapsed)}");
+                str.AppendLine(
+                    $"Average time per round: {(stopwatch.Elapsed.TotalMilliseconds / simulatedRounds):n9} ms");
+                str.AppendLine(
+                    $"Rounds per sec: {((simulatedRounds - previous) / (stopwatch.Elapsed.TotalSeconds - previousTime.TotalSeconds)):n1} / Second");
+                UpdateProgress((float)simulatedRounds / rounds);
+
+                str.AppendLine("\n|---- Blackjack Simulation Results ----|");
                 str.AppendLine($"Rounds: {simulatedRounds:n0}");
                 str.AppendLine($"Player wins: {wins:n0}, Dealer wins: {losses:n0}, Pushes: {pushes:n0}");
                 str.AppendLine($"Stake: {stake:n0}");
@@ -135,13 +146,25 @@ namespace BlackJackWpf
                 str.AppendLine($"Net units per round + 1: {((units) / (float)simulatedRounds) + 1:n9}");
                 str.AppendLine($"Confidence 95%: ±{conf95:n9} [{((units) / (float)simulatedRounds) + 1 + conf95:n6}, {((units) / (float)simulatedRounds) + 1 - conf95:n6}]");
                 str.AppendLine($"Confidence 99.9%: ±{conf999:n9} [{((units) / (float)simulatedRounds) + 1 + conf999:n6}, {((units) / (float)simulatedRounds) + 1 - conf999:n6}]");
-                str.AppendLine("\n|-------- Technical Statistics --------|");
-                str.AppendLine($"Elapsed time: {(stopwatch.Elapsed)}");
-                str.AppendLine(
-                    $"Average time per round: {(stopwatch.Elapsed.TotalMilliseconds / simulatedRounds):n9} ms");
-                str.AppendLine(
-                    $"Rounds per sec: {((simulatedRounds - previous) / (stopwatch.Elapsed.TotalSeconds - previousTime.TotalSeconds)):n1} / Second");
-                UpdateProgress((float)simulatedRounds / rounds);
+
+
+                double cashback = 0;
+                double sessions = 0;
+                foreach (var kvp in dict)
+                {
+                    if (kvp.Key < 0) cashback -= kvp.Key * kvp.Value * Rules.Instance.Cashback;
+                    sessions += kvp.Value;
+                }
+                str.AppendLine($"Cashback: {cashback:n0}");
+                str.AppendLine($"Units with Cashback: {units+cashback:n0}");
+                str.AppendLine($"EV with Cashback: {(units+cashback)/sessions}");
+                
+                dict = dict.OrderByDescending(x => x.Key).ToDictionary();
+                str.AppendLine($"\nUnit limits: \n{string.Join(Environment.NewLine, dict)}"); // <-- Add this line
+
+                
+
+
                 ResultsText.Text = str.ToString();
             }
         }
@@ -293,6 +316,8 @@ namespace BlackJackWpf
                 Rules.Instance.DealerPeeksOnAce = viewModel.DealerPeeksOnAce;
                 Rules.Instance.AllowDouble = viewModel.AllowDouble;
                 Rules.Instance.AllowSplit = viewModel.AllowSplit;
+                Rules.Instance.UpperLimit = viewModel.UpperCashback;
+                Rules.Instance.LowerLimit = viewModel.LowerCashback;
 
                 rounds = viewModel.Rounds;
 
