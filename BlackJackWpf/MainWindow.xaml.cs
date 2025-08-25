@@ -172,7 +172,7 @@ namespace BlackjackWpf
                 str.AppendLine($"Sum of all keys*value in dict: {dict.Sum(x => x.Key * x.Value) / dict.Sum(x => x.Value):n6}");
 
                 double edge = 0;
-                double variance = 0;
+                //double variance = 0;
                 double kelly = 0;
 
                 double wasd = 0;
