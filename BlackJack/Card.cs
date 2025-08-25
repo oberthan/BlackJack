@@ -11,10 +11,10 @@ public class Card
     public string Suit { get; }
     public string Value { get; }
 
-    public int PipValue => Value switch
+    public int PipValue => Value[0] switch
     {
-        "J" or "Q" or "K" => 10,
-        "A" => 11, // treated as 11 first; logic adjusts for soft
+        'J' or 'Q' or 'K' or '1' => 10,
+        'A' => 11, // treated as 11 first; logic adjusts for soft
         _ => int.Parse(Value)
     };
 

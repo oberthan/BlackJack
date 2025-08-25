@@ -29,8 +29,8 @@ public class Deck
 
         for (var n = 0; n < numDecks; n++)
             for (var si = 0; si < suits.Length; si++)
-            for (var vi = 0; vi< values.Length; vi++)
-                Cards[n*52+si*values.Length+vi] = new Card(values[vi], suits[si]);
+                for (var vi = 0; vi < values.Length; vi++)
+                    Cards[n * 52 + si * values.Length + vi] = new Card(values[vi], suits[si]);
         Shuffle();
     }
 
@@ -50,7 +50,7 @@ public class Deck
     public Card DrawCard()
     {
         if (CardsLeft == 0) throw new InvalidOperationException("Deck is empty!");
-        var card = Cards[CardsLeft-1];
+        var card = Cards[CardsLeft - 1];
         CardsLeft--;
         return card;
     }

@@ -18,19 +18,24 @@ public static class HandEvaluator
 {
     public static HandEval Evaluate(IReadOnlyList<Card> hand, bool treatTwoCard21AsBlackjack)
     {
-        var total = 0;
-        var aces = 0;
+        int total = 0, aces = 0;
+        int count = hand.Count;
 
-        foreach (var c in hand)
-            if (c.Value == "A")
+        // Use for-loop for better performance and cache properties
+        for (int i = 0; i < count; i++)
+        {
+            var card = hand[i];
+            var value = card.Value;
+            if (value.Length == 1 && value[0] == 'A') // Faster than string comparison
             {
                 total += 11;
                 aces++;
             }
             else
             {
-                total += c.PipValue;
+                total += card.PipValue;
             }
+        }
 
         // soften as needed
         while (total > 21 && aces > 0)

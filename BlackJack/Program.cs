@@ -92,11 +92,11 @@ public class Program
             Console.WriteLine($"Average Bet: {(stake / (float)rounds):n5}");
             Console.WriteLine($"Blackjacks: {blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
             Console.WriteLine($"RTP: {((units + stake) / (float)stake):n9}");
-            Console.WriteLine($"Net units per round + 1: {((units) / (float)rounds)+1:n9}");
+            Console.WriteLine($"Net units per round + 1: {((units) / (float)rounds) + 1:n9}");
             Console.WriteLine("\n|-------- Technical Statistics --------|");
             Console.WriteLine($"Elapsed time: {(stopwatch.Elapsed)}");
             Console.WriteLine($"Average time per round: {(stopwatch.Elapsed.TotalMilliseconds / rounds):n9} ms");
-            Console.WriteLine($"Rounds per sec: {((rounds-previous) / (stopwatch.Elapsed.TotalSeconds-previousTime.TotalSeconds)):n1} / Second");
+            Console.WriteLine($"Rounds per sec: {((rounds - previous) / (stopwatch.Elapsed.TotalSeconds - previousTime.TotalSeconds)):n1} / Second");
             Console.WriteLine($"Units Squared: {unitsSquared:n0}"); // Add this line where you want to display
         }
     }
@@ -173,7 +173,7 @@ public class Program
 
                 localUnits += res.UnitsWonOrLost;
 
-                if(localUnits <= Rules.Instance.LowerLimit || localUnits >= Rules.Instance.UpperLimit)
+                if (localUnits <= Rules.Instance.LowerLimit || localUnits >= Rules.Instance.UpperLimit)
                 {
                     if (!limitOverShoots.TryAdd(localUnits, 1))
                         limitOverShoots[localUnits]++;

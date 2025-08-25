@@ -1,19 +1,8 @@
 ﻿using BlackJack; // Reference your core library
 using BlackJackWpf.ViewModels;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using static BlackJack.Program;
 
 namespace BlackJackWpf
@@ -67,7 +56,7 @@ namespace BlackJackWpf
             {
                 simulators[i] = new BlackjackSimulator
                 {
-                    Rounds = (rounds / nTasks) + ((i<(rounds%nTasks))?1:0),
+                    Rounds = (rounds / nTasks) + ((i < (rounds % nTasks)) ? 1 : 0),
                 };
             }
 
@@ -156,13 +145,13 @@ namespace BlackJackWpf
                     sessions += kvp.Value;
                 }
                 str.AppendLine($"Cashback: {cashback:n0}");
-                str.AppendLine($"Units with Cashback: {units+cashback:n0}");
-                str.AppendLine($"EV with Cashback: {(units+cashback)/sessions}");
-                
+                str.AppendLine($"Units with Cashback: {units + cashback:n0}");
+                str.AppendLine($"EV with Cashback: {(units + cashback) / sessions}");
+
                 dict = dict.OrderByDescending(x => x.Key).ToDictionary();
                 str.AppendLine($"\nUnit limits: \n{string.Join(Environment.NewLine, dict)}"); // <-- Add this line
 
-                
+
 
 
                 ResultsText.Text = str.ToString();
@@ -171,13 +160,16 @@ namespace BlackJackWpf
 
         private async void SearchStrategy_Click(object sender, RoutedEventArgs e)
         {
-            int simulationsPerTest = 10_000_000; // or your preferred number
+            int initialSimulations = 5_000_000; // Fast, low-accuracy pass
+            int finalSimulations = 20_000_000; // High-accuracy for close results
+            double threshold = 0.002; // Margin for "close" results
+
             var strategy = Strategy.Instance;
             var pairRows = strategy.PairStrategy;
             var softRows = strategy.SoftStrategy;
             var hardRows = strategy.HardStrategy;
 
-            int totalSteps = pairRows.Count * 10; // 10 columns per row
+            int totalSteps = pairRows.Count * 10;
             int currentStep = 0;
 
             var watch = Stopwatch.StartNew();
@@ -186,12 +178,22 @@ namespace BlackJackWpf
                 foreach (var col in new[] { "Vs2", "Vs3", "Vs4", "Vs5", "Vs6", "Vs7", "Vs8", "Vs9", "Vs10", "VsA" })
                 {
                     SetPairCell(row, col, "Y");
-                    double rtpY = await SimulateRTP(simulationsPerTest);
+                    double rtpY = await SimulateRTP(initialSimulations)/initialSimulations;
 
                     SetPairCell(row, col, "N");
-                    double rtpN = await SimulateRTP(simulationsPerTest);
+                    double rtpN = await SimulateRTP(initialSimulations)/initialSimulations;
 
-                    SetPairCell(row, col, rtpY >= rtpN ? "Y" : "N");
+                    // If results are close, re-run with higher accuracy
+                    if (Math.Abs(rtpY - rtpN) < threshold)
+                    {
+                        SetPairCell(row, col, "Y");
+                        rtpY = await SimulateRTP(finalSimulations)/finalSimulations;
+
+                        SetPairCell(row, col, "N");
+                        rtpN = await SimulateRTP(finalSimulations) / finalSimulations;
+                    }
+
+                    SetPairCell(row, col, rtpY <= rtpN ? "Y" : "N");
 
                     currentStep++;
                     UpdateProgress((float)currentStep / totalSteps);
@@ -258,7 +260,7 @@ namespace BlackJackWpf
             stopwatch.Stop();
 
             // RTP = (units + stake) / stake
-            return sum.stake == 0 ? 0 : (sum.units + sum.stake) / (double)sum.stake;
+            return sum.units;
 
             void UpdateResults(BlackjackSimulator sum, long previous = 0)
             {
@@ -286,7 +288,7 @@ namespace BlackJackWpf
                     $"Average time per round: {(stopwatch.Elapsed.TotalMilliseconds / simulatedRounds):n9} ms");
                 str.AppendLine(
                     $"Rounds per sec: {((simulatedRounds - previous) / (stopwatch.Elapsed.TotalSeconds - previousTime.TotalSeconds)):n1} / Second");
-                
+
                 ResultsText.Text = str.ToString();
             }
 

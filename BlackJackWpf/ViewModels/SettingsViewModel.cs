@@ -1,11 +1,5 @@
 ﻿using BlackJack;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlackJackWpf.ViewModels
 {
@@ -40,9 +34,9 @@ namespace BlackJackWpf.ViewModels
         public bool AllowDouble
         {
             get => _allowDouble;
-            set { _allowDouble= value; OnPropertyChanged(nameof(AllowDouble)); }
+            set { _allowDouble = value; OnPropertyChanged(nameof(AllowDouble)); }
         }
-        private bool _allowDouble= Rules.Instance.AllowDouble;
+        private bool _allowDouble = Rules.Instance.AllowDouble;
 
         public bool DoubleOnAnyTwo
         {

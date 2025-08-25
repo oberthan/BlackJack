@@ -10,10 +10,10 @@ public enum Outcome
     PlayerBlackjack, // player has blackjack
     DealerBlackjack, // dealer has blackjack
     PlayerWinWithCharlie // player wins with Charlie
-    
+
 }
 
-public readonly struct RoundResult(Outcome o,double units, int stake, bool blackjack, bool split, bool doubled)
+public readonly struct RoundResult(Outcome o, double units, int stake, bool blackjack, bool split, bool doubled)
 {
     public Outcome Outcome { get; } = o;
     public double UnitsWonOrLost { get; } = units;
@@ -192,7 +192,7 @@ public class Game
 
     private int PlaySingleHand(Player handOwner, bool afterSplit, bool isSplitAces)
     {
-       
+
 
         while (true)
         {
@@ -206,13 +206,13 @@ public class Game
 
             // Get strategy action
             var action = Strategy.Instance.Decide(handOwner, dealer.Hand[0], afterSplit);
-/*            var oldAction = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
-            if (action != oldAction)
-            {
-                throw new InvalidOperationException(
-                    $"Strategy mismatch: {action} vs {oldAction} for hand {handOwner.Hand[0]} and dealer upcard {dealer.Hand[0]}");
-            }
-*/
+            /*            var oldAction = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
+                        if (action != oldAction)
+                        {
+                            throw new InvalidOperationException(
+                                $"Strategy mismatch: {action} vs {oldAction} for hand {handOwner.Hand[0]} and dealer upcard {dealer.Hand[0]}");
+                        }
+            */
             switch (action)
             {
                 case Move.Hit:

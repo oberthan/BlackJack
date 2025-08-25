@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace BlackJack;
+﻿namespace BlackJack;
 
 public enum Move
 {
@@ -10,7 +8,7 @@ public enum Move
     Split
 }
 
-public  class Strategy
+public class Strategy
 {
     public static Strategy Instance { get; set; } = new Strategy();
     public List<PairStrategyRow> PairStrategy { get; set; } = new()
@@ -194,14 +192,14 @@ public  class Strategy
     {
         "H" => Move.Hit,
         "S" => Move.Stand,
-        "D" => canDouble?Move.Double:Move.Hit,
+        "D" => canDouble ? Move.Double : Move.Hit,
         "P" => Move.Split,
-        _ => canDouble?Move.Double:Move.Stand
+        _ => canDouble ? Move.Double : Move.Stand
     };
     private static bool ParseBool(string value) => value.ToLower() switch
     {
         "n" => false,
         "y" => true,
-        _ => Rules.Instance.DoubleAfterSplit? true : false
+        _ => Rules.Instance.DoubleAfterSplit ? true : false
     };
 }

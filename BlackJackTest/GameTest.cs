@@ -1,7 +1,4 @@
 using NUnit.Framework;
-using BlackJack;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace BlackJack.Tests
 {
@@ -26,7 +23,7 @@ namespace BlackJack.Tests
                 var list = new List<Move>();
                 foreach (char c in fromString)
                 {
-                    list.Add(c=='h'?Move.Hit:c=='s'?Move.Stand:Move.Double);
+                    list.Add(c == 'h' ? Move.Hit : c == 's' ? Move.Stand : Move.Double);
                 }
                 array.Add(list);
             }
@@ -45,12 +42,12 @@ namespace BlackJack.Tests
             dealer.Reset();
 
 
-            player.AddCard(new Card("A", "S")); 
-            player.AddCard(new Card("K", "D")); 
+            player.AddCard(new Card("A", "S"));
+            player.AddCard(new Card("K", "D"));
 
-            dealer.AddCard(new Card("9", "H")); 
-            dealer.AddCard(new Card("7", "C")); 
-            
+            dealer.AddCard(new Card("9", "H"));
+            dealer.AddCard(new Card("7", "C"));
+
             var result = game.PlayOneRoundWithHand();
 
             Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerBlackjack));
@@ -99,7 +96,7 @@ namespace BlackJack.Tests
             dealer.AddCard(new Card("A", "H"));
             player.AddCard(new Card("K", "D"));
             dealer.AddCard(new Card("K", "C"));
-            
+
 
             var result = game.PlayOneRoundWithHand();
 
@@ -171,7 +168,7 @@ namespace BlackJack.Tests
             var result = game.PlayOneRoundWithHand();
 
 
-           Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerWinWithCharlie));
+            Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerWinWithCharlie));
             Assert.That(result.UnitsWonOrLost, Is.EqualTo(1));
         }
 
@@ -246,7 +243,7 @@ namespace BlackJack.Tests
                 }
 
                 Assert.That(player.SplitHandPlayer, shouldSplit ? Is.Not.EqualTo(null) : Is.EqualTo(null));
-                Assert.That(result.Stake, Is.EqualTo(shouldSplit ? ((player.DidDouble ? 2 : 1)+ (player.SplitHandPlayer.DidDouble ? 2 : 1)) :(player.DidDouble?2:1)));
+                Assert.That(result.Stake, Is.EqualTo(shouldSplit ? ((player.DidDouble ? 2 : 1) + (player.SplitHandPlayer.DidDouble ? 2 : 1)) : (player.DidDouble ? 2 : 1)));
                 /*            Assert.That(result.Outcome, Is.EqualTo(Outcome.DealerBust));
                             Assert.That(result.UnitsWonOrLost, Is.EqualTo(3)); // Player wins both hands*/
                 i++;
@@ -302,10 +299,10 @@ namespace BlackJack.Tests
             ];
             var parsedMoves = MoveArray_from_String(expectedMoves);
 
-            string[] playerValues = { "2", "3", "4", "5", "6", "7", "8", "9"};
-            string[] dealerValues = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
+            string[] playerValues = { "2", "3", "4", "5", "6", "7", "8", "9" };
+            string[] dealerValues = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
 
-            for (int i = 0; i<playerValues.Length; i++)
+            for (int i = 0; i < playerValues.Length; i++)
             {
                 string playerValue = playerValues[i];
                 for (int k = 0; k < dealerValues.Length; k++)
@@ -316,14 +313,14 @@ namespace BlackJack.Tests
                     player.AddCard(new Card(playerValue, "D"));
                     var dealerUp = new Card(dealerValue, "H");
                     var move = Strategy.Instance.Decide(player, dealerUp, false);
-                    
+
                     Assert.That(move, Is.EqualTo(parsedMoves[i][k]));
                 }
             }
 
         }
-        
-        
+
+
         [Test]
         public void StrategyDecide_HardDouble_FromCards()
         {
@@ -371,7 +368,7 @@ namespace BlackJack.Tests
                             var dealerUp = new Card(dealerValue, "H");
                             var move = Strategy.Instance.Decide(player, dealerUp, false);
 
-                            Assert.That(move, Is.EqualTo(parsedMoves[evaluation.Total-8][k]));
+                            Assert.That(move, Is.EqualTo(parsedMoves[evaluation.Total - 8][k]));
                         }
                     }
                 }
