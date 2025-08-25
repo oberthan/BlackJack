@@ -182,6 +182,53 @@ public class Program
                 }
             }
         }
+        public void ForceStartingHand(List<Card> playerhand, Card upCard)
+        {
+            double localUnits = 0;
+            for (i = 0; i < Rounds; i++)
+            {
+                Game.player.Reset();
+                Game.dealer.Reset();
+                Game.deck.EndOfGame();
+                Game.player.AddCard(playerhand[0]);
+                Game.player.AddCard(playerhand[1]);
+
+                Game.dealer.AddCard(upCard);
+                Game.dealer.AddCard(Game.deck.DrawCard());
+                var res = Game.PlayOneRoundWithHand();
+
+                units += res.UnitsWonOrLost;
+
+                unitsSquared += res.UnitsWonOrLost * res.UnitsWonOrLost; // <-- Add this line
+
+                stake += res.Stake;
+                if (res.Blackjack) blackjacks++;
+                if (res.Split) splits++;
+                if (res.Double) doubles++;
+
+                switch (res.Outcome)
+                {
+                    case Outcome.PlayerWin: wins++; break;
+                    case Outcome.DealerBlackjack: losses++; break;
+                    case Outcome.Bust: losses++; break;
+                    case Outcome.PlayerBlackjack: wins++; break;
+                    case Outcome.DealerBust: wins++; break;
+                    case Outcome.DealerWin: losses++; break;
+                    case Outcome.PlayerWinWithCharlie: wins++; break;
+                    default: pushes++; break;
+                }
+
+                localUnits += res.UnitsWonOrLost;
+
+                if (localUnits <= Rules.Instance.LowerLimit || localUnits >= Rules.Instance.UpperLimit)
+                {
+                    if (!limitOverShoots.TryAdd(localUnits, 1))
+                        limitOverShoots[localUnits]++;
+
+                    localUnits = 0;
+                }
+            }
+        }
 
     }
 }

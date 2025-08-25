@@ -17,10 +17,17 @@ namespace BlackJackWpf
 
         private async void StartSimulation_Click(object sender, RoutedEventArgs e)
         {
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+                button.IsEnabled = false;
             ResultsText.Text = "Running simulation...";
             SimulationProgress.Value = 0;
             await RunSimulation();
             UpdateStatus("Done");
+
+            
+            if (button != null)
+                button.IsEnabled = true;
         }
 
         private void UpdateStatus(string text)
@@ -160,37 +167,51 @@ namespace BlackJackWpf
 
         private async void SearchStrategy_Click(object sender, RoutedEventArgs e)
         {
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+                button.IsEnabled = false;
+
             int initialSimulations = 5_000_000; // Fast, low-accuracy pass
             int finalSimulations = 20_000_000; // High-accuracy for close results
             double threshold = 0.002; // Margin for "close" results
 
             var strategy = Strategy.Instance;
             var pairRows = strategy.PairStrategy;
-            var softRows = strategy.SoftStrategy;
-            var hardRows = strategy.HardStrategy;
 
-            int totalSteps = pairRows.Count * 10;
+            // Map from "2"-"A" to the corresponding row in PairStrategy
+            var pairValues = new[] { "2", "3", "4", "5", "6", "7", "8", "9", "10", "A" };
+            var colNames = new[] { "Vs2", "Vs3", "Vs4", "Vs5", "Vs6", "Vs7", "Vs8", "Vs9", "Vs10", "VsA" };
+
+            int totalSteps = pairValues.Length * colNames.Length;
             int currentStep = 0;
 
             var watch = Stopwatch.StartNew();
-            foreach (var row in pairRows)
+            for (int i = 0; i < pairValues.Length; i++)
             {
-                foreach (var col in new[] { "Vs2", "Vs3", "Vs4", "Vs5", "Vs6", "Vs7", "Vs8", "Vs9", "Vs10", "VsA" })
+                string pair = pairValues[i];
+                var pCard = new Card(pair, "D");
+                // Find the row in PairStrategy where Pair == pair
+                var row = pairRows.FirstOrDefault(r => r.Pair == $"{pCard.PipValue},{pCard.PipValue}");
+
+                //if (row == null) continue;
+
+                for (int j = 0; j < colNames.Length; j++)
                 {
+                    string col = colNames[j];
                     SetPairCell(row, col, "Y");
-                    double rtpY = await SimulateRTP(initialSimulations)/initialSimulations;
+                    double rtpY = await SimulateRTP(initialSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / initialSimulations;
 
                     SetPairCell(row, col, "N");
-                    double rtpN = await SimulateRTP(initialSimulations)/initialSimulations;
+                    double rtpN = await SimulateRTP(initialSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / initialSimulations;
 
                     // If results are close, re-run with higher accuracy
                     if (Math.Abs(rtpY - rtpN) < threshold)
                     {
                         SetPairCell(row, col, "Y");
-                        rtpY = await SimulateRTP(finalSimulations)/finalSimulations;
+                        rtpY = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S"));
 
                         SetPairCell(row, col, "N");
-                        rtpN = await SimulateRTP(finalSimulations) / finalSimulations;
+                        rtpN = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S"));
                     }
 
                     SetPairCell(row, col, rtpY <= rtpN ? "Y" : "N");
@@ -201,6 +222,9 @@ namespace BlackJackWpf
             }
 
             ResultsText.Text = $"Pair strategy optimized! It took {watch.Elapsed}!";
+
+            if (button != null)
+                button.IsEnabled = true;
         }
 
         // Helper to set a cell value by column name
@@ -222,7 +246,7 @@ namespace BlackJackWpf
         }
 
         // Run a simulation and return RTP
-        private async Task<double> SimulateRTP(int rounds)
+        private async Task<double> SimulateRTP(int rounds, List<Card> playerHand, Card upCard)
         {
             var nTasks = Environment.ProcessorCount;
             var simulators = new BlackjackSimulator[nTasks];
@@ -239,7 +263,7 @@ namespace BlackJackWpf
             for (int i = 0; i < nTasks; i++)
             {
                 int idx = i;
-                tasks[i] = Task.Run(() => simulators[idx].RunSimulation());
+                tasks[i] = Task.Run(() => simulators[idx].ForceStartingHand(playerHand, upCard));
             }
             while (!tasks.All(x => x.IsCompleted))
             {
