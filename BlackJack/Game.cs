@@ -91,7 +91,7 @@ public class Game
         if (mainOutcome == Outcome.PlayerWinWithCharlie || splitOutcome == Outcome.PlayerWinWithCharlie)
             return new RoundResult(Outcome.PlayerWinWithCharlie, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
 
-        // Dealer Blackjack (after Charlie check)
+        // Dealer blackjack (after Charlie check)
         if (mainOutcome == Outcome.DealerBlackjack || splitOutcome == Outcome.DealerBlackjack)
             return new RoundResult(Outcome.DealerBlackjack, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
 

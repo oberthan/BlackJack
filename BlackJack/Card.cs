@@ -6,17 +6,21 @@ public class Card
     {
         Value = value;
         Suit = suit;
+
+        int val = Value[0] switch
+        {
+            'J' or 'Q' or 'K' or '1' => 10,
+            'A' => 11,
+            _ => int.Parse(Value)
+        };
+        PipValue = val;
     }
 
     public string Suit { get; }
     public string Value { get; }
 
-    public int PipValue => Value[0] switch
-            {
-                'J' or 'Q' or 'K' or '1' => 10,
-        'A' => 11, // treated as 11 first; logic adjusts for soft
-                _ => int.Parse(Value)
-            };
+    // Cache for PipValue
+    public int PipValue { get; }
 
     public override string ToString()
     {

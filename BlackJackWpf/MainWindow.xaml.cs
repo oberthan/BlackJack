@@ -59,7 +59,7 @@ namespace BlackjackWpf
 
             long wins = 0, losses = 0, pushes = 0;
             double units = 0;
-            long Blackjacks = 0;
+            long blackjacks = 0;
             long splits = 0;
             long doubles = 0;
             long stake = 0;
@@ -95,7 +95,7 @@ namespace BlackjackWpf
                 losses = sum.losses;
                 pushes = sum.pushes;
                 units = sum.units;
-                Blackjacks = sum.Blackjacks;
+                blackjacks = sum.Blackjacks;
                 splits = sum.splits;
                 doubles = sum.doubles;
                 stake = sum.stake;
@@ -147,7 +147,7 @@ namespace BlackjackWpf
                 str.AppendLine($"Total return: {(units + stake):n0}");
                 str.AppendLine($"Net units: {units:n0}");
                 str.AppendLine($"Average Bet: {(stake / (float)simulatedRounds):n5}");
-                str.AppendLine($"Blackjacks: {Blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
+                str.AppendLine($"Blackjacks: {blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
                 str.AppendLine($"RTP: {((units + stake) / (float)stake):n9}");
                 //str.AppendLine($"Indledende RTP: {((units+stake) / (float)simulatedRounds):n9}");
                 str.AppendLine($"Net units per round + 1: {((units) / (float)simulatedRounds) + 1:n9}");

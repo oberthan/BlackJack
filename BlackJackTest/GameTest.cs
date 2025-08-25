@@ -422,8 +422,7 @@ namespace Blackjack.Tests
 
             // Simulate split
             player.DidSplit = true;
-            player.SplitHandPlayer = new Player();
-            player.SplitHandPlayer.Bet = 100;
+            player.SplitHandPlayer = new SplitPlayer(100);
             player.SplitHandPlayer.AddCard(new Card("8", "C"));
             player.SplitHandPlayer.AddCard(new Card("3", "D"));
 
