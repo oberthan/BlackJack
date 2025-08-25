@@ -25,13 +25,16 @@ public static class HandEvaluator
         for (int i = 0; i < count; i++)
         {
             var card = hand[i];
-            var value = card.PipValue;
-            total += value;
-            if (value == 11)
+            var value = card.Value;
+            if (value.Length == 1 && value[0] == 'A') // Faster than string comparison
             {
+                total += 11;
                 aces++;
             }
-
+            else
+            {
+                total += card.PipValue;
+            }
         }
 
         // soften as needed
