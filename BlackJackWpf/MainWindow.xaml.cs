@@ -95,7 +95,7 @@ namespace BlackjackWpf
                 losses = sum.losses;
                 pushes = sum.pushes;
                 units = sum.units;
-                blackjacks = sum.blackjacks;
+                blackjacks = sum.Blackjacks;
                 splits = sum.splits;
                 doubles = sum.doubles;
                 stake = sum.stake;

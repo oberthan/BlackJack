@@ -202,7 +202,7 @@ public class Program
                 unitsSquared += res.UnitsWonOrLost * res.UnitsWonOrLost; // <-- Add this line
 
                 stake += res.Stake;
-                if (res.Blackjack) blackjacks++;
+                if (res.Blackjack) Blackjacks++;
                 if (res.Split) splits++;
                 if (res.Double) doubles++;
 
