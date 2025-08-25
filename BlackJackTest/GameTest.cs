@@ -254,6 +254,34 @@ namespace BlackJack.Tests
             }
 
         }
+        [Test]
+        public void Split_Aces_Normal_Payout()
+        {
+            var game = new Game();
+            var deck = game.deck;
+            var player = game.player;
+            player.Reset();
+            var dealer = game.dealer;
+            dealer.Reset();
+
+
+            player.AddCard(new Card("A", "S"));
+            dealer.AddCard(new Card("8", "H"));
+            player.AddCard(new Card("A", "D"));
+            dealer.AddCard(new Card("10", "C"));
+
+            var Splitdecision = Strategy.Instance.Decide(player, dealer.Hand[0], false);
+
+            Assert.That(Splitdecision, Is.EqualTo(Move.Split));
+
+            var result = game.PlayOneRoundWithHand();
+
+            TestContext.WriteLine($"{player.Hand[1]}, {player.SplitHandPlayer.Hand[1]}");
+
+
+            Assert.That(result.UnitsWonOrLost, Is.EqualTo(2));
+
+        }
 
 
 
@@ -348,6 +376,89 @@ namespace BlackJack.Tests
                     }
                 }
             }
+        }
+
+        [Test]
+        public void PlayOneRound_PlayerDoubleWin_AllRoundResultValues()
+        {
+            var game = new Game();
+            var player = game.player;
+            var dealer = game.dealer;
+            player.Reset();
+            dealer.Reset();
+
+            player.Bet = 2;
+            player.AddCard(new Card("9", "S"));
+            player.AddCard(new Card("2", "D"));
+            dealer.AddCard(new Card("5", "H"));
+            dealer.AddCard(new Card("10", "C"));
+
+            player.DidDouble = true;
+
+            var result = game.PlayOneRoundWithHand();
+
+            Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerWin));
+            Assert.That(result.UnitsWonOrLost, Is.GreaterThan(0));
+            Assert.That(result.Stake, Is.EqualTo(50));
+            Assert.That(result.Blackjack, Is.False);
+            Assert.That(result.Split, Is.False);
+            Assert.That(result.Double, Is.True);
+        }
+
+        [Test]
+        public void PlayOneRound_SplitWin_AllRoundResultValues()
+        {
+            var game = new Game();
+            var player = game.player;
+            var dealer = game.dealer;
+            player.Reset();
+            dealer.Reset();
+
+            player.Bet = 100;
+            player.AddCard(new Card("8", "S"));
+            player.AddCard(new Card("8", "D"));
+            dealer.AddCard(new Card("6", "H"));
+            dealer.AddCard(new Card("10", "C"));
+
+            // Simulate split
+            player.DidSplit = true;
+            player.SplitHandPlayer = new Player();
+            player.SplitHandPlayer.Bet = 100;
+            player.SplitHandPlayer.AddCard(new Card("8", "C"));
+            player.SplitHandPlayer.AddCard(new Card("3", "D"));
+
+            var result = game.PlayOneRoundWithHand();
+
+            Assert.That(result.Outcome, Is.AnyOf(Outcome.PlayerWin, Outcome.Push, Outcome.DealerWin));
+            Assert.That(result.Stake, Is.EqualTo(200));
+            Assert.That(result.Blackjack, Is.False);
+            Assert.That(result.Split, Is.True);
+            Assert.That(result.Double, Is.False);
+        }
+
+        [Test]
+        public void PlayOneRound_PlayerBlackjack_AllRoundResultValues()
+        {
+            var game = new Game();
+            var player = game.player;
+            var dealer = game.dealer;
+            player.Reset();
+            dealer.Reset();
+
+            player.Bet = 75;
+            player.AddCard(new Card("A", "S"));
+            player.AddCard(new Card("K", "D"));
+            dealer.AddCard(new Card("9", "H"));
+            dealer.AddCard(new Card("7", "C"));
+
+            var result = game.PlayOneRoundWithHand();
+
+            Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerBlackjack));
+            Assert.That(result.UnitsWonOrLost, Is.EqualTo(75 * Rules.Instance.BlackjackPayout));
+            Assert.That(result.Stake, Is.EqualTo(75));
+            Assert.That(result.Blackjack, Is.True);
+            Assert.That(result.Split, Is.False);
+            Assert.That(result.Double, Is.False);
         }
     }
 }

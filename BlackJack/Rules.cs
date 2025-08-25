@@ -11,8 +11,12 @@ public class Rules
 
     public double Penetration { get; set; } = 0.7; // 70% penetration
 
+    public bool AllowSplit { get; set; } = true;
+
     // REQUIREMENT: No resplit allowed
     public bool AllowResplit { get; set; } = false;
+
+    public bool AllowDouble { get; set; } = true;
 
     // REQUIREMENT: Double allowed on any first two cards
     public bool DoubleOnAnyTwo { get; set; } = true;

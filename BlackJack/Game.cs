@@ -118,9 +118,13 @@ public class Game
         if (player.SplitHandPlayer != null)
             totalStake += player.SplitHandPlayer.Bet;
 
-        // summarize
+        // --- Six Card Charlie always wins, even over dealer blackjack ---
         if (mainOutcome == Outcome.PlayerWinWithCharlie || splitOutcome == Outcome.PlayerWinWithCharlie)
             return new RoundResult(Outcome.PlayerWinWithCharlie, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
+
+        // Dealer blackjack (after Charlie check)
+        if (mainOutcome == Outcome.DealerBlackjack || splitOutcome == Outcome.DealerBlackjack)
+            return new RoundResult(Outcome.DealerBlackjack, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
 
         if (mainOutcome == Outcome.Bust || splitOutcome == Outcome.Bust)
             return new RoundResult(Outcome.Bust, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
@@ -197,13 +201,13 @@ public class Game
 
             // Get strategy action
             var action = Strategy.Instance.Decide(handOwner, dealer.Hand[0], afterSplit);
-            /*var oldAction = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
+/*            var oldAction = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
             if (action != oldAction)
             {
                 throw new InvalidOperationException(
                     $"Strategy mismatch: {action} vs {oldAction} for hand {handOwner.Hand[0]} and dealer upcard {dealer.Hand[0]}");
-            }*/
-
+            }
+*/
             switch (action)
             {
                 case Move.Hit:

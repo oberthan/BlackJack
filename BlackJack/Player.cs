@@ -34,9 +34,10 @@ public class Player
 
     //------------- Split functionality -------------//
 
-    public bool CanSplit()
+    public virtual bool CanSplit()
     {
         if (Hand.Count != 2 || SplitHandPlayer != null) return false;
+        if (!Rules.Instance.AllowSplit) return false;
         return Rules.Instance.CanSplitPair(Hand[0], Hand[1]);
     }
 
@@ -65,6 +66,7 @@ public class Player
     public bool CanDouble(bool afterSplit, bool thisHandIsSplitAces)
     {
         if (Hand.Count != 2) return false;
+        if (!Rules.Instance.AllowDouble) return false;
         if (!Rules.Instance.DoubleOnAnyTwo) return false;
         if (afterSplit && !Rules.Instance.DoubleAfterSplit) return false;
         if (afterSplit && !Rules.Instance.DoubleAfterSplit11 && GetHandValue() == 11) return false;
@@ -130,7 +132,7 @@ public class SplitPlayer : Player
         Bet = originalBet; // same bet as parent
     }
 
-    public bool CanSplit()
+    public override bool CanSplit()
     {
         return false;
     }

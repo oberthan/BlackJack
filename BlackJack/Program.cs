@@ -20,6 +20,7 @@ public class Program
 
         long wins = 0, losses = 0, pushes = 0;
         double units = 0;
+        double unitsSquared = 0;
         long blackjacks = 0;
         long splits = 0;
         long doubles = 0;
@@ -55,6 +56,7 @@ public class Program
             losses = sum.losses;
             pushes = sum.pushes;
             units = sum.units;
+            unitsSquared = sum.unitsSquared; // Added
             blackjacks = sum.blackjacks;
             splits = sum.splits;
             doubles = sum.doubles;
@@ -95,6 +97,7 @@ public class Program
             Console.WriteLine($"Elapsed time: {(stopwatch.Elapsed)}");
             Console.WriteLine($"Average time per round: {(stopwatch.Elapsed.TotalMilliseconds / rounds):n9} ms");
             Console.WriteLine($"Rounds per sec: {((rounds-previous) / (stopwatch.Elapsed.TotalSeconds-previousTime.TotalSeconds)):n1} / Second");
+            Console.WriteLine($"Units Squared: {unitsSquared:n0}"); // Add this line where you want to display
         }
     }
 
@@ -105,6 +108,7 @@ public class Program
 
         public long wins = 0, losses = 0, pushes = 0;
         public double units = 0;
+        public double unitsSquared = 0;
         public long blackjacks = 0;
         public long splits = 0;
         public long doubles = 0;
@@ -121,6 +125,7 @@ public class Program
                 result.losses += sim.losses;
                 result.pushes += sim.pushes;
                 result.units += sim.units;
+                result.unitsSquared += sim.unitsSquared;
                 result.blackjacks += sim.blackjacks;
                 result.splits += sim.splits;
                 result.doubles += sim.doubles;
@@ -136,6 +141,8 @@ public class Program
                 var res = Game.PlayOneRound();
 
                 units += res.UnitsWonOrLost;
+                unitsSquared += res.UnitsWonOrLost * res.UnitsWonOrLost; // <-- Add this line
+
                 stake += res.Stake;
                 if (res.Blackjack) blackjacks++;
                 if (res.Split) splits++;
@@ -152,7 +159,6 @@ public class Program
                     case Outcome.PlayerWinWithCharlie: wins++; break;
                     default: pushes++; break;
                 }
-
             }
         }
     }
