@@ -21,7 +21,7 @@ public  class Strategy
         new PairStrategyRow { Pair = "5,5", Vs2 = "N", Vs3 = "N", Vs4 = "N", Vs5 = "N", Vs6 = "N", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "6,6", Vs2 = "Y/N", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "7,7", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "8,8", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "Y", Vs9 = "Y", Vs10 = "Y", VsA = "Y"},
+        new PairStrategyRow { Pair = "8,8", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "Y", Vs9 = "Y", Vs10 = "N", VsA = "Y"},
         new PairStrategyRow { Pair = "9,9", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "N", Vs8 = "Y", Vs9 = "Y", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "10,10", Vs2 = "N", Vs3 = "N", Vs4 = "N", Vs5 = "N", Vs6 = "N", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "11,11", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "Y", Vs9 = "Y", Vs10 = "Y", VsA = "Y"}
@@ -45,7 +45,7 @@ public  class Strategy
         new HardStrategyRow { Total = 8, Vs2 = "H", Vs3 = "H", Vs4 = "H", Vs5 = "H", Vs6 = "H", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
         new HardStrategyRow { Total = 9, Vs2 = "H", Vs3 = "D", Vs4 = "D", Vs5 = "D", Vs6 = "D", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
         new HardStrategyRow { Total = 10, Vs2 = "D", Vs3 = "D", Vs4 = "D", Vs5 = "D", Vs6 = "D", Vs7 = "D", Vs8 = "D", Vs9 = "D", Vs10 = "H", VsA = "H"},
-        new HardStrategyRow { Total = 11, Vs2 = "D", Vs3 = "D", Vs4 = "D", Vs5 = "D", Vs6 = "D", Vs7 = "D", Vs8 = "D", Vs9 = "D", Vs10 = "D", VsA = "H"},
+        new HardStrategyRow { Total = 11, Vs2 = "D", Vs3 = "D", Vs4 = "D", Vs5 = "D", Vs6 = "D", Vs7 = "D", Vs8 = "D", Vs9 = "D", Vs10 = "H", VsA = "H"},
         new HardStrategyRow { Total = 12, Vs2 = "H", Vs3 = "H", Vs4 = "S", Vs5 = "S", Vs6 = "S", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
         new HardStrategyRow { Total = 13, Vs2 = "S", Vs3 = "S", Vs4 = "S", Vs5 = "S", Vs6 = "S", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
         new HardStrategyRow { Total = 14, Vs2 = "S", Vs3 = "S", Vs4 = "S", Vs5 = "S", Vs6 = "S", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
@@ -72,11 +72,13 @@ public  class Strategy
         }
 
 
+
         var canDouble = player.CanDouble(afterSplit, player.IsSplitAces);
 
         // --- Soft Totals ---
         if (isSoft)
         {
+            if (cards.Count == 5) return Move.Hit; // Hit soft 5-card hands
             var row = SoftStrategy.FirstOrDefault(r => r.Total == total);
             if (row != null)
                 return ParseMove(LookupAction(row, dealerUp.PipValue), canDouble);

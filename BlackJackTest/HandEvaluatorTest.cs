@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace BlackJackTest
     {
         [TestFixture]
-        public class HandEvaluatorTests
+        public class HandEvaluatorTest
         {
             private Card Ace => new("A", "S");
             private Card Ten => new("10", "H");
