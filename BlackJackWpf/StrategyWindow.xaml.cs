@@ -7,11 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace BlackjackWpf
 {
@@ -44,7 +40,7 @@ namespace BlackjackWpf
 
                 // Default colors
                 style.Setters.Add(new Setter(DataGridCell.ForegroundProperty, Brushes.Black));
-                
+
                 if (e.PropertyName != "Pair" && e.PropertyName != "Total") style.Setters.Add(new Setter(DataGridCell.BackgroundProperty, Brushes.Aquamarine));
 
                 // Highlight based on cell text

@@ -1,9 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blackjack.Tests
 {
@@ -40,16 +35,16 @@ namespace Blackjack.Tests
             }
         }
 
-        [TestCase(new[] {"7", "A"}, "3")]
-        [TestCase(new[] {"10", "A"}, "2")]
-        [TestCase(new[] {"2", "A", "3", "5"}, "J")]
+        [TestCase(new[] { "7", "A" }, "3")]
+        [TestCase(new[] { "10", "A" }, "2")]
+        [TestCase(new[] { "2", "A", "3", "5" }, "J")]
         public void Strategy_OldSameAsNew_Specific(string[] cards, string dealerCard)
         {
 
             var player = new Player();
             foreach (var card in cards)
             {
-            player.AddCard(new Card(card, "S"));
+                player.AddCard(new Card(card, "S"));
 
             }
             var dealerUp = new Card(dealerCard, "H");

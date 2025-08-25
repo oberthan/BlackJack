@@ -28,10 +28,17 @@ namespace BlackjackWpf
 
         private async void StartSimulation_Click(object sender, RoutedEventArgs e)
         {
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+                button.IsEnabled = false;
             ResultsText.Text = "Running simulation...";
             SimulationProgress.Value = 0;
             await RunSimulation();
             UpdateStatus("Done");
+
+            
+            if (button != null)
+                button.IsEnabled = true;
         }
 
         private void UpdateStatus(string text)
@@ -52,13 +59,12 @@ namespace BlackjackWpf
 
             long wins = 0, losses = 0, pushes = 0;
             double units = 0;
-            long Blackjacks = 0;
+            long blackjacks = 0;
             long splits = 0;
             long doubles = 0;
             long stake = 0;
             double unitsSquared = 0; // <-- Add this variable to store units squared
-
-            List<double> rtpHistory = new();
+            Dictionary<double, int> dict = new();
 
             var nTasks = Environment.ProcessorCount;
 
@@ -68,7 +74,7 @@ namespace BlackjackWpf
             {
                 simulators[i] = new BlackjackSimulator
                 {
-                    Rounds = (rounds / nTasks) + ((i<(rounds%nTasks))?1:0),
+                    Rounds = (rounds / nTasks) + ((i < (rounds % nTasks)) ? 1 : 0),
                 };
             }
 
@@ -79,7 +85,6 @@ namespace BlackjackWpf
                 tasks[i] = Task.Run(() => { simulators[taskIndex].RunSimulation(); });
             }
 
-            double previousUnits = 0;
             long previousRounds = 0;
             var previousTime = stopwatch.Elapsed;
             while (!tasks.All(x => x.IsCompleted))
@@ -90,17 +95,15 @@ namespace BlackjackWpf
                 losses = sum.losses;
                 pushes = sum.pushes;
                 units = sum.units;
-                Blackjacks = sum.Blackjacks;
+                blackjacks = sum.blackjacks;
                 splits = sum.splits;
                 doubles = sum.doubles;
                 stake = sum.stake;
                 unitsSquared = sum.unitsSquared; // <-- Add this line
-
-                rtpHistory.Add((units - previousUnits) / (float)(sum.i - previousRounds) + 1);
+                dict = sum.limitOverShoots;
 
                 UpdateResults(sum.i, previousRounds);
                 previousRounds = sum.i;
-                previousUnits = units;
                 previousTime = stopwatch.Elapsed;
 
                 var progress = 30 * (float)sum.i / rounds;
@@ -125,22 +128,10 @@ namespace BlackjackWpf
                 double variance = (unitsSquared / simulatedRounds) - (xbar * xbar);
                 double stddev = Math.Sqrt(variance);
                 double stdError = stddev / Math.Sqrt(simulatedRounds);
+                double conf95 = 1.96 * stdError;
                 double conf999 = 3.291 * stdError;
 
                 var str = new StringBuilder();
-                str.AppendLine("|---- Blackjack Simulation Results ----|");
-                str.AppendLine($"Rounds: {simulatedRounds:n0}");
-                str.AppendLine($"Player wins: {wins:n0}, Dealer wins: {losses:n0}, Pushes: {pushes:n0}");
-                str.AppendLine($"Stake: {stake:n0}");
-                str.AppendLine($"Total return: {(units + stake):n0}");
-                str.AppendLine($"Net units: {units:n0}");
-                str.AppendLine($"Average Bet: {(stake / (float)simulatedRounds):n5}");
-                str.AppendLine($"Blackjacks: {Blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
-                str.AppendLine($"RTP: {((units + stake) / (float)stake):n9}");
-                //str.AppendLine($"Indledende RTP: {((units+stake) / (float)simulatedRounds):n9}");
-                str.AppendLine($"Net units per round + 1: {((units) / (float)simulatedRounds) + 1:n9}");
-                str.AppendLine($"Confidence 99.9%: ±{conf999:n9} [{((units) / (float)simulatedRounds) + 1 + conf999:n6}, {((units) / (float)simulatedRounds) + 1 - conf999:n6}]");
-                //str.AppendLine(PredictRTP(simulatedRounds));
                 str.AppendLine("\n|-------- Technical Statistics --------|");
                 str.AppendLine($"Elapsed time: {(stopwatch.Elapsed)}");
                 str.AppendLine(
@@ -148,48 +139,110 @@ namespace BlackjackWpf
                 str.AppendLine(
                     $"Rounds per sec: {((simulatedRounds - previous) / (stopwatch.Elapsed.TotalSeconds - previousTime.TotalSeconds)):n1} / Second");
                 UpdateProgress((float)simulatedRounds / rounds);
+
+                str.AppendLine("\n|---- Blackjack Simulation Results ----|");
+                str.AppendLine($"Rounds: {simulatedRounds:n0}");
+                str.AppendLine($"Player wins: {wins:n0}, Dealer wins: {losses:n0}, Pushes: {pushes:n0}");
+                str.AppendLine($"Stake: {stake:n0}");
+                str.AppendLine($"Total return: {(units + stake):n0}");
+                str.AppendLine($"Net units: {units:n0}");
+                str.AppendLine($"Average Bet: {(stake / (float)simulatedRounds):n5}");
+                str.AppendLine($"Blackjacks: {blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
+                str.AppendLine($"RTP: {((units + stake) / (float)stake):n9}");
+                //str.AppendLine($"Indledende RTP: {((units+stake) / (float)simulatedRounds):n9}");
+                str.AppendLine($"Net units per round + 1: {((units) / (float)simulatedRounds) + 1:n9}");
+                str.AppendLine($"Confidence 95%: ±{conf95:n9} [{((units) / (float)simulatedRounds) + 1 + conf95:n6}, {((units) / (float)simulatedRounds) + 1 - conf95:n6}]");
+                str.AppendLine($"Confidence 99.9%: ±{conf999:n9} [{((units) / (float)simulatedRounds) + 1 + conf999:n6}, {((units) / (float)simulatedRounds) + 1 - conf999:n6}]");
+
+
+                double cashback = 0;
+                double sessions = 0;
+                foreach (var kvp in dict)
+                {
+                    if (kvp.Key < 0) cashback -= kvp.Key * kvp.Value * Rules.Instance.Cashback;
+                    sessions += kvp.Value;
+                }
+                str.AppendLine($"Cashback: {cashback:n0}");
+                str.AppendLine($"Units with Cashback: {units + cashback:n0}");
+                str.AppendLine($"EV with Cashback: {(units + cashback) / sessions}");
+
+                dict = dict.OrderByDescending(x => x.Key).ToDictionary();
+                str.AppendLine($"\nUnit limits: \n{string.Join(Environment.NewLine, dict)}");
+
+                str.AppendLine($"Sum of all keys*value in dict: {dict.Sum(x => x.Key * x.Value) / dict.Sum(x => x.Value):n6}");
+
+                double edge = 0;
+                double variance = 0;
+                double kelly = 0;
+
+                double wasd = 0;
+
+                foreach (var kvp in dict)
+                {
+                    if (kvp.Key < 0) wasd -= kvp.Key * kvp.Value * Rules.Instance.Cashback;
+
+                }
+
+
+
+
+
+
+
                 ResultsText.Text = str.ToString();
-            }
-            string PredictRTP(long simulatedRounds)
-            {
-                if (rtpHistory.Count < 2) return "";
-
-                //double mean = rtpHistory.Average();
-                double mean = (units) / (float)simulatedRounds +1;
-                double stddev = Math.Sqrt(rtpHistory.Select(x => Math.Pow(x - mean, 2)).Average());
-                double stdError = stddev / Math.Sqrt(rtpHistory.Count);
-
-                // For prediction, assume error decreases with more rounds
-                double predictedRTP = mean;
-                double predictedError = stdError / Math.Sqrt(10); // 10x rounds
-
-                return $"\nPredicted RTP for {rounds * 10:n0} rounds: {predictedRTP:n9} ± {predictedError:n9}";
             }
         }
 
         private async void SearchStrategy_Click(object sender, RoutedEventArgs e)
         {
-            int simulationsPerTest = 10_000_000; // or your preferred number
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+                button.IsEnabled = false;
+
+            int initialSimulations = 5_000_000; // Fast, low-accuracy pass
+            int finalSimulations = 20_000_000; // High-accuracy for close results
+            double threshold = 0.002; // Margin for "close" results
+
             var strategy = Strategy.Instance;
             var pairRows = strategy.PairStrategy;
-            var softRows = strategy.SoftStrategy;
-            var hardRows = strategy.HardStrategy;
 
-            int totalSteps = pairRows.Count * 10; // 10 columns per row
+            // Map from "2"-"A" to the corresponding row in PairStrategy
+            var pairValues = new[] { "2", "3", "4", "5", "6", "7", "8", "9", "10", "A" };
+            var colNames = new[] { "Vs2", "Vs3", "Vs4", "Vs5", "Vs6", "Vs7", "Vs8", "Vs9", "Vs10", "VsA" };
+
+            int totalSteps = pairValues.Length * colNames.Length;
             int currentStep = 0;
 
             var watch = Stopwatch.StartNew();
-            foreach (var row in pairRows)
+            for (int i = 0; i < pairValues.Length; i++)
             {
-                foreach (var col in new[] { "Vs2", "Vs3", "Vs4", "Vs5", "Vs6", "Vs7", "Vs8", "Vs9", "Vs10", "VsA" })
+                string pair = pairValues[i];
+                var pCard = new Card(pair, "D");
+                // Find the row in PairStrategy where Pair == pair
+                var row = pairRows.FirstOrDefault(r => r.Pair == $"{pCard.PipValue},{pCard.PipValue}");
+
+                //if (row == null) continue;
+
+                for (int j = 0; j < colNames.Length; j++)
                 {
+                    string col = colNames[j];
                     SetPairCell(row, col, "Y");
-                    double rtpY = await SimulateRTP(simulationsPerTest);
+                    double rtpY = await SimulateRTP(initialSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / initialSimulations;
 
                     SetPairCell(row, col, "N");
-                    double rtpN = await SimulateRTP(simulationsPerTest);
+                    double rtpN = await SimulateRTP(initialSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / initialSimulations;
 
-                    SetPairCell(row, col, rtpY >= rtpN ? "Y" : "N");
+                    // If results are close, re-run with higher accuracy
+                    if (Math.Abs(rtpY - rtpN) < threshold)
+                    {
+                        SetPairCell(row, col, "Y");
+                        rtpY = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S"));
+
+                        SetPairCell(row, col, "N");
+                        rtpN = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S"));
+                    }
+
+                    SetPairCell(row, col, rtpY <= rtpN ? "Y" : "N");
 
                     currentStep++;
                     UpdateProgress((float)currentStep / totalSteps);
@@ -197,6 +250,9 @@ namespace BlackjackWpf
             }
 
             ResultsText.Text = $"Pair strategy optimized! It took {watch.Elapsed}!";
+
+            if (button != null)
+                button.IsEnabled = true;
         }
 
         // Helper to set a cell value by column name
@@ -218,7 +274,7 @@ namespace BlackjackWpf
         }
 
         // Run a simulation and return RTP
-        private async Task<double> SimulateRTP(int rounds)
+        private async Task<double> SimulateRTP(int rounds, List<Card> playerHand, Card upCard)
         {
             var nTasks = Environment.ProcessorCount;
             var simulators = new BlackjackSimulator[nTasks];
@@ -235,7 +291,7 @@ namespace BlackjackWpf
             for (int i = 0; i < nTasks; i++)
             {
                 int idx = i;
-                tasks[i] = Task.Run(() => simulators[idx].RunSimulation());
+                tasks[i] = Task.Run(() => simulators[idx].ForceStartingHand(playerHand, upCard));
             }
             while (!tasks.All(x => x.IsCompleted))
             {
@@ -256,7 +312,7 @@ namespace BlackjackWpf
             stopwatch.Stop();
 
             // RTP = (units + stake) / stake
-            return sum.stake == 0 ? 0 : (sum.units + sum.stake) / (double)sum.stake;
+            return sum.units;
 
             void UpdateResults(BlackjackSimulator sum, long previous = 0)
             {
@@ -284,7 +340,7 @@ namespace BlackjackWpf
                     $"Average time per round: {(stopwatch.Elapsed.TotalMilliseconds / simulatedRounds):n9} ms");
                 str.AppendLine(
                     $"Rounds per sec: {((simulatedRounds - previous) / (stopwatch.Elapsed.TotalSeconds - previousTime.TotalSeconds)):n1} / Second");
-                
+
                 ResultsText.Text = str.ToString();
             }
 
@@ -314,6 +370,8 @@ namespace BlackjackWpf
                 Rules.Instance.DealerPeeksOnAce = viewModel.DealerPeeksOnAce;
                 Rules.Instance.AllowDouble = viewModel.AllowDouble;
                 Rules.Instance.AllowSplit = viewModel.AllowSplit;
+                Rules.Instance.UpperLimit = viewModel.UpperCashback;
+                Rules.Instance.LowerLimit = viewModel.LowerCashback;
 
                 rounds = viewModel.Rounds;
 

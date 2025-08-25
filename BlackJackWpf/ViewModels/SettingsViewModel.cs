@@ -1,11 +1,7 @@
-﻿using Blackjack;
+﻿using BlackJack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlackjackWpf.ViewModels
 {
@@ -40,9 +36,9 @@ namespace BlackjackWpf.ViewModels
         public bool AllowDouble
         {
             get => _allowDouble;
-            set { _allowDouble= value; OnPropertyChanged(nameof(AllowDouble)); }
+            set { _allowDouble = value; OnPropertyChanged(nameof(AllowDouble)); }
         }
-        private bool _allowDouble= Rules.Instance.AllowDouble;
+        private bool _allowDouble = Rules.Instance.AllowDouble;
 
         public bool DoubleOnAnyTwo
         {
@@ -78,6 +74,19 @@ namespace BlackjackWpf.ViewModels
             set { _sixCardCharlieCount = value; OnPropertyChanged(nameof(SixCardCharlieCount)); }
         }
         private int _sixCardCharlieCount = Rules.Instance.SixCardCharlieCount;
+
+        public double UpperCashback
+        {
+            get => _upperCashback;
+            set { _upperCashback = value; OnPropertyChanged(nameof(UpperCashback)); }
+        }
+        private double _upperCashback = Rules.Instance.UpperLimit;
+        public double LowerCashback
+        {
+            get => _lowerCashback;
+            set { _lowerCashback = value; OnPropertyChanged(nameof(LowerCashback)); }
+        }
+        private double _lowerCashback = Rules.Instance.LowerLimit;
 
         public long Rounds
         {

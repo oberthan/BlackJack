@@ -92,11 +92,11 @@ public class Program
             Console.WriteLine($"Average Bet: {(stake / (float)rounds):n5}");
             Console.WriteLine($"Blackjacks: {Blackjacks:n0}, Splits: {splits:n0}, Doubles: {doubles:n0}");
             Console.WriteLine($"RTP: {((units + stake) / (float)stake):n9}");
-            Console.WriteLine($"Net units per round + 1: {((units) / (float)rounds)+1:n9}");
+            Console.WriteLine($"Net units per round + 1: {((units) / (float)rounds) + 1:n9}");
             Console.WriteLine("\n|-------- Technical Statistics --------|");
             Console.WriteLine($"Elapsed time: {(stopwatch.Elapsed)}");
             Console.WriteLine($"Average time per round: {(stopwatch.Elapsed.TotalMilliseconds / rounds):n9} ms");
-            Console.WriteLine($"Rounds per sec: {((rounds-previous) / (stopwatch.Elapsed.TotalSeconds-previousTime.TotalSeconds)):n1} / Second");
+            Console.WriteLine($"Rounds per sec: {((rounds - previous) / (stopwatch.Elapsed.TotalSeconds - previousTime.TotalSeconds)):n1} / Second");
             Console.WriteLine($"Units Squared: {unitsSquared:n0}"); // Add this line where you want to display
         }
     }
@@ -114,6 +114,7 @@ public class Program
         public long doubles = 0;
         public long stake = 0;
         public long i;
+        public Dictionary<double, int> limitOverShoots = new();
 
         public static BlackjackSimulator Sum(IEnumerable<BlackjackSimulator> simulators)
         {
@@ -130,17 +131,27 @@ public class Program
                 result.splits += sim.splits;
                 result.doubles += sim.doubles;
                 result.stake += sim.stake;
+
+                // Sum up the dictionary limitOverShoots
+                foreach (var kvp in sim.limitOverShoots)
+                {
+                    if (!result.limitOverShoots.TryAdd(kvp.Key, kvp.Value))
+                        result.limitOverShoots[kvp.Key] += kvp.Value;
+                }
             }
             return result;
         }
 
+
         public void RunSimulation()
         {
+            double localUnits = 0;
             for (i = 0; i < Rounds; i++)
             {
                 var res = Game.PlayOneRound();
 
                 units += res.UnitsWonOrLost;
+
                 unitsSquared += res.UnitsWonOrLost * res.UnitsWonOrLost; // <-- Add this line
 
                 stake += res.Stake;
@@ -159,7 +170,65 @@ public class Program
                     case Outcome.PlayerWinWithCharlie: wins++; break;
                     default: pushes++; break;
                 }
+
+                localUnits += res.UnitsWonOrLost;
+
+                if (localUnits <= Rules.Instance.LowerLimit || localUnits >= Rules.Instance.UpperLimit)
+                {
+                    if (!limitOverShoots.TryAdd(localUnits, 1))
+                        limitOverShoots[localUnits]++;
+
+                    localUnits = 0;
+                }
             }
         }
+        public void ForceStartingHand(List<Card> playerhand, Card upCard)
+        {
+            double localUnits = 0;
+            for (i = 0; i < Rounds; i++)
+            {
+                Game.player.Reset();
+                Game.dealer.Reset();
+                Game.deck.EndOfGame();
+                Game.player.AddCard(playerhand[0]);
+                Game.player.AddCard(playerhand[1]);
+
+                Game.dealer.AddCard(upCard);
+                Game.dealer.AddCard(Game.deck.DrawCard());
+                var res = Game.PlayOneRoundWithHand();
+
+                units += res.UnitsWonOrLost;
+
+                unitsSquared += res.UnitsWonOrLost * res.UnitsWonOrLost; // <-- Add this line
+
+                stake += res.Stake;
+                if (res.Blackjack) blackjacks++;
+                if (res.Split) splits++;
+                if (res.Double) doubles++;
+
+                switch (res.Outcome)
+                {
+                    case Outcome.PlayerWin: wins++; break;
+                    case Outcome.DealerBlackjack: losses++; break;
+                    case Outcome.Bust: losses++; break;
+                    case Outcome.PlayerBlackjack: wins++; break;
+                    case Outcome.DealerBust: wins++; break;
+                    case Outcome.DealerWin: losses++; break;
+                    case Outcome.PlayerWinWithCharlie: wins++; break;
+                    default: pushes++; break;
+                }
+
+                localUnits += res.UnitsWonOrLost;
+
+                if (localUnits <= Rules.Instance.LowerLimit || localUnits >= Rules.Instance.UpperLimit)
+                {
+                    if (!limitOverShoots.TryAdd(localUnits, 1))
+                        limitOverShoots[localUnits]++;
+
+                    localUnits = 0;
+                }
+            }
+        }
+
     }
 }

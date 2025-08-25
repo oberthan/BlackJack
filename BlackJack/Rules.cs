@@ -23,7 +23,7 @@ public class Rules
 
     // REQUIREMENT: Double after split allowed except on split Aces
     public bool DoubleAfterSplit { get; set; } = true;
-    public bool DoubleAfterSplit11 { get; set; } = false; // 11 = total,
+    public bool DoubleAfterSplit11 { get; set; } = true; // 11 = total,
     public bool DoubleAfterSplitAces { get; set; } = false;
 
     // REQUIREMENT: Six Card Charlie – player wins if reaches 6 cards <= 21
@@ -48,4 +48,8 @@ public class Rules
             _ => int.Parse(c.Value)
         };
     }
+
+    public double UpperLimit = 3;
+    public double LowerLimit = -3;
+    public double Cashback = 0.1; // 10% cashback on losses
 }

@@ -10,7 +10,7 @@ public enum Outcome
     PlayerBlackjack, // player has Blackjack
     DealerBlackjack, // dealer has Blackjack
     PlayerWinWithCharlie // player wins with Charlie
-    
+
 }
 
 public readonly struct RoundResult(Outcome o,double units, int stake, bool Blackjack, bool split, bool doubled)
@@ -29,7 +29,12 @@ public class Game
     public readonly Deck deck = new(); // 8-deck shoe with 0.7 penetration by default
     public readonly Player player = new();
 
-
+    public void Reset()
+    {
+        deck.SetupShoe();
+        dealer.Reset();
+        player.Reset();
+    }
     public RoundResult PlayOneRound()
     {
         player.Reset();
@@ -85,6 +90,10 @@ public class Game
     {
         if (mainOutcome == Outcome.PlayerWinWithCharlie || splitOutcome == Outcome.PlayerWinWithCharlie)
             return new RoundResult(Outcome.PlayerWinWithCharlie, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
+
+        // Dealer blackjack (after Charlie check)
+        if (mainOutcome == Outcome.DealerBlackjack || splitOutcome == Outcome.DealerBlackjack)
+            return new RoundResult(Outcome.DealerBlackjack, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
 
         if (mainOutcome == Outcome.Bust || splitOutcome == Outcome.Bust)
             return new RoundResult(Outcome.Bust, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
@@ -214,7 +223,7 @@ public class Game
 
     private int PlaySingleHand(Player handOwner, bool afterSplit, bool isSplitAces)
     {
-       
+
 
         while (true)
         {
