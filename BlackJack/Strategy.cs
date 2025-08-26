@@ -56,7 +56,7 @@ public class Strategy
 
     public Move Decide(Player player, Card dealerUp, bool afterSplit)
     {
-        var eval = HandEvaluator.Evaluate(player.Hand, false);
+        var eval = HandEvaluator.Instance.Evaluate(player.Hand, false);
         var total = eval.Total;
         var isSoft = eval.IsSoft;
         var cards = player.Hand;
@@ -114,7 +114,7 @@ public class Strategy
     }
     public static Move DecideOld(Player player, Card dealerUp, bool afterSplit)
     {
-        var eval = HandEvaluator.Evaluate(player.Hand, false);
+        var eval = HandEvaluator.Instance.Evaluate(player.Hand, false);
         var total = eval.Total;
         var isSoft = eval.IsSoft;
         var up = dealerUp.PipValue; // 2–11 where 11 = Ace

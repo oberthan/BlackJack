@@ -53,8 +53,8 @@ public class Game
     public RoundResult PlayOneRoundWithHand()
     {
         // evaluate Blackjacks (initial only)
-        var pEval = HandEvaluator.Evaluate(player.Hand, true);
-        var dEval = HandEvaluator.Evaluate(dealer.Hand, true);
+        var pEval = HandEvaluator.Instance.Evaluate(player.Hand, true);
+        var dEval = HandEvaluator.Instance.Evaluate(dealer.Hand, true);
         if (pEval.IsBlackjack) player.DidBlackjack = true; // track for later
 
         if (InitialCheckForBlackjack(dEval, pEval, out var playOneRoundWithHand)) return playOneRoundWithHand;
@@ -190,8 +190,8 @@ public class Game
     // Helper to determine hand outcome for all enum values
     private int GetHandOutcome(Player handOwner, bool isSplitHand)
     {
-        var pEval = HandEvaluator.Evaluate(handOwner.Hand, !isSplitHand);
-        var dEval = HandEvaluator.Evaluate(dealer.Hand, false);
+        var pEval = HandEvaluator.Instance.Evaluate(handOwner.Hand, !isSplitHand);
+        var dEval = HandEvaluator.Instance.Evaluate(dealer.Hand, false);
 
         // Six Card Charlie
         if (handOwner.Hand.Count >= Rules.Instance.SixCardCharlieCount && pEval.Total <= 21)
@@ -229,7 +229,7 @@ public class Game
         {
             if (isSplitAces)
                 return 0; // only one card dealt, no further play
-            var eval = HandEvaluator.Evaluate(handOwner.Hand, false);
+            var eval = HandEvaluator.Instance.Evaluate(handOwner.Hand, false);
 
             // Six Card Charlie
             if (handOwner.Hand.Count >= Rules.Instance.SixCardCharlieCount && eval.Total <= 21)
@@ -248,7 +248,7 @@ public class Game
             {
                 case Move.Hit:
                     handOwner.AddCard(deck.DrawCard());
-                    if (HandEvaluator.Evaluate(handOwner.Hand, false).Total > 21)
+                    if (HandEvaluator.Instance.Evaluate(handOwner.Hand, false).Total > 21)
                         return 0; // bust
                     break;
 
@@ -285,14 +285,14 @@ public class Game
 
     private int SettleAgainstDealer(Player handOwner, bool isSplitHand)
     {
-        var pEval = HandEvaluator.Evaluate(handOwner.Hand,
+        var pEval = HandEvaluator.Instance.Evaluate(handOwner.Hand,
             !isSplitHand); // 2-card 21 after split is NOT Blackjack
 
         // Charlie win first
         if (handOwner.Hand.Count >= Rules.Instance.SixCardCharlieCount && pEval.Total <= 21)
             return +handOwner.Bet; // REQUIREMENT: wins over everything
 
-        var dEval = HandEvaluator.Evaluate(dealer.Hand, false);
+        var dEval = HandEvaluator.Instance.Evaluate(dealer.Hand, false);
 
         // bust checks
         if (pEval.Total > 21) return -handOwner.Bet;
