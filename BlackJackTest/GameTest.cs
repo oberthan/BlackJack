@@ -399,7 +399,7 @@ namespace BlackJackTest
             Assert.That(result.Stake, Is.EqualTo(50));
             Assert.That(result.Blackjack, Is.False);
             Assert.That(result.Split, Is.False);
-            Assert.That(result.Double, Is.True);
+            Assert.That(result.Doubled, Is.True);
         }
 
         [Test]
@@ -429,7 +429,7 @@ namespace BlackJackTest
             Assert.That(result.Stake, Is.EqualTo(200));
             Assert.That(result.Blackjack, Is.False);
             Assert.That(result.Split, Is.True);
-            Assert.That(result.Double, Is.False);
+            Assert.That(result.Doubled, Is.False);
         }
 
         [Test]
@@ -454,7 +454,7 @@ namespace BlackJackTest
             Assert.That(result.Stake, Is.EqualTo(75));
             Assert.That(result.Blackjack, Is.True);
             Assert.That(result.Split, Is.False);
-            Assert.That(result.Double, Is.False);
+            Assert.That(result.Doubled, Is.False);
         }
     }
 }

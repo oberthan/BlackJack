@@ -1,4 +1,7 @@
-﻿namespace Blackjack;
+﻿using System.Diagnostics;
+using NUnit.Framework;
+
+namespace Blackjack;
 
 public enum Move
 {
@@ -39,6 +42,8 @@ public class Strategy
         new PairStrategyRow { Pair = CardValue.Ace, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.P, VsA = Decision.P}
     };
 
+    private const int pairStrategyMinPair = 2;
+    
     public List<SoftStrategyRow> SoftStrategy { get; set; } = new()
     {
         new SoftStrategyRow { Total = 13, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
@@ -51,6 +56,8 @@ public class Strategy
         new SoftStrategyRow { Total = 20, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.S, Vs8 = Decision.S, Vs9 = Decision.S, Vs10 = Decision.S, VsA = Decision.S}
     };
 
+    private const int softStrategyMinTotal = 13;
+    private const int softStrategyMaxTotal = 20;
 
     public List<HardStrategyRow> HardStrategy { get; set; } = new()
     {
@@ -66,8 +73,8 @@ public class Strategy
         new HardStrategyRow { Total = 17, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.S, Vs8 = Decision.S, Vs9 = Decision.S, Vs10 = Decision.S, VsA = Decision.S}
     };
 
-    private readonly int hardStrategyMaxTotal = 17;
     private readonly int hardStrategyMinTotal = 8;
+    private readonly int hardStrategyMaxTotal = 17;
 
     public Move Decide(Player player, CardValue dealerUp, bool afterSplit)
     {
@@ -81,8 +88,9 @@ public class Strategy
         if (canSplit)
         {
             var pair = cards[0];
-            var row = PairStrategy.FirstOrDefault(r => r.Pair == pair);
-            if (row != null && ParseBool(LookupAction(row, (int)dealerUp)))
+            var row = PairStrategy[(int)pair-pairStrategyMinPair];
+            Debug.Assert(row.Pair == pair);
+            if (ParseBool(LookupAction(row, (int)dealerUp)))
                 return Move.Split;
         }
 
@@ -99,9 +107,9 @@ public class Strategy
             if (cards.Count >= 4 && total == 19 && upValue == 10) return Move.Hit;
 
 
-            var row = SoftStrategy.FirstOrDefault(r => r.Total == total);
-            if (row != null)
-                return ParseMove(LookupAction(row, upValue), canDouble);
+            var row = SoftStrategy[total-softStrategyMinTotal];
+            Debug.Assert(row.Total == total);
+            return ParseMove(LookupAction(row, upValue), canDouble);
         }
 
         // --- Hard Totals ---
@@ -120,9 +128,9 @@ public class Strategy
                 return Move.Stand; // fallback for totals outside the strategy range
             if (total < hardStrategyMinTotal)
                 return Move.Hit; // fallback for totals outside the strategy range
-            var row = HardStrategy.FirstOrDefault(r => r.Total == total);
-            if (row != null)
-                return ParseMove(LookupAction(row, upValue), canDouble);
+            var row = HardStrategy[total-hardStrategyMinTotal];
+            Debug.Assert(row.Total == total);
+            return ParseMove(LookupAction(row, upValue), canDouble);
         }
 
         return Move.Hit;

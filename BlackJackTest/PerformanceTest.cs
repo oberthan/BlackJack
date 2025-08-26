@@ -27,7 +27,7 @@ namespace BlackJackTest
         }
 
         [Test]
-        public void MultiThreadTest()
+        public void MultiThreadFixedRoundsTest()
         {
             var warmUpSimulator = new BlackjackSimulator
             {
@@ -37,12 +37,12 @@ namespace BlackJackTest
             warmUpSimulator.RunSimulation();
 
 
-            var threads = Environment.ProcessorCount-2;
+            var threads = Environment.ProcessorCount-1;
             if (threads < 1) threads = 1;
             var simulators = new BlackjackSimulator[threads];
             for (var i = 0; i < threads; i++)
             {
-                simulators[i] = new BlackjackSimulator { Rounds = 50_000_000 / threads };
+                simulators[i] = new BlackjackSimulator { Rounds = (50_000_000+threads-1) / threads };
             }
 
             var sw = Stopwatch.StartNew();
@@ -57,7 +57,62 @@ namespace BlackJackTest
             var sum = BlackjackSimulator.Sum(simulators);
             sw.Stop();
             TestContext.Out.WriteLine(
-                $"Multi-threaded ({threads} threads): {sum.i:N0} rounds in {sw.Elapsed.TotalSeconds:F2} seconds ({sum.i / sw.Elapsed.TotalSeconds:N0} rounds/sec)");
+                $"Multi-threaded ({threads} threads): {sum.rounds:N0} rounds in {sw.Elapsed.TotalSeconds:F2} seconds ({sum.rounds / sw.Elapsed.TotalSeconds:N0} rounds/sec)");
+        }
+
+        [Test]
+        public void MultiThreadMinRoundsTest()
+        {
+            var warmUpSimulator = new BlackjackSimulator
+            {
+                Rounds = 10000
+            };
+            // Initial run to warm up any JIT compilation
+            warmUpSimulator.RunSimulation();
+
+            var minTotalRounds = 50_000_000;
+
+
+
+            var threads = Environment.ProcessorCount-1;
+            if (threads < 1) threads = 1;
+
+            var simulators = new BlackjackSimulator[threads];
+            for (var i = 0; i < threads; i++)
+            {
+                simulators[i] = new BlackjackSimulator();
+            }
+
+            var sw = Stopwatch.StartNew();
+            var tasks = new Task[threads];
+            using CancellationTokenSource cts = new();
+            var cancellationToken = cts.Token;
+            for (int i = 0; i < threads; i++)
+            {
+                int index = i;
+                tasks[i] = Task.Run(() => simulators[index].RunSimulationUntilCancelled(cancellationToken), cancellationToken);
+            }
+            var waitHandle = cancellationToken.WaitHandle;
+            var terminationTask = Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (simulators.Sum(x => x.rounds) >= minTotalRounds)
+                    {
+                        return;
+                    }
+
+                    waitHandle.WaitOne(20);
+                }
+            }, cancellationToken);
+            terminationTask.Wait();
+            cts.Cancel();
+            Task.WaitAll(tasks);
+            
+            var sum = BlackjackSimulator.Sum(simulators);
+            sw.Stop();
+            TestContext.Out.WriteLine(
+                $"Multi-threaded ({threads} threads): {sum.rounds:N0} rounds in {sw.Elapsed.TotalSeconds:F2} seconds ({sum.rounds / sw.Elapsed.TotalSeconds:N0} rounds/sec)");
         }
     }
 }

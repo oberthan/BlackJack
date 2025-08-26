@@ -12,16 +12,16 @@ namespace Blackjack.Test
                 Outcome.PlayerWin,
                 1.5,
                 100,
-                blackjack: true,
-                split: false,
-                doubled: true);
+                Blackjack: true,
+                Split: false,
+                Doubled: true);
 
             Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerWin));
             Assert.That(result.UnitsWonOrLost, Is.EqualTo(1.5));
             Assert.That(result.Stake, Is.EqualTo(100));
             Assert.That(result.Blackjack, Is.True);
             Assert.That(result.Split, Is.False);
-            Assert.That(result.Double, Is.True);
+            Assert.That(result.Doubled, Is.True);
         }
 
         [TestCase(Outcome.Bust, -100, 100, false, false, false)]
@@ -42,7 +42,7 @@ namespace Blackjack.Test
             Assert.That(result.Stake, Is.EqualTo(stake));
             Assert.That(result.Blackjack, Is.EqualTo(blackjack));
             Assert.That(result.Split, Is.EqualTo(split));
-            Assert.That(result.Double, Is.EqualTo(doubled));
+            Assert.That(result.Doubled, Is.EqualTo(doubled));
         }
     }
 }

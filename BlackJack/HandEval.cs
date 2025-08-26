@@ -1,31 +1,25 @@
 ﻿namespace Blackjack;
 
-public readonly struct HandEval
+public readonly struct HandEval(byte total, bool isSoft, bool isBlackjack)
 {
-    public int Total { get; }
-    public bool IsSoft { get; }
-    public bool IsBlackjack { get; } // only for original 2-card hands (not split 21)
-
-    public HandEval(int total, bool isSoft, bool isBlackjack)
-    {
-        Total = total;
-        IsSoft = isSoft;
-        IsBlackjack = isBlackjack;
-    }
+    public readonly byte Total = total;
+    public readonly bool IsSoft = isSoft;
+    public readonly bool IsBlackjack = isBlackjack; // only for original 2-card hands (not split 21)
 }
 
 public static class HandEvaluator
 {
     public static HandEval Evaluate(List<CardValue> hand, bool treatTwoCard21AsBlackjack)
     {
-        int total = 0, aces = 0;
+        byte total = 0;
+        int aces = 0;
         int count = hand.Count;
 
         for (int i = 0; i < count; i++)
         {
             var card = hand[i];
             var value = card;
-            total += (int)value;
+            total += (byte)value;
             if (value == CardValue.Ace)
             {
                 aces++;

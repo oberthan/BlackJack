@@ -66,7 +66,8 @@ namespace BlackjackWpf
             double unitsSquared = 0; // <-- Add this variable to store units squared
             Dictionary<double, int> dict = new();
 
-            var nTasks = Environment.ProcessorCount;
+            var nTasks = Environment.ProcessorCount-1;
+            if (nTasks < 1) nTasks = 1;
 
             var tasks = new Task[nTasks];
             var simulators = new BlackjackSimulator[nTasks];
@@ -102,13 +103,13 @@ namespace BlackjackWpf
                 unitsSquared = sum.unitsSquared; // <-- Add this line
                 dict = sum.limitOverShoots;
 
-                UpdateResults(sum.i, previousRounds);
-                previousRounds = sum.i;
+                UpdateResults(sum.rounds, previousRounds);
+                previousRounds = sum.rounds;
                 previousTime = stopwatch.Elapsed;
 
-                var progress = 30 * (float)sum.i / rounds;
+                var progress = 30 * (float)sum.rounds / rounds;
                 UpdateStatus(
-                    $"[{new string('#', (int)progress)}{new string('-', (int)(30 - progress))}] {100f * sum.i / rounds:F1}%");
+                    $"[{new string('#', (int)progress)}{new string('-', (int)(30 - progress))}] {100f * sum.rounds / rounds:F1}%");
 
             }
 
@@ -363,12 +364,12 @@ namespace BlackjackWpf
 
 
                 UpdateResults(sum, previousRounds);
-                previousRounds = sum.i;
+                previousRounds = sum.rounds;
                 previousTime = stopwatch.Elapsed;
 
-                var progress = 30 * (float)sum.i / rounds;
+                var progress = 30 * (float)sum.rounds / rounds;
                 UpdateStatus(
-                    $"[{new string('#', (int)progress)}{new string('-', (int)(30 - progress))}] {100f * sum.i / rounds:F1}%");
+                    $"[{new string('#', (int)progress)}{new string('-', (int)(30 - progress))}] {100f * sum.rounds / rounds:F1}%");
 
             }
             await Task.WhenAll(tasks);
@@ -379,7 +380,7 @@ namespace BlackjackWpf
 
             void UpdateResults(BlackjackSimulator sum, long previous = 0)
             {
-                var simulatedRounds = sum.i;
+                var simulatedRounds = sum.rounds;
                 var wins = sum.wins;
                 var losses = sum.losses;
                 var pushes = sum.pushes;

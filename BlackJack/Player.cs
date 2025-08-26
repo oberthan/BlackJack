@@ -2,14 +2,14 @@
 
 public class Player
 {
-    public List<CardValue> Hand { get; } = new();
-    public int Bet { get; set; } = 1;
-    public SplitPlayer? SplitHandPlayer { get; set; }
+    public List<CardValue> Hand = new();
+    public int Bet = 1;
+    public SplitPlayer? SplitHandPlayer;
 
 
-    public bool DidBlackjack { get; set; }
-    public bool DidSplit { get; set; }
-    public bool DidDouble { get; set; }
+    public bool DidBlackjack;
+    public bool DidSplit;
+    public bool DidDouble;
 
     public bool IsSplitAces => SplitHandPlayer != null && Hand.Count == 2 && Hand[0]== CardValue.Ace;
     public bool IsOriginalAces => Hand.Count == 2 && Hand[0]== CardValue.Ace && Hand[1]== CardValue.Ace;

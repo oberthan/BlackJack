@@ -13,15 +13,7 @@ public enum Outcome
 
 }
 
-public readonly struct RoundResult(Outcome o,double units, int stake, bool blackjack, bool split, bool doubled)
-{
-    public Outcome Outcome { get; } = o;
-    public double UnitsWonOrLost { get; } = units;
-    public int Stake { get; } = stake;
-    public bool Blackjack { get; } = blackjack;
-    public bool Split { get; } = split;
-    public bool Double { get; } = doubled;
-}
+public record RoundResult(Outcome Outcome, double UnitsWonOrLost, int Stake, bool Blackjack, bool Split, bool Doubled);
 
 public class Game
 {
