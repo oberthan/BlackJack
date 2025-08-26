@@ -217,7 +217,7 @@ namespace BlackjackWpf
             int firstPassSimulations = 1_000_000;
             int secondPassSimulations = 25_000_000; // Fast, low-accuracy pass
             int finalSimulations = 100_000_000; // High-accuracy for close results
-            double firstThreshold = 0.003; // Margin for "close" results
+            double firstThreshold = 0.05; // Margin for "close" results
             double secondThreshold = 0.002;
 
             var strategy = Strategy.Instance;
