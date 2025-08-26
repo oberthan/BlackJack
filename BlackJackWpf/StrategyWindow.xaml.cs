@@ -17,6 +17,7 @@ namespace BlackjackWpf
     public partial class StrategyWindow : Window
     {
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(nameof(ViewModel), typeof(StrategyViewModel), typeof(StrategyWindow), new PropertyMetadata(default(StrategyViewModel)));
+        
         public StrategyWindow()
         {
             InitializeComponent();

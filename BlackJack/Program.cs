@@ -114,7 +114,7 @@ public class Program
         public long doubles = 0;
         public long stake = 0;
         public long rounds;
-        public Dictionary<double, int> limitOverShoots = new();
+        public Dictionary<double, long> limitOverShoots = new();
 
         public static BlackjackSimulator Sum(IEnumerable<BlackjackSimulator> simulators)
         {
