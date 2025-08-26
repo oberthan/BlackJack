@@ -230,7 +230,7 @@ namespace BlackjackWpf
             int totalSteps = pairValues.Length * colNames.Length;
             int currentStep = 0;
 
-            double[][][] difference = new double[pairValues.Length][colNames.Length][3];
+            double[,,] differences = new double[pairValues.Length, colNames.Length, 3];
 
             var watch = Stopwatch.StartNew();
             for (int i = 0; i < pairValues.Length; i++)
@@ -251,24 +251,36 @@ namespace BlackjackWpf
                     SetPairCell(row, col, "N");
                     double rtpN = await SimulateRTP(firstPassSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / firstPassSimulations;
 
+
                     // If results are close, re-run with higher accuracy
-                    if (Math.Abs(rtpY - rtpN) < firstThreshold)
+                    var firstPass = Math.Abs(rtpY - rtpN);
+                    differences[i, j, 0] = firstPass;
+                    if (firstPass < firstThreshold)
                     {
                         SetPairCell(row, col, "Y");
                         rtpY = await SimulateRTP(secondPassSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / secondPassSimulations;
 
                         SetPairCell(row, col, "N");
                         rtpN = await SimulateRTP(secondPassSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / secondPassSimulations;
+
+                        var secondPass = Math.Abs(rtpY - rtpN);
+                        differences[i,j,1] = secondPass;
+
+                        if (secondPass < secondThreshold)
+                        {
+                            SetPairCell(row, col, "Y");
+                            rtpY = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / finalSimulations;
+
+                            SetPairCell(row, col, "N");
+                            rtpN = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / finalSimulations;
+                   
+                            var finalPass = Math.Abs(rtpY - rtpN);
+                            differences[i,j,2] = finalPass;
+                        }
                     }
 
-                    if (Math.Abs(rtpY - rtpN) < secondThreshold)
-                    {
-                        SetPairCell(row, col, "Y");
-                        rtpY = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S"));
 
-                        SetPairCell(row, col, "N");
-                        rtpN = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S"));
-                    }
+
 
                     SetPairCell(row, col, rtpY >= rtpN ? "Y" : "N");
 
@@ -277,7 +289,24 @@ namespace BlackjackWpf
                 }
             }
 
-            ResultsText.Text = $"Pair strategy optimized! It took {watch.Elapsed}!";
+            var str = new StringBuilder();
+
+            str.AppendLine($"Pair strategy optimized! It took {watch.Elapsed}!");
+
+
+            for (int i = 0; i < pairValues.Length; i++)
+            {
+                str.AppendLine($"({pairValues[i]}, {pairValues[i]})::: ");
+
+                for (int j = 0; j < colNames.Length; j++)
+                {
+                    str.Append($"[{differences[i,j,0]:n5}:{differences[i, j, 1]:n5}:{differences[i, j, 2]:n5}] | ");
+                }
+
+
+            }
+
+            ResultsText.Text = str.ToString();
 
             if (button != null)
                 button.IsEnabled = true;
