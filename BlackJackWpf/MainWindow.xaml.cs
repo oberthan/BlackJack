@@ -294,7 +294,7 @@ namespace BlackjackWpf
             str.AppendLine($"Pair strategy optimized! It took {watch.Elapsed}!");
 
 
-            for (int i = pairValues.Length-1; i > 0; i--)
+            for (int i = pairValues.Length-1; i >= 0; i--)
             {
                 str.Append($"({pairValues[i]}, {pairValues[i]})::: ");
 
