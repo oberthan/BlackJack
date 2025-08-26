@@ -33,7 +33,15 @@ namespace BlackjackWpf
                 button.IsEnabled = false;
             ResultsText.Text = "Running simulation...";
             SimulationProgress.Value = 0;
-            await RunSimulation();
+            try
+            {
+                await RunSimulation();
+            }
+            catch(Exception ex)
+            {
+                ResultsText.Text = $"Error: {ex.Message}\n{ex.StackTrace}";
+            }
+
             UpdateStatus("Done");
 
             
@@ -239,6 +247,8 @@ namespace BlackjackWpf
             double[,,] differences = new double[pairValues.Length, colNames.Length, 3];
 
             var watch = Stopwatch.StartNew();
+            try
+            {
             for (int i = 0; i < pairValues.Length; i++)
             {
                 var pair = pairValues[i];
@@ -295,6 +305,7 @@ namespace BlackjackWpf
                 }
             }
 
+
             var str = new StringBuilder();
 
             str.AppendLine($"Pair strategy optimized! It took {watch.Elapsed}!");
@@ -314,6 +325,11 @@ namespace BlackjackWpf
             }
 
             ResultsText.Text = str.ToString();
+            }
+            catch (Exception ex)
+            {
+                ResultsText.Text = $"Error: {ex.Message}\n{ex.StackTrace}";
+            }
 
             if (button != null)
                 button.IsEnabled = true;

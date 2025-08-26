@@ -47,14 +47,25 @@ namespace BlackJackTest
 
             var sw = Stopwatch.StartNew();
             var tasks = new Task[threads];
-            for (int i = 0; i < threads; i++)
+            try
             {
-                int index = i;
-                tasks[i] = Task.Run(() => simulators[index].RunSimulation());
-            }
 
-            Task.WaitAll(tasks);
+
+                for (int i = 0; i < threads; i++)
+                {
+                    int index = i;
+                    tasks[i] = Task.Run(() => simulators[index].RunSimulation());
+                }
+
+                Task.WaitAll(tasks);
+            }
+            catch (Exception e)
+            {
+                TestContext.WriteLine(e);
+                throw;
+            }
             var sum = BlackjackSimulator.Sum(simulators);
+
             sw.Stop();
             TestContext.Out.WriteLine(
                 $"Multi-threaded ({threads} threads): {sum.rounds:N0} rounds in {sw.Elapsed.TotalSeconds:F2} seconds ({sum.rounds / sw.Elapsed.TotalSeconds:N0} rounds/sec)");
