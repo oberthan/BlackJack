@@ -207,13 +207,18 @@ namespace BlackjackWpf
 
         private async void SearchStrategy_Click(object sender, RoutedEventArgs e)
         {
+
+
+
             var button = sender as System.Windows.Controls.Button;
             if (button != null)
                 button.IsEnabled = false;
 
-            int initialSimulations = 5_000_000; // Fast, low-accuracy pass
-            int finalSimulations = 20_000_000; // High-accuracy for close results
-            double threshold = 0.002; // Margin for "close" results
+            int firstPassSimulations = 1_000_000;
+            int secondPassSimulations = 25_000_000; // Fast, low-accuracy pass
+            int finalSimulations = 100_000_000; // High-accuracy for close results
+            double firstThreshold = 0.003; // Margin for "close" results
+            double secondThreshold = 0.002;
 
             var strategy = Strategy.Instance;
             var pairRows = strategy.PairStrategy;
@@ -224,6 +229,8 @@ namespace BlackjackWpf
 
             int totalSteps = pairValues.Length * colNames.Length;
             int currentStep = 0;
+
+            double[][][] difference = new double[pairValues.Length][colNames.Length][3];
 
             var watch = Stopwatch.StartNew();
             for (int i = 0; i < pairValues.Length; i++)
@@ -239,13 +246,22 @@ namespace BlackjackWpf
                 {
                     string col = colNames[j];
                     SetPairCell(row, col, "Y");
-                    double rtpY = await SimulateRTP(initialSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / initialSimulations;
+                    double rtpY = await SimulateRTP(firstPassSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / firstPassSimulations;
 
                     SetPairCell(row, col, "N");
-                    double rtpN = await SimulateRTP(initialSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / initialSimulations;
+                    double rtpN = await SimulateRTP(firstPassSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / firstPassSimulations;
 
                     // If results are close, re-run with higher accuracy
-                    if (Math.Abs(rtpY - rtpN) < threshold)
+                    if (Math.Abs(rtpY - rtpN) < firstThreshold)
+                    {
+                        SetPairCell(row, col, "Y");
+                        rtpY = await SimulateRTP(secondPassSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / secondPassSimulations;
+
+                        SetPairCell(row, col, "N");
+                        rtpN = await SimulateRTP(secondPassSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / secondPassSimulations;
+                    }
+
+                    if (Math.Abs(rtpY - rtpN) < secondThreshold)
                     {
                         SetPairCell(row, col, "Y");
                         rtpY = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S"));
