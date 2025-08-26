@@ -182,7 +182,7 @@ namespace BlackjackWpf
                 double ev_sum = 0;
                 double sigma_squared = 0;
 
-                var sessions_sum = dict.Sum(x => x.Value);
+                long sessions_sum = dict.Sum(x => x.Value);
 
                 foreach (var kvp in dict)
                 {
@@ -396,12 +396,12 @@ namespace BlackjackWpf
 
             void UpdateResults(BlackjackSimulator sum, long previous = 0)
             {
-                var simulatedRounds = sum.rounds;
-                var wins = sum.wins;
-                var losses = sum.losses;
-                var pushes = sum.pushes;
-                var units = sum.units;
-                var stake = sum.stake;
+                long simulatedRounds = sum.rounds;
+                long wins = sum.wins;
+                long losses = sum.losses;
+                long pushes = sum.pushes;
+                double units = sum.units;
+                long stake = sum.stake;
 
                 var str = new StringBuilder();
                 str.AppendLine("|---- Blackjack Simulation Results ----|");
