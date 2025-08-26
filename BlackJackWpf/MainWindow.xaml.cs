@@ -169,24 +169,36 @@ namespace BlackjackWpf
                 dict = dict.OrderByDescending(x => x.Key).ToDictionary();
                 str.AppendLine($"\nUnit limits: \n{string.Join(Environment.NewLine, dict)}");
 
-                str.AppendLine($"Sum of all keys*value in dict: {dict.Sum(x => x.Key * x.Value) / dict.Sum(x => x.Value):n6}");
-
-                double edge = 0;
-                //double variance = 0;
                 double kelly = 0;
+                double ev_sum = 0;
+                double sigma_squared = 0;
 
-                double wasd = 0;
+                var sessions_sum = dict.Sum(x => x.Value);
 
                 foreach (var kvp in dict)
                 {
-                    if (kvp.Key < 0) wasd -= kvp.Key * kvp.Value * Rules.Instance.Cashback;
+                    if (kvp.Key < 0)
+                    {
+                        ev_sum += kvp.Key * kvp.Value * (1 - Rules.Instance.Cashback);
+                        sigma_squared += kvp.Value * (kvp.Key * (1 - Rules.Instance.Cashback) * kvp.Key * (1 - Rules.Instance.Cashback));
+                    }
+                    else
+                    {
+                        ev_sum += kvp.Key * kvp.Value;
+                        sigma_squared += kvp.Key * kvp.Key * kvp.Value;
+                    }
 
                 }
+                double ev = ev_sum / sessions_sum;
 
+                sigma_squared /= sessions_sum;
+                sigma_squared -= ev * ev;
 
+                kelly = ev / sigma_squared;
 
-
-
+                str.AppendLine($"Kelly: {kelly:n6}");
+                str.AppendLine($"EV: {ev:n6}");
+                str.AppendLine($"Kelly*EV: {kelly * ev:n6}");
 
 
                 ResultsText.Text = str.ToString();

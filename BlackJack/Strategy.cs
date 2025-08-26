@@ -16,7 +16,7 @@ public class Strategy
     public List<PairStrategyRow> PairStrategy { get; set; } = new()
     {
         new PairStrategyRow { Pair = "2,2", Vs2 = "Y/N", Vs3 = "Y/N", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "3,3", Vs2 = "Y/N", Vs3 = "Y/N", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
+        new PairStrategyRow { Pair = "3,3", Vs2 = "N", Vs3 = "Y/N", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "4,4", Vs2 = "N", Vs3 = "N", Vs4 = "N", Vs5 = "Y/N", Vs6 = "Y/N", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "5,5", Vs2 = "N", Vs3 = "N", Vs4 = "N", Vs5 = "N", Vs6 = "N", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "6,6", Vs2 = "Y/N", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
@@ -78,7 +78,12 @@ public class Strategy
         // --- Soft Totals ---
         if (isSoft)
         {
-            if (cards.Count == 5) return Move.Hit; // Hit soft 5-card hands
+            // six card charlie strats
+            if (cards.Count == 5 && total >= 19) return Move.Hit;
+            if (cards.Count >= 4 && total == 18 && !(dealerUp.PipValue >= 3 && dealerUp.PipValue <= 6)) return Move.Hit;
+            if (cards.Count >= 4 && total == 19 && dealerUp.PipValue == 10) return Move.Hit;
+
+
             var row = SoftStrategy.FirstOrDefault(r => r.Total == total);
             if (row != null)
                 return ParseMove(LookupAction(row, dealerUp.PipValue), canDouble);
@@ -87,6 +92,14 @@ public class Strategy
         // --- Hard Totals ---
         if (!isSoft)
         {
+
+            // six card charlie strats
+            if (cards.Count >= 4 && total == 12 && dealerUp.PipValue >= 4 && dealerUp.PipValue <= 6) return Move.Hit;
+            if (cards.Count >= 4 && total == 13 && dealerUp.PipValue == 2 && dealerUp.PipValue == 3) return Move.Hit;
+            if (cards.Count == 5 && total >= 13 && total <= 15 && dealerUp.PipValue >= 2 && dealerUp.PipValue <= 6) return Move.Hit;
+            if (cards.Count == 5 && total == 16 && dealerUp.PipValue == 2 && dealerUp.PipValue == 3) return Move.Hit;
+            if (cards.Count == 5 && total == 17 && dealerUp.PipValue >= 9 && dealerUp.PipValue <= 11) return Move.Hit;
+
 
             if (total > HardStrategy.MaxBy(r => r.Total).Total)
                 return Move.Stand; // fallback for totals outside the strategy range
