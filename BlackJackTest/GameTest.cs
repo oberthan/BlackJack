@@ -1,9 +1,7 @@
-using NUnit.Framework;
 using Blackjack;
-using System.Collections.Generic;
-using System.Reflection;
+using NUnit.Framework;
 
-namespace Blackjack.Tests
+namespace BlackJackTest
 {
     [TestFixture]
     public class GameTest
@@ -353,7 +351,7 @@ namespace Blackjack.Tests
                 {
                     string playerValueTwo = playerValues[g];
 
-                    var evaluation = HandEvaluator.Evaluate(new List<Card>
+                    var evaluation = HandEvaluator.Instance.Evaluate(new List<Card>
                     {
                         new Card(playerValueOne, "S"),
                         new Card(playerValueTwo, "D")

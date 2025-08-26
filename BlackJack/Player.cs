@@ -4,7 +4,7 @@ public class Player
 {
     public List<Card> Hand { get; } = new();
     public int Bet { get; set; } = 1;
-    public SplitPlayer? SplitHandPlayer { get; private set; }
+    public SplitPlayer? SplitHandPlayer { get; set; }
 
 
     public bool DidBlackjack { get; set; }
