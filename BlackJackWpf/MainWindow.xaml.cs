@@ -242,7 +242,7 @@ namespace BlackjackWpf
                         rtpN = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S"));
                     }
 
-                    SetPairCell(row, col, rtpY <= rtpN ? "Y" : "N");
+                    SetPairCell(row, col, rtpY >= rtpN ? "Y" : "N");
 
                     currentStep++;
                     UpdateProgress((float)currentStep / totalSteps);
