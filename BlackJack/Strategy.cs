@@ -16,12 +16,12 @@ public class Strategy
     public List<PairStrategyRow> PairStrategy { get; set; } = new()
     {
         new PairStrategyRow { Pair = "2,2", Vs2 = "Y/N", Vs3 = "Y/N", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "3,3", Vs2 = "N", Vs3 = "Y/N", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
+        new PairStrategyRow { Pair = "3,3", Vs2 = "Y/N", Vs3 = "Y/N", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "4,4", Vs2 = "N", Vs3 = "N", Vs4 = "N", Vs5 = "Y/N", Vs6 = "Y/N", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "5,5", Vs2 = "N", Vs3 = "N", Vs4 = "N", Vs5 = "N", Vs6 = "N", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "6,6", Vs2 = "Y/N", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "7,7", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "8,8", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "Y", Vs9 = "Y", Vs10 = "N", VsA = "Y"},
+        new PairStrategyRow { Pair = "8,8", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "Y", Vs9 = "Y", Vs10 = "Y", VsA = "Y"},
         new PairStrategyRow { Pair = "9,9", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "N", Vs8 = "Y", Vs9 = "Y", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "10,10", Vs2 = "N", Vs3 = "N", Vs4 = "N", Vs5 = "N", Vs6 = "N", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
         new PairStrategyRow { Pair = "11,11", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "Y", Vs9 = "Y", Vs10 = "Y", VsA = "Y"}
