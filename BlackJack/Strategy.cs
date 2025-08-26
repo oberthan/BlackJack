@@ -71,7 +71,7 @@ public class Strategy
     private readonly int hardStrategyMaxTotal = 17;
     private readonly int hardStrategyMinTotal = 8;
 
-    public Move Decide(Player player, Card dealerUp, bool afterSplit)
+    public Move Decide(Player player, CardValue dealerUp, bool afterSplit)
     {
         var eval = HandEvaluator.Instance.Evaluate(player.Hand, false);
         var total = eval.Total;
@@ -82,13 +82,13 @@ public class Strategy
         // --- Pair Splitting ---
         if (canSplit)
         {
-            var pair = $"{cards[0].PipValue},{cards[1].PipValue}";
+            var pair = $"{cards[0]},{cards[1]}";
             var row = PairStrategy.FirstOrDefault(r => r.Pair == pair);
-            if (row != null && ParseBool(LookupAction(row, dealerUp.PipValue)))
+            if (row != null && ParseBool(LookupAction(row, (int)dealerUp)))
                 return Move.Split;
         }
 
-
+        var upValue = (int) dealerUp;
 
         var canDouble = player.CanDouble(afterSplit, player.IsSplitAces);
 
@@ -97,13 +97,13 @@ public class Strategy
         {
             // six card charlie strats
             if (cards.Count == 5 && total >= 19) return Move.Hit;
-            if (cards.Count >= 4 && total == 18 && !(dealerUp.PipValue >= 3 && dealerUp.PipValue <= 6)) return Move.Hit;
-            if (cards.Count >= 4 && total == 19 && dealerUp.PipValue == 10) return Move.Hit;
+            if (cards.Count >= 4 && total == 18 && !(upValue is >= 3 and <= 6)) return Move.Hit;
+            if (cards.Count >= 4 && total == 19 && upValue == 10) return Move.Hit;
 
 
             var row = SoftStrategy.FirstOrDefault(r => r.Total == total);
             if (row != null)
-                return ParseMove(LookupAction(row, dealerUp.PipValue), canDouble);
+                return ParseMove(LookupAction(row, upValue), canDouble);
         }
 
         // --- Hard Totals ---
@@ -111,11 +111,11 @@ public class Strategy
         {
 
             // six card charlie strats
-            if (cards.Count >= 4 && total == 12 && dealerUp.PipValue >= 4 && dealerUp.PipValue <= 6) return Move.Hit;
-            if (cards.Count >= 4 && total == 13 && dealerUp.PipValue == 2 && dealerUp.PipValue == 3) return Move.Hit;
-            if (cards.Count == 5 && total >= 13 && total <= 15 && dealerUp.PipValue >= 2 && dealerUp.PipValue <= 6) return Move.Hit;
-            if (cards.Count == 5 && total == 16 && dealerUp.PipValue == 2 && dealerUp.PipValue == 3) return Move.Hit;
-            if (cards.Count == 5 && total == 17 && dealerUp.PipValue >= 9 && dealerUp.PipValue <= 11) return Move.Hit;
+            if (cards.Count >= 4 && total == 12 && upValue is >= 4 and <= 6) return Move.Hit;
+            if (cards.Count >= 4 && total == 13 && upValue == 2 && upValue == 3) return Move.Hit;
+            if (cards.Count == 5 && total >= 13 && total <= 15 && upValue >= 2 && upValue <= 6) return Move.Hit;
+            if (cards.Count == 5 && total == 16 && upValue == 2 && upValue == 3) return Move.Hit;
+            if (cards.Count == 5 && total == 17 && upValue >= 9 && upValue <= 11) return Move.Hit;
 
 
             if (total > hardStrategyMaxTotal)
@@ -124,23 +124,23 @@ public class Strategy
                 return Move.Hit; // fallback for totals outside the strategy range
             var row = HardStrategy.FirstOrDefault(r => r.Total == total);
             if (row != null)
-                return ParseMove(LookupAction(row, dealerUp.PipValue), canDouble);
+                return ParseMove(LookupAction(row, upValue), canDouble);
         }
 
         return Move.Hit;
     }
-    public static Move DecideOld(Player player, Card dealerUp, bool afterSplit)
+    public static Move DecideOld(Player player, CardValue dealerUp, bool afterSplit)
     {
         var eval = HandEvaluator.Instance.Evaluate(player.Hand, false);
         var total = eval.Total;
         var isSoft = eval.IsSoft;
-        var up = dealerUp.PipValue; // 2–11 where 11 = Ace
+        var up = (int)dealerUp; // 2–11 where 11 = Ace
         var cards = player.Hand;
 
         // --- Pair Splitting ---
-        if (!afterSplit && cards.Count == 2 && cards[0].PipValue == cards[1].PipValue)
+        if (!afterSplit && cards.Count == 2 && cards[0] == cards[1])
         {
-            var pairVal = cards[0].PipValue;
+            var pairVal = (int)cards[0];
 
             if (pairVal == 11) return Move.Split; // AA
             if (pairVal == 8) return Move.Split; // 8s

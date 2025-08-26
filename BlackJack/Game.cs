@@ -139,7 +139,7 @@ public class Game
         if (player.SplitHandPlayer != null)
         {
             var unitsSplit = PlaySingleHand(player.SplitHandPlayer, true,
-                player.SplitHandPlayer.Hand[0].Value == "A");
+                player.SplitHandPlayer.Hand[0] == CardValue.Ace);
             // Dealer plays once for both hands (standard shoe game): delay dealer play until both hands done.
             netUnits += unitsSplit; // will be combined after dealer plays
         }
@@ -150,7 +150,7 @@ public class Game
     private bool InitialCheckForBlackjack(HandEval dEval, HandEval pEval, out RoundResult playOneRoundWithHand)
     {
         // REQUIREMENT: Dealer peeks for Blackjack when showing Ace
-        if (Rules.Instance.DealerPeeksOnAce && dealer.Hand[0].Value == "A")
+        if (Rules.Instance.DealerPeeksOnAce && dealer.Hand[0] == CardValue.Ace)
             if (dEval.IsBlackjack)
             {
                 if (pEval.IsBlackjack)
@@ -270,7 +270,7 @@ public class Game
                         handOwner.Split(deck);
                         handOwner.DidSplit = true; // track for later
 
-                        if (handOwner.Hand[0].Value == "A")
+                        if (handOwner.Hand[0] == CardValue.Ace)
                         {
                             isSplitAces = true;
                         }

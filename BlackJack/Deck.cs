@@ -9,7 +9,7 @@ public class Deck
 {
     private readonly int numDecks;
     private readonly int penetrationCut; // remaining-card threshold to reshuffle
-    public Card[] Cards { get; private set; }
+    public int[] Cards { get; private set; }
     public int CardsLeft;
 
     public Deck(int numDecks = 8)
@@ -22,15 +22,20 @@ public class Deck
 
     public void SetupShoe()
     {
-        string[] suits = { "H", "D", "V", "S" };
-        string[] values = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
+        CardSuit[] suits = [CardSuit.Hearts, CardSuit.Diamonds, CardSuit.Clubs, CardSuit.Spades];
+        CardValue[] values =
+        [
+            CardValue.Two, CardValue.Three, CardValue.Four, CardValue.Five, CardValue.Six, CardValue.Seven,
+            CardValue.Eight, CardValue.Nine, CardValue.Ten, CardValue.Jack, CardValue.Queen, CardValue.King,
+            CardValue.Ace
+        ];
 
-        Cards = new Card[numDecks * 52];
+        Cards = new int[numDecks * 52];
 
         for (var n = 0; n < numDecks; n++)
             for (var si = 0; si < suits.Length; si++)
                 for (var vi = 0; vi < values.Length; vi++)
-                    Cards[n * 52 + si * values.Length + vi] = new Card(values[vi], suits[si]);
+                    Cards[n * 52 + si * values.Length + vi] = (int)values[vi] | (int)suits[si];
         Shuffle();
     }
 
@@ -47,12 +52,12 @@ public class Deck
     }
 
 
-    public Card DrawCard()
+    public CardValue DrawCard()
     {
         if (CardsLeft == 0) throw new InvalidOperationException("Deck is empty!");
         var card = Cards[CardsLeft - 1];
         CardsLeft--;
-        return card;
+        return (CardValue)(card&(int)CardValue.Mask);
     }
 
     public void EndOfGame()

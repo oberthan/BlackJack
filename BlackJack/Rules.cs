@@ -33,20 +33,9 @@ public class Rules
     public bool DealerPeeksOnAce { get; set; } = true;
 
     // REQUIREMENT: Split only on first two cards of equal value
-    public bool CanSplitPair(Card a, Card b)
+    public bool CanSplitPair(CardValue a, CardValue b)
     {
-        return CardValueForSplit(a) == CardValueForSplit(b);
-    }
-
-    // Face cards are same value (J/Q/K = 10) for “same value” comparisons
-    private int CardValueForSplit(Card c)
-    {
-        return c.Value switch
-        {
-            "J" or "Q" or "K" => 10,
-            "A" => 11, // just to distinguish Aces as a pair
-            _ => int.Parse(c.Value)
-        };
+        return (int)a == (int)b;
     }
 
     public double UpperLimit = 3;

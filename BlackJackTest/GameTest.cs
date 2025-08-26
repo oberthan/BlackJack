@@ -130,13 +130,13 @@ namespace BlackJackTest
             var result = game.PlayOneRoundWithHand();
 
             TestContext.Out.WriteLine("Player Hand:");
-            foreach (Card card in player.Hand)
+            foreach (CardValue card in player.Hand)
             {
                 TestContext.Out.WriteLine(card.ToString());
 
             }
             TestContext.Out.WriteLine("\n\nDealer Hand:");
-            foreach (Card card in dealer.Hand)
+            foreach (CardValue card in dealer.Hand)
             {
                 TestContext.Out.WriteLine(card.ToString());
 
@@ -157,14 +157,14 @@ namespace BlackJackTest
             dealer.Reset();
 
 
-            player.AddCard(new Card("2", "S"));
-            player.AddCard(new Card("2", "S"));
-            player.AddCard(new Card("2", "S"));
-            player.AddCard(new Card("2", "S"));
-            player.AddCard(new Card("2", "S"));
-            dealer.AddCard(new Card("7", "H"));
-            player.AddCard(new Card("2", "D"));
-            dealer.AddCard(new Card("6", "C"));
+            player.AddCard(CardValue.Two);
+            player.AddCard(CardValue.Two);
+            player.AddCard(CardValue.Two);
+            player.AddCard(CardValue.Two);
+            player.AddCard(CardValue.Two);
+            dealer.AddCard(CardValue.Seven);
+            player.AddCard(CardValue.Two);
+            dealer.AddCard(CardValue.Six);
 
             var result = game.PlayOneRoundWithHand();
 
@@ -220,7 +220,7 @@ namespace BlackJackTest
 
                 TestContext.Out.WriteLine($"\n\n\n\nGame {i}");
                 TestContext.Out.WriteLine("Player Hand 1:");
-                foreach (Card card in player.Hand)
+                foreach (var card in player.Hand)
                 {
                     TestContext.Out.WriteLine(card.ToString());
 
@@ -229,7 +229,7 @@ namespace BlackJackTest
                 if (player.SplitHandPlayer != null)
                 {
                     TestContext.Out.WriteLine("\nPlayer Hand 2:");
-                    foreach (Card card in player.SplitHandPlayer.Hand)
+                    foreach (var card in player.SplitHandPlayer.Hand)
                     {
                         TestContext.Out.WriteLine(card.ToString());
 
@@ -237,7 +237,7 @@ namespace BlackJackTest
                 }
 
                 TestContext.Out.WriteLine("\n\nDealer Hand:");
-                foreach (Card card in dealer.Hand)
+                foreach (var card in dealer.Hand)
                 {
                     TestContext.Out.WriteLine(card.ToString());
 
@@ -351,7 +351,7 @@ namespace BlackJackTest
                 {
                     string playerValueTwo = playerValues[g];
 
-                    var evaluation = HandEvaluator.Instance.Evaluate(new List<Card>
+                    var evaluation = HandEvaluator.Instance.Evaluate(new List<CardValue>
                     {
                         new Card(playerValueOne, "S"),
                         new Card(playerValueTwo, "D")

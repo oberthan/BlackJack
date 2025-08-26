@@ -224,7 +224,12 @@ namespace BlackjackWpf
             var pairRows = strategy.PairStrategy;
 
             // Map from "2"-"A" to the corresponding row in PairStrategy
-            var pairValues = new[] { "2", "3", "4", "5", "6", "7", "8", "9", "10", "A" };
+            CardValue[] pairValues =
+            [
+                CardValue.Two, CardValue.Three, CardValue.Four, CardValue.Five, CardValue.Six, CardValue.Seven,
+                CardValue.Eight, CardValue.Nine, CardValue.Ten, CardValue.Jack, CardValue.Queen, CardValue.King,
+                CardValue.Ace
+            ];
             var colNames = new[] { "Vs2", "Vs3", "Vs4", "Vs5", "Vs6", "Vs7", "Vs8", "Vs9", "Vs10", "VsA" };
 
             int totalSteps = pairValues.Length * colNames.Length;
@@ -235,10 +240,10 @@ namespace BlackjackWpf
             var watch = Stopwatch.StartNew();
             for (int i = 0; i < pairValues.Length; i++)
             {
-                string pair = pairValues[i];
-                var pCard = new Card(pair, "D");
+                var pair = pairValues[i];
+                var pCard = pair;
                 // Find the row in PairStrategy where Pair == pair
-                var row = pairRows.FirstOrDefault(r => r.Pair == $"{pCard.PipValue},{pCard.PipValue}");
+                var row = pairRows.FirstOrDefault(r => r.Pair == $"{pCard},{pCard}");
 
                 //if (row == null) continue;
 
@@ -246,10 +251,10 @@ namespace BlackjackWpf
                 {
                     string col = colNames[j];
                     SetPairCell(row, col, "Y");
-                    double rtpY = await SimulateRTP(firstPassSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / firstPassSimulations;
+                    double rtpY = await SimulateRTP(firstPassSimulations, [pCard, pCard], pairValues[j]) / firstPassSimulations;
 
                     SetPairCell(row, col, "N");
-                    double rtpN = await SimulateRTP(firstPassSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / firstPassSimulations;
+                    double rtpN = await SimulateRTP(firstPassSimulations, [pCard, pCard],pairValues[j]) / firstPassSimulations;
 
 
                     // If results are close, re-run with higher accuracy
@@ -258,10 +263,10 @@ namespace BlackjackWpf
                     if (firstPass < firstThreshold)
                     {
                         SetPairCell(row, col, "Y");
-                        rtpY = await SimulateRTP(secondPassSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / secondPassSimulations;
+                        rtpY = await SimulateRTP(secondPassSimulations, [pCard, pCard], pairValues[j]) / secondPassSimulations;
 
                         SetPairCell(row, col, "N");
-                        rtpN = await SimulateRTP(secondPassSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / secondPassSimulations;
+                        rtpN = await SimulateRTP(secondPassSimulations, [pCard, pCard], pairValues[j]) / secondPassSimulations;
 
                         var secondPass = Math.Abs(rtpY - rtpN);
                         differences[i,j,1] = secondPass;
@@ -269,10 +274,10 @@ namespace BlackjackWpf
                         if (secondPass < secondThreshold)
                         {
                             SetPairCell(row, col, "Y");
-                            rtpY = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / finalSimulations;
+                            rtpY = await SimulateRTP(finalSimulations, [pCard, pCard], pairValues[j]) / finalSimulations;
 
                             SetPairCell(row, col, "N");
-                            rtpN = await SimulateRTP(finalSimulations, [pCard, pCard], new Card(pairValues[j], "S")) / finalSimulations;
+                            rtpN = await SimulateRTP(finalSimulations, [pCard, pCard], pairValues[j]) / finalSimulations;
                    
                             var finalPass = Math.Abs(rtpY - rtpN);
                             differences[i,j,2] = finalPass;
@@ -333,7 +338,7 @@ namespace BlackjackWpf
         }
 
         // Run a simulation and return RTP
-        private async Task<double> SimulateRTP(int rounds, List<Card> playerHand, Card upCard)
+        private async Task<double> SimulateRTP(int rounds, List<CardValue> playerHand, CardValue upCard)
         {
             var nTasks = Environment.ProcessorCount;
             var simulators = new BlackjackSimulator[nTasks];

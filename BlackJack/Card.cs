@@ -26,4 +26,35 @@ public class Card
     {
         return $"{Value} of {Suit}";
     }
+    
+    public static implicit operator CardValue(Card card)
+    {
+        return (CardValue)card.PipValue;
+    }
+}
+
+public enum CardValue
+{
+    Ace = 11,
+    Two = 2,
+    Three = 3,
+    Four = 4,
+    Five = 5,
+    Six = 6,
+    Seven = 7,
+    Eight = 8,
+    Nine = 9,
+    Ten = 10,
+    Jack = 10,
+    Queen = 10,
+    King = 10,
+    Mask = 0x0F // lower 4 bits
+}
+
+public enum CardSuit
+{
+    Hearts = 1 << 4,
+    Diamonds = 2 << 4,
+    Clubs = 3 << 4,
+    Spades = 4 << 4
 }

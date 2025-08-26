@@ -2,7 +2,7 @@
 
 public class Player
 {
-    public List<Card> Hand { get; } = new();
+    public List<CardValue> Hand { get; } = new();
     public int Bet { get; set; } = 1;
     public SplitPlayer? SplitHandPlayer { get; set; }
 
@@ -11,8 +11,8 @@ public class Player
     public bool DidSplit { get; set; }
     public bool DidDouble { get; set; }
 
-    public bool IsSplitAces => SplitHandPlayer != null && Hand.Count == 2 && Hand[0].Value == "A";
-    public bool IsOriginalAces => Hand.Count == 2 && Hand[0].Value == "A" && Hand[1].Value == "A";
+    public bool IsSplitAces => SplitHandPlayer != null && Hand.Count == 2 && Hand[0]== CardValue.Ace;
+    public bool IsOriginalAces => Hand.Count == 2 && Hand[0]== CardValue.Ace && Hand[1]== CardValue.Ace;
 
 
     public void Reset()
@@ -26,7 +26,11 @@ public class Player
         DidDouble = false;
     }
 
-    public void AddCard(Card card)
+    public void AddCard(CardValue card)
+    {
+        Hand.Add(card);
+    }
+    public void AddCard(CardValue card, CardSuit suit)
     {
         Hand.Add(card);
     }
@@ -91,19 +95,13 @@ public class Player
         var aces = 0;
 
         foreach (var card in Hand)
-            if (card.Value == "A")
+        {
+            total += (int)card;
+            if (card == CardValue.Ace)
             {
-                total += 11;
                 aces++;
             }
-            else if (card.Value is "J" or "Q" or "K")
-            {
-                total += 10;
-            }
-            else
-            {
-                total += int.Parse(card.Value);
-            }
+        }
 
         while (total > 21 && aces > 0)
         {

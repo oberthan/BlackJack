@@ -182,7 +182,7 @@ public class Program
                 }
             }
         }
-        public void ForceStartingHand(List<Card> playerhand, Card upCard)
+        public void ForceStartingHand(List<CardValue> playerHand, CardValue upCard)
         {
             double localUnits = 0;
             for (i = 0; i < Rounds; i++)
@@ -190,8 +190,8 @@ public class Program
                 Game.player.Reset();
                 Game.dealer.Reset();
                 Game.deck.EndOfGame();
-                Game.player.AddCard(playerhand[0]);
-                Game.player.AddCard(playerhand[1]);
+                Game.player.AddCard(playerHand[0]);
+                Game.player.AddCard(playerHand[1]);
 
                 Game.dealer.AddCard(upCard);
                 Game.dealer.AddCard(Game.deck.DrawCard());
