@@ -1,12 +1,8 @@
 ﻿namespace Blackjack;
 
-public static class Rnd
-{
-    public static Random Rng = new();
-}
-
 public class Deck
 {
+    private Random rnd = new();
     private readonly int numDecks;
     private readonly int penetrationCut; // remaining-card threshold to reshuffle
     public int[] Cards { get; private set; }
@@ -17,10 +13,11 @@ public class Deck
         this.numDecks = numDecks;
         var total = numDecks * 52;
         penetrationCut = (int)Math.Ceiling(total * (1.0 - Rules.Instance.Penetration));
-        SetupShoe();
+        Cards = SetupShoe();
+        Shuffle();
     }
 
-    public void SetupShoe()
+    public int[] SetupShoe()
     {
         CardSuit[] suits = [CardSuit.Hearts, CardSuit.Diamonds, CardSuit.Clubs, CardSuit.Spades];
         CardValue[] values =
@@ -30,13 +27,13 @@ public class Deck
             CardValue.Ace
         ];
 
-        Cards = new int[numDecks * 52];
+        var cards = new int[numDecks * 52];
 
         for (var n = 0; n < numDecks; n++)
             for (var si = 0; si < suits.Length; si++)
                 for (var vi = 0; vi < values.Length; vi++)
-                    Cards[n * 52 + si * values.Length + vi] = (int)values[vi] | (int)suits[si];
-        Shuffle();
+                    cards[n * 52 + si * values.Length + vi] = (int)values[vi] | (int)suits[si];
+        return cards;
     }
 
     public void Shuffle()
@@ -46,7 +43,7 @@ public class Deck
         // Fisher-Yates shuffle algorithm (Knuth / Durstenfeld swap shuffle version https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
         for (var i = n - 1; i > 0; i--)
         {
-            var j = Rnd.Rng.Next(i + 1);
+            var j = rnd.Next(i + 1);
             (Cards[i], Cards[j]) = (Cards[j], Cards[i]);
         }
     }
@@ -63,5 +60,10 @@ public class Deck
     public void EndOfGame()
     {
         if (CardsLeft < penetrationCut) Shuffle();
+    }
+
+    public void RandomSeed(int seed)
+    {
+        rnd = new Random(seed);
     }
 }

@@ -12,7 +12,7 @@ namespace Blackjack.Test
                 Outcome.PlayerWin,
                 1.5,
                 100,
-                Blackjack: true,
+                blackjack: true,
                 split: false,
                 doubled: true);
 

@@ -243,17 +243,17 @@ namespace BlackjackWpf
                 var pair = pairValues[i];
                 var pCard = pair;
                 // Find the row in PairStrategy where Pair == pair
-                var row = pairRows.FirstOrDefault(r => r.Pair == $"{pCard},{pCard}");
+                var row = pairRows.First(r => r.Pair == pCard);
 
                 //if (row == null) continue;
 
                 for (int j = 0; j < colNames.Length; j++)
                 {
                     string col = colNames[j];
-                    SetPairCell(row, col, "Y");
+                    SetPairCell(row, col,  Decision.P);
                     double rtpY = await SimulateRTP(firstPassSimulations, [pCard, pCard], pairValues[j]) / firstPassSimulations;
 
-                    SetPairCell(row, col, "N");
+                    SetPairCell(row, col, Decision.N);
                     double rtpN = await SimulateRTP(firstPassSimulations, [pCard, pCard],pairValues[j]) / firstPassSimulations;
 
 
@@ -262,10 +262,10 @@ namespace BlackjackWpf
                     differences[i, j, 0] = firstPass;
                     if (firstPass < firstThreshold)
                     {
-                        SetPairCell(row, col, "Y");
+                        SetPairCell(row, col, Decision.P);
                         rtpY = await SimulateRTP(secondPassSimulations, [pCard, pCard], pairValues[j]) / secondPassSimulations;
 
-                        SetPairCell(row, col, "N");
+                        SetPairCell(row, col, Decision.N);
                         rtpN = await SimulateRTP(secondPassSimulations, [pCard, pCard], pairValues[j]) / secondPassSimulations;
 
                         var secondPass = Math.Abs(rtpY - rtpN);
@@ -273,10 +273,10 @@ namespace BlackjackWpf
 
                         if (secondPass < secondThreshold)
                         {
-                            SetPairCell(row, col, "Y");
+                            SetPairCell(row, col, Decision.P);
                             rtpY = await SimulateRTP(finalSimulations, [pCard, pCard], pairValues[j]) / finalSimulations;
 
-                            SetPairCell(row, col, "N");
+                            SetPairCell(row, col, Decision.N);
                             rtpN = await SimulateRTP(finalSimulations, [pCard, pCard], pairValues[j]) / finalSimulations;
                    
                             var finalPass = Math.Abs(rtpY - rtpN);
@@ -287,7 +287,7 @@ namespace BlackjackWpf
 
 
 
-                    SetPairCell(row, col, rtpY >= rtpN ? "Y" : "N");
+                    SetPairCell(row, col, rtpY >= rtpN ? Decision.P : Decision.N);
 
                     currentStep++;
                     UpdateProgress((float)currentStep / totalSteps);
@@ -319,9 +319,8 @@ namespace BlackjackWpf
         }
 
         // Helper to set a cell value by column name
-        private void SetPairCell(PairStrategyRow row, string col, string value)
+        private void SetPairCell(PairStrategyRow row, string col, Decision decision)
         {
-            var decision = Enum.Parse<Decision>(value);
             switch (col)
             {
                 case "Vs2": row.Vs2 = decision; break;

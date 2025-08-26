@@ -13,39 +13,39 @@ public enum Outcome
 
 }
 
-public readonly struct RoundResult(Outcome o,double units, int stake, bool Blackjack, bool split, bool doubled)
+public readonly struct RoundResult(Outcome o,double units, int stake, bool blackjack, bool split, bool doubled)
 {
     public Outcome Outcome { get; } = o;
     public double UnitsWonOrLost { get; } = units;
     public int Stake { get; } = stake;
-    public bool Blackjack { get; } = Blackjack;
+    public bool Blackjack { get; } = blackjack;
     public bool Split { get; } = split;
     public bool Double { get; } = doubled;
 }
 
 public class Game
 {
-    public readonly Dealer dealer = new(); // dealer uses same Player class but different flow
-    public readonly Deck deck = new(); // 8-deck shoe with 0.7 penetration by default
-    public readonly Player player = new();
+    public readonly Dealer Dealer = new(); // dealer uses same Player class but different flow
+    public readonly Deck Deck = new(); // 8-deck shoe with 0.7 penetration by default
+    public readonly Player Player = new();
 
     public void Reset()
     {
-        deck.SetupShoe();
-        dealer.Reset();
-        player.Reset();
+        Deck.SetupShoe();
+        Dealer.Reset();
+        Player.Reset();
     }
     public RoundResult PlayOneRound()
     {
-        player.Reset();
-        dealer.Reset();
-        deck.EndOfGame();
+        Player.Reset();
+        Dealer.Reset();
+        Deck.EndOfGame();
 
         // initial deal
-        player.AddCard(deck.DrawCard());
-        dealer.AddCard(deck.DrawCard()); // dealer upcard
-        player.AddCard(deck.DrawCard());
-        dealer.AddCard(deck.DrawCard()); // dealer hole card
+        Player.AddCard(Deck.DrawCard());
+        Dealer.AddCard(Deck.DrawCard()); // dealer upcard
+        Player.AddCard(Deck.DrawCard());
+        Dealer.AddCard(Deck.DrawCard()); // dealer hole card
 
         return PlayOneRoundWithHand();
     }
@@ -53,9 +53,9 @@ public class Game
     public RoundResult PlayOneRoundWithHand()
     {
         // evaluate Blackjacks (initial only)
-        var pEval = HandEvaluator.Instance.Evaluate(player.Hand, true);
-        var dEval = HandEvaluator.Instance.Evaluate(dealer.Hand, true);
-        if (pEval.IsBlackjack) player.DidBlackjack = true; // track for later
+        var pEval = HandEvaluator.Evaluate(Player.Hand, true);
+        var dEval = HandEvaluator.Evaluate(Dealer.Hand, true);
+        if (pEval.IsBlackjack) Player.DidBlackjack = true; // track for later
 
         if (InitialCheckForBlackjack(dEval, pEval, out var playOneRoundWithHand)) return playOneRoundWithHand;
 
@@ -67,21 +67,21 @@ public class Game
         if (DealerTurn(dEval, out var roundResult)) return roundResult;
 
         // Resolve outcomes for hands that need comparing
-        int mainResult = GetHandOutcome(player, false);
-        netUnits += SettleAgainstDealer(player, false);
-        Outcome mainOutcome = GetOutcomeFromResult(mainResult, player, dealer);
+        int mainResult = GetHandOutcome(Player, false);
+        netUnits += SettleAgainstDealer(Player, false);
+        Outcome mainOutcome = GetOutcomeFromResult(mainResult, Player, Dealer);
 
         Outcome? splitOutcome = null;
-        if (player.SplitHandPlayer != null)
+        if (Player.SplitHandPlayer != null)
         {
-            int splitResult = GetHandOutcome(player.SplitHandPlayer, true);
-            netUnits += SettleAgainstDealer(player.SplitHandPlayer, true);
-            splitOutcome = GetOutcomeFromResult(splitResult, player.SplitHandPlayer, dealer);
+            int splitResult = GetHandOutcome(Player.SplitHandPlayer, true);
+            netUnits += SettleAgainstDealer(Player.SplitHandPlayer, true);
+            splitOutcome = GetOutcomeFromResult(splitResult, Player.SplitHandPlayer, Dealer);
         }
 
-        int totalStake = player.Bet; // original hand (already doubled if double down)
-        if (player.SplitHandPlayer != null)
-            totalStake += player.SplitHandPlayer.Bet;
+        int totalStake = Player.Bet; // original hand (already doubled if double down)
+        if (Player.SplitHandPlayer != null)
+            totalStake += Player.SplitHandPlayer.Bet;
 
         return Summarize(mainOutcome, splitOutcome, netUnits, totalStake);
     }
@@ -89,37 +89,37 @@ public class Game
     private RoundResult Summarize(Outcome mainOutcome, Outcome? splitOutcome, int netUnits, int totalStake)
     {
         if (mainOutcome == Outcome.PlayerWinWithCharlie || splitOutcome == Outcome.PlayerWinWithCharlie)
-            return new RoundResult(Outcome.PlayerWinWithCharlie, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
+            return new RoundResult(Outcome.PlayerWinWithCharlie, netUnits, totalStake, Player.DidBlackjack, Player.DidSplit, Player.DidDouble);
 
         // Dealer blackjack (after Charlie check)
         if (mainOutcome == Outcome.DealerBlackjack || splitOutcome == Outcome.DealerBlackjack)
-            return new RoundResult(Outcome.DealerBlackjack, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
+            return new RoundResult(Outcome.DealerBlackjack, netUnits, totalStake, Player.DidBlackjack, Player.DidSplit, Player.DidDouble);
 
         if (mainOutcome == Outcome.Bust || splitOutcome == Outcome.Bust)
-            return new RoundResult(Outcome.Bust, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
+            return new RoundResult(Outcome.Bust, netUnits, totalStake, Player.DidBlackjack, Player.DidSplit, Player.DidDouble);
 
         if (mainOutcome == Outcome.DealerBust || splitOutcome == Outcome.DealerBust)
-            return new RoundResult(Outcome.DealerBust, netUnits, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
+            return new RoundResult(Outcome.DealerBust, netUnits, totalStake, Player.DidBlackjack, Player.DidSplit, Player.DidDouble);
 
         if (netUnits > 0)
-            return new RoundResult(Outcome.PlayerWin, netUnits, totalStake, player.DidBlackjack, player.DidSplit,
-                player.DidDouble);
+            return new RoundResult(Outcome.PlayerWin, netUnits, totalStake, Player.DidBlackjack, Player.DidSplit,
+                Player.DidDouble);
         if (netUnits < 0)
-            return new RoundResult(Outcome.DealerWin, netUnits, totalStake, player.DidBlackjack, player.DidSplit,
-                player.DidDouble);
-        return new RoundResult(Outcome.Push, 0, totalStake, player.DidBlackjack, player.DidSplit, player.DidDouble);
+            return new RoundResult(Outcome.DealerWin, netUnits, totalStake, Player.DidBlackjack, Player.DidSplit,
+                Player.DidDouble);
+        return new RoundResult(Outcome.Push, 0, totalStake, Player.DidBlackjack, Player.DidSplit, Player.DidDouble);
     }
 
     private bool DealerTurn(HandEval dEval, out RoundResult roundResult)
     {
         if (dEval.IsBlackjack)
         {
-            roundResult = new RoundResult(Outcome.DealerBlackjack, -player.Bet, player.Bet, player.DidBlackjack, player.DidSplit,
-                player.DidDouble);
+            roundResult = new RoundResult(Outcome.DealerBlackjack, -Player.Bet, Player.Bet, Player.DidBlackjack, Player.DidSplit,
+                Player.DidDouble);
             return true;
         }
 
-        dealer.Play(deck);
+        Dealer.Play(Deck);
 
         roundResult = default;
         return false;
@@ -135,11 +135,11 @@ public class Game
 
 
         // Play a single hand and (optionally) the split hand
-        var unitsMain = PlaySingleHand(player, afterSplit, false);
-        if (player.SplitHandPlayer != null)
+        PlaySingleHand(Player, afterSplit, false);
+        if (Player.SplitHandPlayer != null)
         {
-            var unitsSplit = PlaySingleHand(player.SplitHandPlayer, true,
-                player.SplitHandPlayer.Hand[0] == CardValue.Ace);
+            var unitsSplit = PlaySingleHand(Player.SplitHandPlayer, true,
+                Player.SplitHandPlayer.Hand[0] == CardValue.Ace);
             // Dealer plays once for both hands (standard shoe game): delay dealer play until both hands done.
             netUnits += unitsSplit; // will be combined after dealer plays
         }
@@ -150,18 +150,18 @@ public class Game
     private bool InitialCheckForBlackjack(HandEval dEval, HandEval pEval, out RoundResult playOneRoundWithHand)
     {
         // REQUIREMENT: Dealer peeks for Blackjack when showing Ace
-        if (Rules.Instance.DealerPeeksOnAce && dealer.Hand[0] == CardValue.Ace)
+        if (Rules.Instance.DealerPeeksOnAce && Dealer.Hand[0] == CardValue.Ace)
             if (dEval.IsBlackjack)
             {
                 if (pEval.IsBlackjack)
                 {
-                    playOneRoundWithHand = new RoundResult(Outcome.Push, 0, player.Bet, player.DidBlackjack, player.DidSplit,
-                        player.DidDouble);
+                    playOneRoundWithHand = new RoundResult(Outcome.Push, 0, Player.Bet, Player.DidBlackjack, Player.DidSplit,
+                        Player.DidDouble);
                     return true;
                 }
 
-                playOneRoundWithHand = new RoundResult(Outcome.DealerBlackjack, -player.Bet, player.Bet, player.DidBlackjack, player.DidSplit,
-                    player.DidDouble);
+                playOneRoundWithHand = new RoundResult(Outcome.DealerBlackjack, -Player.Bet, Player.Bet, Player.DidBlackjack, Player.DidSplit,
+                    Player.DidDouble);
                 return true;
             }
 
@@ -170,15 +170,15 @@ public class Game
         {
             if (dEval.IsBlackjack)
             {
-                playOneRoundWithHand = new RoundResult(Outcome.Push, 0, player.Bet, player.DidBlackjack, player.DidSplit,
-                    player.DidDouble);
+                playOneRoundWithHand = new RoundResult(Outcome.Push, 0, Player.Bet, Player.DidBlackjack, Player.DidSplit,
+                    Player.DidDouble);
                 return true;
             }
 
             // REQUIREMENT: Blackjack pays 3:2
-            var units = player.Bet * Rules.Instance.BlackjackPayout;
-            playOneRoundWithHand = new RoundResult(Outcome.PlayerBlackjack, units, player.Bet, player.DidBlackjack, player.DidSplit,
-                player.DidDouble);
+            var units = Player.Bet * Rules.Instance.BlackjackPayout;
+            playOneRoundWithHand = new RoundResult(Outcome.PlayerBlackjack, units, Player.Bet, Player.DidBlackjack, Player.DidSplit,
+                Player.DidDouble);
             return true;
         }
 
@@ -190,8 +190,8 @@ public class Game
     // Helper to determine hand outcome for all enum values
     private int GetHandOutcome(Player handOwner, bool isSplitHand)
     {
-        var pEval = HandEvaluator.Instance.Evaluate(handOwner.Hand, !isSplitHand);
-        var dEval = HandEvaluator.Instance.Evaluate(dealer.Hand, false);
+        var pEval = HandEvaluator.Evaluate(handOwner.Hand, !isSplitHand);
+        var dEval = HandEvaluator.Evaluate(Dealer.Hand, false);
 
         // Six Card Charlie
         if (handOwner.Hand.Count >= Rules.Instance.SixCardCharlieCount && pEval.Total <= 21)
@@ -229,14 +229,14 @@ public class Game
         {
             if (isSplitAces)
                 return 0; // only one card dealt, no further play
-            var eval = HandEvaluator.Instance.Evaluate(handOwner.Hand, false);
+            var eval = HandEvaluator.Evaluate(handOwner.Hand, false);
 
             // Six Card Charlie
             if (handOwner.Hand.Count >= Rules.Instance.SixCardCharlieCount && eval.Total <= 21)
                 return 0;
 
             // Get strategy action
-            var action = Strategy.Instance.Decide(handOwner, dealer.Hand[0], afterSplit);
+            var action = Strategy.Instance.Decide(handOwner, Dealer.Hand[0], afterSplit);
 /*            var oldAction = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
             if (action != oldAction)
             {
@@ -247,8 +247,8 @@ public class Game
             switch (action)
             {
                 case Move.Hit:
-                    handOwner.AddCard(deck.DrawCard());
-                    if (HandEvaluator.Instance.Evaluate(handOwner.Hand, false).Total > 21)
+                    handOwner.AddCard(Deck.DrawCard());
+                    if (HandEvaluator.Evaluate(handOwner.Hand, false).Total > 21)
                         return 0; // bust
                     break;
 
@@ -258,7 +258,7 @@ public class Game
                 case Move.Double:
                     if (handOwner.CanDouble(afterSplit, false))
                     {
-                        handOwner.DoubleDown(deck);
+                        handOwner.DoubleDown(Deck);
                         handOwner.DidDouble = true; // track for later
                     }
 
@@ -267,7 +267,7 @@ public class Game
                 case Move.Split:
                     if (handOwner.CanSplit())
                     {
-                        handOwner.Split(deck);
+                        handOwner.Split(Deck);
                         handOwner.DidSplit = true; // track for later
 
                         if (handOwner.Hand[0] == CardValue.Ace)
@@ -285,14 +285,14 @@ public class Game
 
     private int SettleAgainstDealer(Player handOwner, bool isSplitHand)
     {
-        var pEval = HandEvaluator.Instance.Evaluate(handOwner.Hand,
+        var pEval = HandEvaluator.Evaluate(handOwner.Hand,
             !isSplitHand); // 2-card 21 after split is NOT Blackjack
 
         // Charlie win first
         if (handOwner.Hand.Count >= Rules.Instance.SixCardCharlieCount && pEval.Total <= 21)
             return +handOwner.Bet; // REQUIREMENT: wins over everything
 
-        var dEval = HandEvaluator.Instance.Evaluate(dealer.Hand, false);
+        var dEval = HandEvaluator.Evaluate(Dealer.Hand, false);
 
         // bust checks
         if (pEval.Total > 21) return -handOwner.Bet;

@@ -36,10 +36,10 @@ namespace BlackJackTest
         public void PlayOneRound_PlayerBlackjack_DealerNoBlackjack_PlayerWinsWithBlackjackPayout()
         {
             var game = new Game();
-            var deck = game.deck;
-            var player = game.player;
+            var deck = game.Deck;
+            var player = game.Player;
             player.Reset();
-            var dealer = game.dealer;
+            var dealer = game.Dealer;
             dealer.Reset();
 
 
@@ -60,10 +60,10 @@ namespace BlackJackTest
         public void PlayOneRound_BothBlackjack_Push()
         {
             var game = new Game();
-            var deck = game.deck;
-            var player = game.player;
+            var deck = game.Deck;
+            var player = game.Player;
             player.Reset();
-            var dealer = game.dealer;
+            var dealer = game.Dealer;
             dealer.Reset();
 
 
@@ -86,10 +86,10 @@ namespace BlackJackTest
         public void PlayOneRound_DealerBlackjack_PlayerNoBlackjack_DealerWins()
         {
             var game = new Game();
-            var deck = game.deck;
-            var player = game.player;
+            var deck = game.Deck;
+            var player = game.Player;
             player.Reset();
-            var dealer = game.dealer;
+            var dealer = game.Dealer;
             dealer.Reset();
 
 
@@ -110,13 +110,12 @@ namespace BlackJackTest
         [Test]
         public void PlayOneRound_PlayerBust_DealerWins()
         {
-            Rnd.Rng = new Random(1232); // Ensure consistent shuffling for testing
-
             var game = new Game();
-            var deck = game.deck;
-            var player = game.player;
+            var deck = game.Deck;
+            deck.RandomSeed(1232);
+            var player = game.Player;
             player.Reset();
-            var dealer = game.dealer;
+            var dealer = game.Dealer;
             dealer.Reset();
 
 
@@ -150,10 +149,10 @@ namespace BlackJackTest
         public void PlayOneRound_PlayerCharlieWin_PlayerWins()
         {
             var game = new Game();
-            var deck = game.deck;
-            var player = game.player;
+            var deck = game.Deck;
+            var player = game.Player;
             player.Reset();
-            var dealer = game.dealer;
+            var dealer = game.Dealer;
             dealer.Reset();
 
 
@@ -204,10 +203,10 @@ namespace BlackJackTest
             foreach (bool shouldSplit in pairSplits)
             {
                 var game = new Game();
-                var deck = game.deck;
-                var player = game.player;
+                var deck = game.Deck;
+                var player = game.Player;
                 player.Reset();
-                var dealer = game.dealer;
+                var dealer = game.Dealer;
                 dealer.Reset();
 
 
@@ -256,10 +255,10 @@ namespace BlackJackTest
         public void Split_Aces_Normal_Payout()
         {
             var game = new Game();
-            var deck = game.deck;
-            var player = game.player;
+            var deck = game.Deck;
+            var player = game.Player;
             player.Reset();
-            var dealer = game.dealer;
+            var dealer = game.Dealer;
             dealer.Reset();
 
 
@@ -351,7 +350,7 @@ namespace BlackJackTest
                 {
                     string playerValueTwo = playerValues[g];
 
-                    var evaluation = HandEvaluator.Instance.Evaluate(new List<CardValue>
+                    var evaluation = HandEvaluator.Evaluate(new List<CardValue>
                     {
                         new Card(playerValueOne, "S"),
                         new Card(playerValueTwo, "D")
@@ -380,8 +379,8 @@ namespace BlackJackTest
         public void PlayOneRound_PlayerDoubleWin_AllRoundResultValues()
         {
             var game = new Game();
-            var player = game.player;
-            var dealer = game.dealer;
+            var player = game.Player;
+            var dealer = game.Dealer;
             player.Reset();
             dealer.Reset();
 
@@ -407,8 +406,8 @@ namespace BlackJackTest
         public void PlayOneRound_SplitWin_AllRoundResultValues()
         {
             var game = new Game();
-            var player = game.player;
-            var dealer = game.dealer;
+            var player = game.Player;
+            var dealer = game.Dealer;
             player.Reset();
             dealer.Reset();
 
@@ -437,8 +436,8 @@ namespace BlackJackTest
         public void PlayOneRound_PlayerBlackjack_AllRoundResultValues()
         {
             var game = new Game();
-            var player = game.player;
-            var dealer = game.dealer;
+            var player = game.Player;
+            var dealer = game.Dealer;
             player.Reset();
             dealer.Reset();
 

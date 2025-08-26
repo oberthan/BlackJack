@@ -18,12 +18,12 @@ public class StrategyRow
 
 public class PairStrategyRow : StrategyRow
 {
-    public string Pair { get; set; } = "";
+    public CardValue Pair;
 }
 
 public class SoftStrategyRow : StrategyRow
 {
-    public int Total { get; set; }
+    public int Total;
 }
 
 public class HardStrategyRow : StrategyRow

@@ -6,7 +6,7 @@ public class Dealer : Player
     {
         while (true)
         {
-            var eval = HandEvaluator.Instance.Evaluate(Hand, false);
+            var eval = HandEvaluator.Evaluate(Hand, false);
             if (eval.Total < 17) AddCard(deck.DrawCard());
             else if (eval.Total == 17 && !Rules.Instance.DealerStandsOnSoft17 && eval.IsSoft) AddCard(deck.DrawCard());
             else break; // REQUIREMENT: dealer stands on ALL 17s (including soft)

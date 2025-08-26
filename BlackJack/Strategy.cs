@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Blackjack;
+﻿namespace Blackjack;
 
 public enum Move
 {
@@ -26,19 +24,19 @@ public enum Decision
 
 public class Strategy
 {
-    public static Strategy Instance { get; set; } = new Strategy();
+    public static Strategy Instance { get; set; } = new();
     public List<PairStrategyRow> PairStrategy { get; set; } = new()
     {
-        new PairStrategyRow { Pair = "2,2", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = "3,3", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = "4,4", Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = "5,5", Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.N, Vs6 = Decision.N, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = "6,6", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = "7,7", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = "8,8", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.P, VsA = Decision.P},
-        new PairStrategyRow { Pair = "9,9", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = "10,10", Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.N, Vs6 = Decision.N, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = "11,11", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.P, VsA = Decision.P}
+        new PairStrategyRow { Pair = CardValue.Two, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Three, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Four, Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Five, Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.N, Vs6 = Decision.N, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Six, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Seven, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Eight, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.P, VsA = Decision.P},
+        new PairStrategyRow { Pair = CardValue.Nine, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Ten, Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.N, Vs6 = Decision.N, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Ace, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.P, VsA = Decision.P}
     };
 
     public List<SoftStrategyRow> SoftStrategy { get; set; } = new()
@@ -73,7 +71,7 @@ public class Strategy
 
     public Move Decide(Player player, CardValue dealerUp, bool afterSplit)
     {
-        var eval = HandEvaluator.Instance.Evaluate(player.Hand, false);
+        var eval = HandEvaluator.Evaluate(player.Hand, false);
         var total = eval.Total;
         var isSoft = eval.IsSoft;
         var cards = player.Hand;
@@ -82,7 +80,7 @@ public class Strategy
         // --- Pair Splitting ---
         if (canSplit)
         {
-            var pair = $"{cards[0]},{cards[1]}";
+            var pair = cards[0];
             var row = PairStrategy.FirstOrDefault(r => r.Pair == pair);
             if (row != null && ParseBool(LookupAction(row, (int)dealerUp)))
                 return Move.Split;
@@ -112,9 +110,9 @@ public class Strategy
 
             // six card charlie strats
             if (cards.Count >= 4 && total == 12 && upValue is >= 4 and <= 6) return Move.Hit;
-            if (cards.Count >= 4 && total == 13 && upValue == 2 && upValue == 3) return Move.Hit;
+            if (cards.Count >= 4 && total == 13 && upValue == 2 && upValue == 3) return Move.Hit; // MAKES NO SENSE
             if (cards.Count == 5 && total >= 13 && total <= 15 && upValue >= 2 && upValue <= 6) return Move.Hit;
-            if (cards.Count == 5 && total == 16 && upValue == 2 && upValue == 3) return Move.Hit;
+            if (cards.Count == 5 && total == 16 && upValue == 2 && upValue == 3) return Move.Hit; // MAKES NO SENSE
             if (cards.Count == 5 && total == 17 && upValue >= 9 && upValue <= 11) return Move.Hit;
 
 
@@ -131,7 +129,7 @@ public class Strategy
     }
     public static Move DecideOld(Player player, CardValue dealerUp, bool afterSplit)
     {
-        var eval = HandEvaluator.Instance.Evaluate(player.Hand, false);
+        var eval = HandEvaluator.Evaluate(player.Hand, false);
         var total = eval.Total;
         var isSoft = eval.IsSoft;
         var up = (int)dealerUp; // 2–11 where 11 = Ace
@@ -177,14 +175,14 @@ public class Strategy
         if (!isSoft)
         {
             if (total >= 17) return Move.Stand;
-            if (total >= 13 && total <= 16)
-                return up >= 2 && up <= 6 ? Move.Stand : Move.Hit;
+            if (total >= 13)
+                return up is >= 2 and <= 6 ? Move.Stand : Move.Hit;
             if (total == 12)
-                return up >= 4 && up <= 6 ? Move.Stand : Move.Hit;
+                return up is >= 4 and <= 6 ? Move.Stand : Move.Hit;
             if (total == 11) return up <= 10 && canDouble ? Move.Double : Move.Hit;
             if (total == 10) return up <= 9 && canDouble ? Move.Double : Move.Hit;
             if (total == 9) return up >= 3 && up <= 6 && canDouble ? Move.Double : Move.Hit;
-            if (total <= 8) return Move.Hit;
+            return Move.Hit;
         }
 
         return Move.Stand; // fallback
@@ -226,7 +224,8 @@ public class Strategy
         Decision.S => Move.Stand,
         Decision.D => canDouble ? Move.Double : Move.Hit,
         Decision.P => Move.Split,
-        Decision.Ds => canDouble ? Move.Double : Move.Stand
+        Decision.Ds => canDouble ? Move.Double : Move.Stand,
+        _ => Move.Hit
     };
     private static bool ParseBool(Decision value) => value switch
     {

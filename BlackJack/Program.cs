@@ -187,14 +187,14 @@ public class Program
             double localUnits = 0;
             for (i = 0; i < Rounds; i++)
             {
-                Game.player.Reset();
-                Game.dealer.Reset();
-                Game.deck.EndOfGame();
-                Game.player.AddCard(playerHand[0]);
-                Game.player.AddCard(playerHand[1]);
+                Game.Player.Reset();
+                Game.Dealer.Reset();
+                Game.Deck.EndOfGame();
+                Game.Player.AddCard(playerHand[0]);
+                Game.Player.AddCard(playerHand[1]);
 
-                Game.dealer.AddCard(upCard);
-                Game.dealer.AddCard(Game.deck.DrawCard());
+                Game.Dealer.AddCard(upCard);
+                Game.Dealer.AddCard(Game.Deck.DrawCard());
                 var res = Game.PlayOneRoundWithHand();
 
                 units += res.UnitsWonOrLost;

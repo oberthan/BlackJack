@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-
-namespace Blackjack;
+﻿namespace Blackjack;
 
 public readonly struct HandEval
 {
@@ -16,39 +14,10 @@ public readonly struct HandEval
     }
 }
 
-public class HandEvaluator
+public static class HandEvaluator
 {
-    public static HandEvaluator Instance = new HandEvaluator();
-
-    private readonly ConcurrentDictionary<ulong, HandEval> cache = new ConcurrentDictionary<ulong, HandEval>();
-
-    // Helper to generate a unique key for a hand
-    private ulong GetHandKey(List<CardValue> hand, bool treatAsBJ)
+    public static HandEval Evaluate(List<CardValue> hand, bool treatTwoCard21AsBlackjack)
     {
-        ulong key = 0;
-        for (int i = 0; i < hand.Count && i < 8; i++)
-        {
-            // Use 8 bits per card: 4 bits for pip, 4 bits for suit (assuming <= 16 values each)
-            // This is a simple hash, not cryptographically secure
-            int pip = (int)hand[i];
-            key |= (uint)(pip << i * 4);
-        }
-        key |= (ulong)hand.Count << 60; // encode count in high bits
-        if (treatAsBJ)
-        {
-            key |= 1UL << 59; // flag for treating 2-card 21 as blackjack
-        }
-        return key;
-    }
-
-    public HandEval Evaluate(List<CardValue> hand, bool treatTwoCard21AsBlackjack)
-    {
-        //ulong key = GetHandKey(hand, treatTwoCard21AsBlackjack);
-        //if (cache.TryGetValue(key, out var cachedEval))
-        //{
-        //    return cachedEval;
-        //}
-
         int total = 0, aces = 0;
         int count = hand.Count;
 
@@ -73,7 +42,6 @@ public class HandEvaluator
         var isBJ = treatTwoCard21AsBlackjack && hand.Count == 2 && total == 21;
 
         var eval = new HandEval(total, isSoft, isBJ);
-//        cache.TryAdd(key, eval);
         return eval;
     }
 }
