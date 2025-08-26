@@ -316,18 +316,19 @@ namespace BlackjackWpf
         // Helper to set a cell value by column name
         private void SetPairCell(PairStrategyRow row, string col, string value)
         {
+            var decision = Enum.Parse<Decision>(value);
             switch (col)
             {
-                case "Vs2": row.Vs2 = value; break;
-                case "Vs3": row.Vs3 = value; break;
-                case "Vs4": row.Vs4 = value; break;
-                case "Vs5": row.Vs5 = value; break;
-                case "Vs6": row.Vs6 = value; break;
-                case "Vs7": row.Vs7 = value; break;
-                case "Vs8": row.Vs8 = value; break;
-                case "Vs9": row.Vs9 = value; break;
-                case "Vs10": row.Vs10 = value; break;
-                case "VsA": row.VsA = value; break;
+                case "Vs2": row.Vs2 = decision; break;
+                case "Vs3": row.Vs3 = decision; break;
+                case "Vs4": row.Vs4 = decision; break;
+                case "Vs5": row.Vs5 = decision; break;
+                case "Vs6": row.Vs6 = decision; break;
+                case "Vs7": row.Vs7 = decision; break;
+                case "Vs8": row.Vs8 = decision; break;
+                case "Vs9": row.Vs9 = decision; break;
+                case "Vs10": row.Vs10 = decision; break;
+                case "VsA": row.VsA = decision; break;
             }
         }
 

@@ -1,44 +1,32 @@
-﻿public class PairStrategyRow
+﻿using Blackjack;
+
+
+public class StrategyRow
+{
+    public Decision Vs2;
+    public Decision Vs3;
+    public Decision Vs4;
+    public Decision Vs5;
+    public Decision Vs6;
+    public Decision Vs7;
+    public Decision Vs8;
+    public Decision Vs9;
+    public Decision Vs10;
+    public Decision VsA;
+}
+
+
+public class PairStrategyRow : StrategyRow
 {
     public string Pair { get; set; } = "";
-    public string Vs2 { get; set; } = "N";
-    public string Vs3 { get; set; } = "N";
-    public string Vs4 { get; set; } = "N";
-    public string Vs5 { get; set; } = "N";
-    public string Vs6 { get; set; } = "N";
-    public string Vs7 { get; set; } = "N";
-    public string Vs8 { get; set; } = "N";
-    public string Vs9 { get; set; } = "N";
-    public string Vs10 { get; set; } = "N";
-    public string VsA { get; set; } = "N";
 }
 
-public class SoftStrategyRow
+public class SoftStrategyRow : StrategyRow
 {
     public int Total { get; set; }
-    public string Vs2 { get; set; } = "H";
-    public string Vs3 { get; set; } = "H";
-    public string Vs4 { get; set; } = "H";
-    public string Vs5 { get; set; } = "H";
-    public string Vs6 { get; set; } = "H";
-    public string Vs7 { get; set; } = "H";
-    public string Vs8 { get; set; } = "H";
-    public string Vs9 { get; set; } = "H";
-    public string Vs10 { get; set; } = "H";
-    public string VsA { get; set; } = "H";
 }
 
-public class HardStrategyRow
+public class HardStrategyRow : StrategyRow
 {
-    public int Total { get; set; }
-    public string Vs2 { get; set; } = "H";
-    public string Vs3 { get; set; } = "H";
-    public string Vs4 { get; set; } = "H";
-    public string Vs5 { get; set; } = "H";
-    public string Vs6 { get; set; } = "H";
-    public string Vs7 { get; set; } = "H";
-    public string Vs8 { get; set; } = "H";
-    public string Vs9 { get; set; } = "H";
-    public string Vs10 { get; set; } = "H";
-    public string VsA { get; set; } = "H";
+    public int Total;
 }

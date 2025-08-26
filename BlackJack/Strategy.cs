@@ -10,49 +10,66 @@ public enum Move
     Split
 }
 
+public enum Decision
+{
+    H, // Hit
+    S, // Stand
+    D, // Double if allowed, otherwise Hit
+    Ds, // Double if allowed, otherwise Stand
+    P, // Split
+    Ph, // Split if allowed, otherwise Hit
+    Ps, // Split if allowed, otherwise Stand
+    Rh, // Surrender if allowed, otherwise Hit
+    Rs, // Surrender if allowed, otherwise Stand
+    N  // Not possible (for pairs)
+}
+
 public class Strategy
 {
     public static Strategy Instance { get; set; } = new Strategy();
     public List<PairStrategyRow> PairStrategy { get; set; } = new()
     {
-        new PairStrategyRow { Pair = "2,2", Vs2 = "Y/N", Vs3 = "Y/N", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "3,3", Vs2 = "Y/N", Vs3 = "Y/N", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "4,4", Vs2 = "N", Vs3 = "N", Vs4 = "N", Vs5 = "Y/N", Vs6 = "Y/N", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "5,5", Vs2 = "N", Vs3 = "N", Vs4 = "N", Vs5 = "N", Vs6 = "N", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "6,6", Vs2 = "Y/N", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "7,7", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "8,8", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "Y", Vs9 = "Y", Vs10 = "Y", VsA = "Y"},
-        new PairStrategyRow { Pair = "9,9", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "N", Vs8 = "Y", Vs9 = "Y", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "10,10", Vs2 = "N", Vs3 = "N", Vs4 = "N", Vs5 = "N", Vs6 = "N", Vs7 = "N", Vs8 = "N", Vs9 = "N", Vs10 = "N", VsA = "N"},
-        new PairStrategyRow { Pair = "11,11", Vs2 = "Y", Vs3 = "Y", Vs4 = "Y", Vs5 = "Y", Vs6 = "Y", Vs7 = "Y", Vs8 = "Y", Vs9 = "Y", Vs10 = "Y", VsA = "Y"}
+        new PairStrategyRow { Pair = "2,2", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = "3,3", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = "4,4", Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = "5,5", Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.N, Vs6 = Decision.N, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = "6,6", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = "7,7", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = "8,8", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.P, VsA = Decision.P},
+        new PairStrategyRow { Pair = "9,9", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = "10,10", Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.N, Vs6 = Decision.N, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = "11,11", Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.P, VsA = Decision.P}
     };
 
     public List<SoftStrategyRow> SoftStrategy { get; set; } = new()
     {
-        new SoftStrategyRow { Total = 13, Vs2 = "H", Vs3 = "H", Vs4 = "H", Vs5 = "D", Vs6 = "D", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new SoftStrategyRow { Total = 14, Vs2 = "H", Vs3 = "H", Vs4 = "H", Vs5 = "D", Vs6 = "D", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new SoftStrategyRow { Total = 15, Vs2 = "H", Vs3 = "H", Vs4 = "D", Vs5 = "D", Vs6 = "D", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new SoftStrategyRow { Total = 16, Vs2 = "H", Vs3 = "H", Vs4 = "D", Vs5 = "D", Vs6 = "D", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new SoftStrategyRow { Total = 17, Vs2 = "H", Vs3 = "D", Vs4 = "D", Vs5 = "D", Vs6 = "D", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new SoftStrategyRow { Total = 18, Vs2 = "S", Vs3 = "Ds", Vs4 = "Ds", Vs5 = "Ds", Vs6 = "Ds", Vs7 = "S", Vs8 = "S", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new SoftStrategyRow { Total = 19, Vs2 = "S", Vs3 = "S", Vs4 = "S", Vs5 = "S", Vs6 = "S", Vs7 = "S", Vs8 = "S", Vs9 = "S", Vs10 = "S", VsA = "S"},
-        new SoftStrategyRow { Total = 20, Vs2 = "S", Vs3 = "S", Vs4 = "S", Vs5 = "S", Vs6 = "S", Vs7 = "S", Vs8 = "S", Vs9 = "S", Vs10 = "S", VsA = "S"}
+        new SoftStrategyRow { Total = 13, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new SoftStrategyRow { Total = 14, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new SoftStrategyRow { Total = 15, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new SoftStrategyRow { Total = 16, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new SoftStrategyRow { Total = 17, Vs2 = Decision.H, Vs3 = Decision.D, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new SoftStrategyRow { Total = 18, Vs2 = Decision.S, Vs3 = Decision.Ds, Vs4 = Decision.Ds, Vs5 = Decision.Ds, Vs6 = Decision.Ds, Vs7 = Decision.S, Vs8 = Decision.S, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new SoftStrategyRow { Total = 19, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.S, Vs8 = Decision.S, Vs9 = Decision.S, Vs10 = Decision.S, VsA = Decision.S},
+        new SoftStrategyRow { Total = 20, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.S, Vs8 = Decision.S, Vs9 = Decision.S, Vs10 = Decision.S, VsA = Decision.S}
     };
 
 
     public List<HardStrategyRow> HardStrategy { get; set; } = new()
     {
-        new HardStrategyRow { Total = 8, Vs2 = "H", Vs3 = "H", Vs4 = "H", Vs5 = "H", Vs6 = "H", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new HardStrategyRow { Total = 9, Vs2 = "H", Vs3 = "D", Vs4 = "D", Vs5 = "D", Vs6 = "D", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new HardStrategyRow { Total = 10, Vs2 = "D", Vs3 = "D", Vs4 = "D", Vs5 = "D", Vs6 = "D", Vs7 = "D", Vs8 = "D", Vs9 = "D", Vs10 = "H", VsA = "H"},
-        new HardStrategyRow { Total = 11, Vs2 = "D", Vs3 = "D", Vs4 = "D", Vs5 = "D", Vs6 = "D", Vs7 = "D", Vs8 = "D", Vs9 = "D", Vs10 = "H", VsA = "H"},
-        new HardStrategyRow { Total = 12, Vs2 = "H", Vs3 = "H", Vs4 = "S", Vs5 = "S", Vs6 = "S", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new HardStrategyRow { Total = 13, Vs2 = "S", Vs3 = "S", Vs4 = "S", Vs5 = "S", Vs6 = "S", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new HardStrategyRow { Total = 14, Vs2 = "S", Vs3 = "S", Vs4 = "S", Vs5 = "S", Vs6 = "S", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new HardStrategyRow { Total = 15, Vs2 = "S", Vs3 = "S", Vs4 = "S", Vs5 = "S", Vs6 = "S", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new HardStrategyRow { Total = 16, Vs2 = "S", Vs3 = "S", Vs4 = "S", Vs5 = "S", Vs6 = "S", Vs7 = "H", Vs8 = "H", Vs9 = "H", Vs10 = "H", VsA = "H"},
-        new HardStrategyRow { Total = 17, Vs2 = "S", Vs3 = "S", Vs4 = "S", Vs5 = "S", Vs6 = "S", Vs7 = "S", Vs8 = "S", Vs9 = "S", Vs10 = "S", VsA = "S"}
+        new HardStrategyRow { Total = 8, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.H, Vs6 = Decision.H, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new HardStrategyRow { Total = 9, Vs2 = Decision.H, Vs3 = Decision.D, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new HardStrategyRow { Total = 10, Vs2 = Decision.D, Vs3 = Decision.D, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.D, Vs8 = Decision.D, Vs9 = Decision.D, Vs10 = Decision.H, VsA = Decision.H},
+        new HardStrategyRow { Total = 11, Vs2 = Decision.D, Vs3 = Decision.D, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.D, Vs8 = Decision.D, Vs9 = Decision.D, Vs10 = Decision.H, VsA = Decision.H},
+        new HardStrategyRow { Total = 12, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new HardStrategyRow { Total = 13, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new HardStrategyRow { Total = 14, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new HardStrategyRow { Total = 15, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new HardStrategyRow { Total = 16, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new HardStrategyRow { Total = 17, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.S, Vs8 = Decision.S, Vs9 = Decision.S, Vs10 = Decision.S, VsA = Decision.S}
     };
+
+    private readonly int hardStrategyMaxTotal = 17;
+    private readonly int hardStrategyMinTotal = 8;
 
     public Move Decide(Player player, Card dealerUp, bool afterSplit)
     {
@@ -101,9 +118,9 @@ public class Strategy
             if (cards.Count == 5 && total == 17 && dealerUp.PipValue >= 9 && dealerUp.PipValue <= 11) return Move.Hit;
 
 
-            if (total > HardStrategy.MaxBy(r => r.Total).Total)
+            if (total > hardStrategyMaxTotal)
                 return Move.Stand; // fallback for totals outside the strategy range
-            if (total < HardStrategy.MinBy(r => r.Total).Total)
+            if (total < hardStrategyMinTotal)
                 return Move.Hit; // fallback for totals outside the strategy range
             var row = HardStrategy.FirstOrDefault(r => r.Total == total);
             if (row != null)
@@ -172,7 +189,7 @@ public class Strategy
 
         return Move.Stand; // fallback
     }
-    private static string LookupAction(dynamic row, int up) =>
+    private static Decision LookupAction(StrategyRow row, int up) =>
         up switch
         {
             2 => row.Vs2,
@@ -185,36 +202,36 @@ public class Strategy
             9 => row.Vs9,
             10 => row.Vs10,
             11 => row.VsA,
-            _ => "H"
+            _ => Decision.H
         };
-    private static bool LookupBool(dynamic row, int up) =>
-        up switch
-        {
-            2 => row.Vs2,
-            3 => row.Vs3,
-            4 => row.Vs4,
-            5 => row.Vs5,
-            6 => row.Vs6,
-            7 => row.Vs7,
-            8 => row.Vs8,
-            9 => row.Vs9,
-            10 => row.Vs10,
-            11 => row.VsA,
-            _ => false
-        };
+    //private static string LookupAction(dynamic row, int up) =>
+    //    up switch
+    //    {
+    //        2 => row.Vs2,
+    //        3 => row.Vs3,
+    //        4 => row.Vs4,
+    //        5 => row.Vs5,
+    //        6 => row.Vs6,
+    //        7 => row.Vs7,
+    //        8 => row.Vs8,
+    //        9 => row.Vs9,
+    //        10 => row.Vs10,
+    //        11 => row.VsA,
+    //        _ => "H"
+    //    };
 
-    private static Move ParseMove(string action, bool canDouble) => action switch
+    private static Move ParseMove(Decision action, bool canDouble) => action switch
     {
-        "H" => Move.Hit,
-        "S" => Move.Stand,
-        "D" => canDouble ? Move.Double : Move.Hit,
-        "P" => Move.Split,
-        _ => canDouble ? Move.Double : Move.Stand
+        Decision.H => Move.Hit,
+        Decision.S => Move.Stand,
+        Decision.D => canDouble ? Move.Double : Move.Hit,
+        Decision.P => Move.Split,
+        Decision.Ds => canDouble ? Move.Double : Move.Stand
     };
-    private static bool ParseBool(string value) => value.ToLower() switch
+    private static bool ParseBool(Decision value) => value switch
     {
-        "n" => false,
-        "y" => true,
-        _ => Rules.Instance.DoubleAfterSplit ? true : false
+        Decision.N => false,
+        Decision.P => true,
+        _ => Rules.Instance.DoubleAfterSplit
     };
 }
