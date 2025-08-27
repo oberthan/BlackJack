@@ -237,8 +237,7 @@ namespace BlackjackWpf
             CardValue[] pairValues =
             [
                 CardValue.Two, CardValue.Three, CardValue.Four, CardValue.Five, CardValue.Six, CardValue.Seven,
-                CardValue.Eight, CardValue.Nine, CardValue.Ten, CardValue.Jack, CardValue.Queen, CardValue.King,
-                CardValue.Ace
+                CardValue.Eight, CardValue.Nine, CardValue.Ten, CardValue.Ace
             ];
             var colNames = new[] { "Vs2", "Vs3", "Vs4", "Vs5", "Vs6", "Vs7", "Vs8", "Vs9", "Vs10", "VsA" };
 
@@ -250,82 +249,83 @@ namespace BlackjackWpf
             var watch = Stopwatch.StartNew();
             try
             {
-            for (int i = 0; i < pairValues.Length; i++)
-            {
-                var pair = pairValues[i];
-                var pCard = pair;
-                // Find the row in PairStrategy where Pair == pair
-                var row = pairRows.First(r => r.Pair == pCard);
-
-                //if (row == null) continue;
-
-                for (int j = 0; j < colNames.Length; j++)
+                for (int i = 0; i < pairValues.Length; i++)
                 {
-                    string col = colNames[j];
-                    SetPairCell(row, col,  Decision.P);
-                    double rtpY = await SimulateRTP(firstPassSimulations, [pCard, pCard], pairValues[j]) / firstPassSimulations;
+                    var pair = pairValues[i];
+                    var pCard = pair;
+                    // Find the row in PairStrategy where Pair == pair
+                    var row = pairRows.First(r => r.Pair == pCard);
 
-                    SetPairCell(row, col, Decision.N);
-                    double rtpN = await SimulateRTP(firstPassSimulations, [pCard, pCard],pairValues[j]) / firstPassSimulations;
+                    //if (row == null) continue;
 
-
-                    // If results are close, re-run with higher accuracy
-                    var firstPass = Math.Abs(rtpY - rtpN);
-                    differences[i, j, 0] = firstPass;
-                    if (firstPass < firstThreshold)
+                    for (int j = 0; j < colNames.Length; j++)
                     {
-                        SetPairCell(row, col, Decision.P);
-                        rtpY = await SimulateRTP(secondPassSimulations, [pCard, pCard], pairValues[j]) / secondPassSimulations;
+                        string col = colNames[j];
+                        SetPairCell(row, col,  Decision.P);
+                        double rtpY = await SimulateRTP(firstPassSimulations, [pCard, pCard], pairValues[j]) / firstPassSimulations;
 
                         SetPairCell(row, col, Decision.N);
-                        rtpN = await SimulateRTP(secondPassSimulations, [pCard, pCard], pairValues[j]) / secondPassSimulations;
+                        double rtpN = await SimulateRTP(firstPassSimulations, [pCard, pCard],pairValues[j]) / firstPassSimulations;
 
-                        var secondPass = Math.Abs(rtpY - rtpN);
-                        differences[i,j,1] = secondPass;
 
-                        if (secondPass < secondThreshold)
+                        // If results are close, re-run with higher accuracy
+                        var firstPass = Math.Abs(rtpY - rtpN);
+                        differences[i, j, 0] = firstPass;
+                        if (firstPass < firstThreshold)
                         {
                             SetPairCell(row, col, Decision.P);
-                            rtpY = await SimulateRTP(finalSimulations, [pCard, pCard], pairValues[j]) / finalSimulations;
+                            rtpY = await SimulateRTP(secondPassSimulations, [pCard, pCard], pairValues[j]) / secondPassSimulations;
 
                             SetPairCell(row, col, Decision.N);
-                            rtpN = await SimulateRTP(finalSimulations, [pCard, pCard], pairValues[j]) / finalSimulations;
-                   
-                            var finalPass = Math.Abs(rtpY - rtpN);
-                            differences[i,j,2] = finalPass;
+                            rtpN = await SimulateRTP(secondPassSimulations, [pCard, pCard], pairValues[j]) / secondPassSimulations;
+
+                            var secondPass = Math.Abs(rtpY - rtpN);
+                            differences[i,j,1] = secondPass;
+
+                            if (secondPass < secondThreshold)
+                            {
+                                SetPairCell(row, col, Decision.P);
+                                rtpY = await SimulateRTP(finalSimulations, [pCard, pCard], pairValues[j]) / finalSimulations;
+
+                                SetPairCell(row, col, Decision.N);
+                                rtpN = await SimulateRTP(finalSimulations, [pCard, pCard], pairValues[j]) / finalSimulations;
+                       
+                                var finalPass = Math.Abs(rtpY - rtpN);
+                                differences[i,j,2] = finalPass;
+                            }
                         }
+
+
+
+
+                        SetPairCell(row, col, rtpY >= rtpN ? Decision.P : Decision.N);
+
+                        currentStep++;
+                        UpdateProgress((float)currentStep / totalSteps);
+                    }
+                }
+
+
+                var str = new StringBuilder();
+
+                str.AppendLine($"Pair strategy optimized! It took {watch.Elapsed}!");
+
+
+                for (int i = pairValues.Length-1; i >= 0; i--)
+                {
+                    str.Append($"({pairValues[i]}, {pairValues[i]})::: ");
+
+                    for (int j = 0; j < colNames.Length; j++)
+                    {
+                        var differencePassOne = differences[i, j, 0];
+                        str.Append($"[{differencePassOne}:{differences[i, j, 1]:n5}:{differences[i, j, 2]:n5}] | ");
                     }
 
+                    str.AppendLine("");
 
-
-
-                    SetPairCell(row, col, rtpY >= rtpN ? Decision.P : Decision.N);
-
-                    currentStep++;
-                    UpdateProgress((float)currentStep / totalSteps);
-                }
-            }
-
-
-            var str = new StringBuilder();
-
-            str.AppendLine($"Pair strategy optimized! It took {watch.Elapsed}!");
-
-
-            for (int i = pairValues.Length-1; i >= 0; i--)
-            {
-                str.Append($"({pairValues[i]}, {pairValues[i]})::: ");
-
-                for (int j = 0; j < colNames.Length; j++)
-                {
-                    str.Append($"[{differences[i,j,0]:n5}:{differences[i, j, 1]:n5}:{differences[i, j, 2]:n5}] | ");
                 }
 
-                str.AppendLine("");
-
-            }
-
-            ResultsText.Text = str.ToString();
+                ResultsText.Text = str.ToString();
             }
             catch (Exception ex)
             {
