@@ -116,6 +116,7 @@ namespace BlackjackWpf
                 previousTime = stopwatch.Elapsed;
 
                 var progress = 30 * (float)sum.rounds / rounds;
+                progress = Math.Min(progress, 30);
                 UpdateStatus(
                     $"[{new string('#', (int)progress)}{new string('-', (int)(30 - progress))}] {100f * sum.rounds / rounds:F1}%");
 
