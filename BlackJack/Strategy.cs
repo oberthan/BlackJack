@@ -46,6 +46,7 @@ public class Strategy
     
     public List<SoftStrategyRow> SoftStrategy { get; set; } = new()
     {
+        new SoftStrategyRow { Total = 12, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.H, Vs6 = Decision.H, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
         new SoftStrategyRow { Total = 13, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
         new SoftStrategyRow { Total = 14, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
         new SoftStrategyRow { Total = 15, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
@@ -56,7 +57,7 @@ public class Strategy
         new SoftStrategyRow { Total = 20, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.S, Vs8 = Decision.S, Vs9 = Decision.S, Vs10 = Decision.S, VsA = Decision.S}
     };
 
-    private const int softStrategyMinTotal = 13;
+    private const int softStrategyMinTotal = 12;
     private const int softStrategyMaxTotal = 20;
 
     public List<HardStrategyRow> HardStrategy { get; set; } = new()
