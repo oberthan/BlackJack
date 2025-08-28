@@ -18,10 +18,6 @@ public enum Decision
     D, // Double if allowed, otherwise Hit
     Ds, // Double if allowed, otherwise Stand
     P, // Split
-    Ph, // Split if allowed, otherwise Hit
-    Ps, // Split if allowed, otherwise Stand
-    Rh, // Surrender if allowed, otherwise Hit
-    Rs, // Surrender if allowed, otherwise Stand
     N  // Not possible (for pairs)
 }
 
