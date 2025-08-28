@@ -571,9 +571,9 @@ namespace BlackjackWpf
             var isAccepted = strategyWindow.ShowDialog();
             if (isAccepted == true)
             {
-                Strategy.Instance.HardStrategy = viewModel.HardStrategy.ToList();
-                Strategy.Instance.SoftStrategy = viewModel.SoftStrategy.ToList();
-                Strategy.Instance.PairStrategy = viewModel.PairStrategy.ToList();
+                Strategy.Instance.HardStrategy = viewModel.HardStrategy.OrderBy(x => x.Total).ToList();
+                Strategy.Instance.SoftStrategy = viewModel.SoftStrategy.OrderBy(x => x.Total).ToList();
+                Strategy.Instance.PairStrategy = viewModel.PairStrategy.OrderBy(x => (int)x.Pair).ToList();
             }
         }
 
