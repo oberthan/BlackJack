@@ -215,57 +215,81 @@ namespace BlackjackWpf
             }
         }
 
-        private async void SearchStrategy_Click(object sender, RoutedEventArgs e)
+        private async void SearchStrategyPair_Click(object sender, RoutedEventArgs e)
         {
-
 
 
             var button = sender as System.Windows.Controls.Button;
             if (button != null)
                 button.IsEnabled = false;
 
-            int firstPassSimulations = 1_000_000;
-            int secondPassSimulations = 25_000_000; // Fast, low-accuracy pass
-            int finalSimulations = 100_000_000; // High-accuracy for close results
+            ResultsText.Text = "Searching for optimal pair strategy...";
+            SimulationProgress.Value = 0;
+            UpdateStatus("Starting search...");
+            var decisions = new[] { Decision.P, Decision.N };
+            var values = new[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+            SearchStrategy(Strategy.Instance.PairStrategy, decisions);
+
+            if (button != null)
+                button.IsEnabled = true;
+        }
+
+        private async void SearchStrategy(IEnumerable<StrategyRow> rowsIE, Decision[] decisionChecks)
+        {
+            var rows = rowsIE.ToList();
+
+            int firstPassSimulations = 10_000_000;
+            int secondPassSimulations = 50_000_000; // Fast, low-accuracy pass
+            int finalSimulations = 500_000_000; // High-accuracy for close results
             double firstThreshold = 0.05; // Margin for "close" results
             double secondThreshold = 0.002;
 
-            var strategy = Strategy.Instance;
-            var pairRows = strategy.PairStrategy;
-
+            
             // Map from "2"-"A" to the corresponding row in PairStrategy
-            CardValue[] pairValues =
+            CardValue[] dealserValues =
             [
                 CardValue.Two, CardValue.Three, CardValue.Four, CardValue.Five, CardValue.Six, CardValue.Seven,
                 CardValue.Eight, CardValue.Nine, CardValue.Ten, CardValue.Ace
             ];
             var colNames = new[] { "Vs2", "Vs3", "Vs4", "Vs5", "Vs6", "Vs7", "Vs8", "Vs9", "Vs10", "VsA" };
 
-            int totalSteps = pairValues.Length * colNames.Length;
+            int totalSteps = rows.Count * colNames.Length;
             int currentStep = 0;
 
-            double[,,] differences = new double[pairValues.Length, colNames.Length, 3];
+            double[,,] differences = new double[dealserValues.Length, colNames.Length, 3];
 
             var watch = Stopwatch.StartNew();
             try
             {
-                for (int i = 0; i < pairValues.Length; i++)
+                for (int i = 0; i < rows.Count; i++)
                 {
-                    var pair = pairValues[i];
-                    var pCard = pair;
+                    var pair = dealserValues[i];
+                    List<CardValue> cards = [pair, pair];
                     // Find the row in PairStrategy where Pair == pair
-                    var row = pairRows.First(r => r.Pair == pCard);
+                    var row = rows[i];
 
                     //if (row == null) continue;
 
                     for (int j = 0; j < colNames.Length; j++)
                     {
                         string col = colNames[j];
-                        SetPairCell(row, col,  Decision.P);
-                        double rtpY = await SimulateRTP(firstPassSimulations, [pCard, pCard], pairValues[j]) / firstPassSimulations;
 
-                        SetPairCell(row, col, Decision.N);
-                        double rtpN = await SimulateRTP(firstPassSimulations, [pCard, pCard],pairValues[j]) / firstPassSimulations;
+
+
+
+                        var (dec, diff) = await FindBestDecision(firstPassSimulations);
+
+
+
+
+
+
+
+                        SetRowColumn(row, col,  Decision.P);
+                        double rtpY = await SimulateRTP(firstPassSimulations, cards, dealserValues[j]) / firstPassSimulations;
+
+                        SetRowColumn(row, col, Decision.N);
+                        double rtpN = await SimulateRTP(firstPassSimulations, cards,dealserValues[j]) / firstPassSimulations;
 
 
                         // If results are close, re-run with higher accuracy
@@ -273,22 +297,22 @@ namespace BlackjackWpf
                         differences[i, j, 0] = firstPass;
                         if (firstPass < firstThreshold)
                         {
-                            SetPairCell(row, col, Decision.P);
-                            rtpY = await SimulateRTP(secondPassSimulations, [pCard, pCard], pairValues[j]) / secondPassSimulations;
+                            SetRowColumn(row, col, Decision.P);
+                            rtpY = await SimulateRTP(secondPassSimulations, cards, dealserValues[j]) / secondPassSimulations;
 
-                            SetPairCell(row, col, Decision.N);
-                            rtpN = await SimulateRTP(secondPassSimulations, [pCard, pCard], pairValues[j]) / secondPassSimulations;
+                            SetRowColumn(row, col, Decision.N);
+                            rtpN = await SimulateRTP(secondPassSimulations, cards, dealserValues[j]) / secondPassSimulations;
 
                             var secondPass = Math.Abs(rtpY - rtpN);
                             differences[i,j,1] = secondPass;
 
                             if (secondPass < secondThreshold)
                             {
-                                SetPairCell(row, col, Decision.P);
-                                rtpY = await SimulateRTP(finalSimulations, [pCard, pCard], pairValues[j]) / finalSimulations;
+                                SetRowColumn(row, col, Decision.P);
+                                rtpY = await SimulateRTP(finalSimulations, cards, dealserValues[j]) / finalSimulations;
 
-                                SetPairCell(row, col, Decision.N);
-                                rtpN = await SimulateRTP(finalSimulations, [pCard, pCard], pairValues[j]) / finalSimulations;
+                                SetRowColumn(row, col, Decision.N);
+                                rtpN = await SimulateRTP(finalSimulations, cards, dealserValues[j]) / finalSimulations;
                        
                                 var finalPass = Math.Abs(rtpY - rtpN);
                                 differences[i,j,2] = finalPass;
@@ -298,10 +322,28 @@ namespace BlackjackWpf
 
 
 
-                        SetPairCell(row, col, rtpY >= rtpN ? Decision.P : Decision.N);
+                        SetRowColumn(row, col, rtpY >= rtpN ? Decision.P : Decision.N);
 
                         currentStep++;
                         UpdateProgress((float)currentStep / totalSteps);
+
+                        async Task<(Decision, double)> FindBestDecision(int simulationCount)
+                        {
+                            double maxUnits = 0;
+                            Decision bestDecision = Decision.P;
+
+                            foreach (var decision in decisionChecks)
+                            {
+                                SetRowColumn(row, col, decision);
+                                var units = await SimulateRTP(simulationCount, cards, dealserValues[j]) / simulationCount;
+                                if (units > maxUnits)
+                                {
+                                    maxUnits = units;
+                                    bestDecision = decision;
+                                }
+                            }
+                            return (bestDecision, maxUnits);
+                        }
                     }
                 }
 
@@ -311,9 +353,9 @@ namespace BlackjackWpf
                 str.AppendLine($"Pair strategy optimized! It took {watch.Elapsed}!");
 
 
-                for (int i = pairValues.Length-1; i >= 0; i--)
+                for (int i = dealserValues.Length-1; i >= 0; i--)
                 {
-                    str.Append($"({pairValues[i]}, {pairValues[i]})::: ");
+                    str.Append($"({dealserValues[i]}, {dealserValues[i]})::: ");
 
                     for (int j = 0; j < colNames.Length; j++)
                     {
@@ -332,12 +374,11 @@ namespace BlackjackWpf
                 ResultsText.Text = $"Error: {ex.Message}\n{ex.StackTrace}";
             }
 
-            if (button != null)
-                button.IsEnabled = true;
+
         }
 
         // Helper to set a cell value by column name
-        private void SetPairCell(PairStrategyRow row, string col, Decision decision)
+        private void SetRowColumn(StrategyRow row, string col, Decision decision)
         {
             switch (col)
             {
