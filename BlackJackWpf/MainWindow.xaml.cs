@@ -250,7 +250,7 @@ namespace BlackjackWpf
             ResultsText.Text = "Searching for optimal soft strategy...";
             SimulationProgress.Value = 0;
             UpdateStatus("Starting search...");
-            var decisions = new[] { Decision.H, Decision.D, Decision.Ds, Decision.S };
+            var decisions = new[] { Decision.H, Decision.D, Decision.S };
             List<List<CardValue>> hands =
             [
                 [CardValue.Ace, CardValue.Ace], [CardValue.Ace, CardValue.Two], [CardValue.Ace, CardValue.Three],
@@ -369,6 +369,7 @@ namespace BlackjackWpf
                             double maxUnits = -10;
                             double minDiff = 10;
                             Decision bestDecision = Decision.H;
+                            Decision secondBest = Decision.H;
 
                             foreach (var decision in decisionChecks)
                             {
@@ -381,8 +382,14 @@ namespace BlackjackWpf
                                 if (units > maxUnits)
                                 {
                                     maxUnits = units;
+                                    secondBest = bestDecision;
                                     bestDecision = decision;
                                 }
+                            }
+
+                            if (bestDecision == Decision.D)
+                            {
+                                bestDecision = secondBest==Decision.H? Decision.D : Decision.Ds;
                             }
                             return (bestDecision, minDiff);
                         }
