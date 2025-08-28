@@ -253,10 +253,10 @@ namespace BlackjackWpf
             var decisions = new[] { Decision.H, Decision.D, Decision.Ds, Decision.S };
             List<List<CardValue>> hands =
             [
-                [CardValue.Ace, CardValue.Two], [CardValue.Ace, CardValue.Three],
+                [CardValue.Ace, CardValue.Ace], [CardValue.Ace, CardValue.Two], [CardValue.Ace, CardValue.Three],
                 [CardValue.Ace,CardValue.Four], [CardValue.Ace,CardValue.Five], [CardValue.Ace,CardValue.Six],
-                [CardValue.Ace,CardValue.Seven], [CardValue.Ace,CardValue.Eight], [CardValue.Ace,CardValue.Nine], 
-                [CardValue.Ace, CardValue.Ace]
+                [CardValue.Ace,CardValue.Seven], [CardValue.Ace,CardValue.Eight], [CardValue.Ace,CardValue.Nine]
+                
             ];
 
             var preRules = Rules.Instance.AllowSplit;
@@ -327,7 +327,7 @@ namespace BlackjackWpf
                 {
                     List<CardValue> cards = hands[i];
                     // Find the row in PairStrategy where Pair == pair
-                    var row = rows[i];
+                    var row = rows.Find(x=> x.Total == (int)cards[0] + (int)cards[1]);
 
                     //if (row == null) continue;
 
@@ -392,12 +392,13 @@ namespace BlackjackWpf
 
                 var str = new StringBuilder();
 
-                str.AppendLine($"Pair strategy optimized! It took {watch.Elapsed}!");
+                str.AppendLine($"{rows[0].GetType()} optimized! It took {watch.Elapsed}!");
+                str.AppendLine("(Total)");
 
 
-                for (int i = dealserValues.Length-1; i >= 0; i--)
+                for (int i = rows.Count-1; i >= 0; i--)
                 {
-                    str.Append($"({dealserValues[i]}, {dealserValues[i]})::: ");
+                    str.Append($"({rows[i].Total})::: ");
 
                     for (int j = 0; j < colNames.Length; j++)
                     {
