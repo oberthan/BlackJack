@@ -300,13 +300,13 @@ namespace BlackjackWpf
         {
             var rows = rowsIe.ToList();
 
-            long firstPassSimulations = 10_000_000;
-            long secondPassSimulations = 50_000_000; // Fast, low-accuracy pass
-            long finalSimulations = 500_000_000; // High-accuracy for close results
+            long firstPassSimulations = 50_000_000;
+            long secondPassSimulations = 500_000_000; // Fast, low-accuracy pass
+            long finalSimulations = 10_000_000_000; // High-accuracy for close results
             double firstThreshold = 0.05; // Margin for "close" results
-            double secondThreshold = 0.002;
+            double secondThreshold = 0.005;
 
-            
+
             // Map from "2"-"A" to the corresponding row in PairStrategy
             CardValue[] dealserValues =
             [
