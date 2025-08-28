@@ -21,6 +21,8 @@ public class Game
     public readonly Deck Deck = new(); // 8-deck shoe with 0.7 penetration by default
     public readonly Player Player = new();
 
+    public Strategy strategy = Strategy.Instance;
+
     public void Reset()
     {
         Deck.SetupShoe();
@@ -228,7 +230,7 @@ public class Game
                 return 0;
 
             // Get strategy action
-            var action = Strategy.Instance.Decide(handOwner, Dealer.Hand[0], afterSplit);
+            var action = strategy.Decide(handOwner, Dealer.Hand[0], afterSplit);
 /*            var oldAction = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
             if (action != oldAction)
             {
