@@ -2,6 +2,7 @@
 
 public class StrategyRow
 {
+    public int Total { get; set; }
     public Decision Vs2 { get; set; }
     public Decision Vs3 { get; set; }
     public Decision Vs4 { get; set; }
@@ -21,10 +22,10 @@ public class PairStrategyRow : StrategyRow
 
 public class SoftStrategyRow : StrategyRow
 {
-    public int Total { get; set; }
+
 }
 
 public class HardStrategyRow : StrategyRow
 {
-    public int Total { get; set; }
+
 }

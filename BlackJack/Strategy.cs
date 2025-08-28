@@ -30,16 +30,16 @@ public class Strategy
     public static Strategy Instance { get; set; } = new();
     public List<PairStrategyRow> PairStrategy { get; set; } = new()
     {
-        new PairStrategyRow { Pair = CardValue.Two, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = CardValue.Three, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = CardValue.Four, Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = CardValue.Five, Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.N, Vs6 = Decision.N, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = CardValue.Six, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = CardValue.Seven, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = CardValue.Eight, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.P, VsA = Decision.P},
-        new PairStrategyRow { Pair = CardValue.Nine, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = CardValue.Ten, Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.N, Vs6 = Decision.N, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
-        new PairStrategyRow { Pair = CardValue.Ace, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.P, VsA = Decision.P}
+        new PairStrategyRow { Pair = CardValue.Two, Total = 4, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Three, Total = 6, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Four, Total = 8, Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Five, Total = 10, Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.N, Vs6 = Decision.N, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Six, Total = 12, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Seven, Total = 14, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Eight, Total = 16, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.P, VsA = Decision.P},
+        new PairStrategyRow { Pair = CardValue.Nine, Total = 18, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.N, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Ten, Total = 20, Vs2 = Decision.N, Vs3 = Decision.N, Vs4 = Decision.N, Vs5 = Decision.N, Vs6 = Decision.N, Vs7 = Decision.N, Vs8 = Decision.N, Vs9 = Decision.N, Vs10 = Decision.N, VsA = Decision.N},
+        new PairStrategyRow { Pair = CardValue.Ace, Total = 22, Vs2 = Decision.P, Vs3 = Decision.P, Vs4 = Decision.P, Vs5 = Decision.P, Vs6 = Decision.P, Vs7 = Decision.P, Vs8 = Decision.P, Vs9 = Decision.P, Vs10 = Decision.P, VsA = Decision.P}
     };
 
     private const int pairStrategyMinPair = 2;
