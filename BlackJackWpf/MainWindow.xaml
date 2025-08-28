@@ -19,7 +19,11 @@
             <Button Margin="3" FontSize="15" FontWeight="Bold"  Content="Start Simulation" Click="StartSimulation_Click" />
             <Button Margin="3" Content="Settings..." Click="ShowSettings_Click" />
             <Button Margin="3" Content="Strategy" Click="ShowStrategy_Click" />
-            <Button Margin="3" Content="Search for strategy" Click="SearchStrategy_Click" />
+            <StackPanel Orientation="Horizontal" Margin="3" >
+                <Button  Content="Pair" Click="SearchStrategyPair_Click" />
+                <Button  Content="Soft" Click="SearchStrategySoft_Click" />
+                <Button  Content="Hard" Click="SearchStrategyHard_Click" />
+            </StackPanel>
         </StackPanel>
         <ProgressBar Margin="3" Grid.Row="1" Grid.Column="0" x:Name="SimulationProgress" Minimum="0" Maximum="100" Orientation="Vertical" Width="25" HorizontalAlignment="Left"/>
         <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="1">
