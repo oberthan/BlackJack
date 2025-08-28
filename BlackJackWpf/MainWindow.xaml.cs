@@ -300,8 +300,8 @@ namespace BlackjackWpf
         {
             var rows = rowsIe.ToList();
 
-            int firstPassSimulations = 10_000_000;
-            int secondPassSimulations = 50_000_000; // Fast, low-accuracy pass
+            long firstPassSimulations = 10_000_000;
+            long secondPassSimulations = 50_000_000; // Fast, low-accuracy pass
             long finalSimulations = 500_000_000; // High-accuracy for close results
             double firstThreshold = 0.05; // Margin for "close" results
             double secondThreshold = 0.002;
@@ -327,7 +327,7 @@ namespace BlackjackWpf
                 {
                     List<CardValue> cards = hands[i];
                     // Find the row in PairStrategy where Pair == pair
-                    var row = rows.Find(x=> x.Total == (int)cards[0] + (int)cards[1]);
+                    var row = rows.Find(x=> x.Total == HandEvaluator.Evaluate(cards, false).Total);
 
                     //if (row == null) continue;
 
@@ -351,7 +351,7 @@ namespace BlackjackWpf
 
                             if (diff < secondThreshold)
                             {
-                                (dec, diff) = await FindBestDecision(firstPassSimulations);
+                                (dec, diff) = await FindBestDecision(finalSimulations);
                                 differences[i,j,2] = diff;
                             }
                         }
@@ -364,7 +364,7 @@ namespace BlackjackWpf
                         currentStep++;
                         UpdateProgress((float)currentStep / totalSteps);
 
-                        async Task<(Decision, double)> FindBestDecision(int simulationCount)
+                        async Task<(Decision, double)> FindBestDecision(long simulationCount)
                         {
                             double maxUnits = -10;
                             double minDiff = 10;
