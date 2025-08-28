@@ -262,7 +262,7 @@ namespace BlackjackWpf
             var preRules = Rules.Instance.AllowSplit;
             Rules.Instance.AllowSplit = false; // Disable splitting for hard strategy search
 
-            await SearchStrategy(Strategy.Instance.PairStrategy, hands, decisions);
+            await SearchStrategy(Strategy.Instance.SoftStrategy, hands, decisions);
 
             Rules.Instance.AllowSplit = preRules; // Restore original setting
 
@@ -289,7 +289,7 @@ namespace BlackjackWpf
             ];
 
 
-            await SearchStrategy(Strategy.Instance.PairStrategy, hands, decisions);
+            await SearchStrategy(Strategy.Instance.HardStrategy, hands, decisions);
 
 
             if (button != null)
@@ -302,7 +302,7 @@ namespace BlackjackWpf
 
             int firstPassSimulations = 10_000_000;
             int secondPassSimulations = 50_000_000; // Fast, low-accuracy pass
-            int finalSimulations = 500_000_000; // High-accuracy for close results
+            long finalSimulations = 500_000_000; // High-accuracy for close results
             double firstThreshold = 0.05; // Margin for "close" results
             double secondThreshold = 0.002;
 
