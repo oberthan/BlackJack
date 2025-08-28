@@ -250,7 +250,7 @@ namespace BlackjackWpf
             ResultsText.Text = "Searching for optimal soft strategy...";
             SimulationProgress.Value = 0;
             UpdateStatus("Starting search...");
-            var decisions = new[] { Decision.H, Decision.D, Decision.S };
+            var decisions = new[] { Decision.H, Decision.S, Decision.D };
             List<List<CardValue>> hands =
             [
                 [CardValue.Ace, CardValue.Ace], [CardValue.Ace, CardValue.Two], [CardValue.Ace, CardValue.Three],
@@ -279,7 +279,7 @@ namespace BlackjackWpf
             ResultsText.Text = "Searching for optimal hard strategy...";
             SimulationProgress.Value = 0;
             UpdateStatus("Starting search...");
-            var decisions = new[] { Decision.D, Decision.S, Decision.H };
+            var decisions = new[] {  Decision.S, Decision.H, Decision.D };
             List<List<CardValue>> hands =
             [
                 [CardValue.Two, CardValue.Six], [CardValue.Three, CardValue.Six],
@@ -367,6 +367,8 @@ namespace BlackjackWpf
                         async Task<(Decision, double)> FindBestDecision(long simulationCount)
                         {
                             double maxUnits = -10;
+                            double secondMax = -10;
+
                             double minDiff = 10;
                             Decision bestDecision = Decision.H;
                             Decision secondBest = Decision.H;
@@ -381,10 +383,17 @@ namespace BlackjackWpf
                                     minDiff = diff;
                                 if (units > maxUnits)
                                 {
+                                    secondMax = maxUnits;
                                     maxUnits = units;
                                     secondBest = bestDecision;
                                     bestDecision = decision;
                                 }
+                                else if (units > secondMax)
+                                {
+                                    secondMax = units;
+                                    secondBest = decision;
+                                }
+
                             }
 
                             if (bestDecision == Decision.D)
