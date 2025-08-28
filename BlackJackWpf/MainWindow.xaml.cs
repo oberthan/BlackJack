@@ -327,7 +327,7 @@ namespace BlackjackWpf
                 {
                     List<CardValue> cards = hands[i];
                     // Find the row in PairStrategy where Pair == pair
-                    var row = rows.Find(x=> x.Total == (int)cards[0] + (int)cards[1]);
+                    var row = rows.Find(x=> x.Total == HandEvaluator.Evaluate(cards, false).Total);
 
                     //if (row == null) continue;
 
