@@ -308,7 +308,7 @@ namespace BlackjackWpf
 
 
             // Map from "2"-"A" to the corresponding row in PairStrategy
-            CardValue[] dealserValues =
+            CardValue[] dealerValues =
             [
                 CardValue.Two, CardValue.Three, CardValue.Four, CardValue.Five, CardValue.Six, CardValue.Seven,
                 CardValue.Eight, CardValue.Nine, CardValue.Ten, CardValue.Ace
@@ -318,7 +318,7 @@ namespace BlackjackWpf
             int totalSteps = rows.Count * colNames.Length;
             int currentStep = 0;
 
-            double[,,] differences = new double[dealserValues.Length, colNames.Length, 3];
+            double[,,] differences = new double[dealerValues.Length, colNames.Length, 3];
 
             var watch = Stopwatch.StartNew();
             try
@@ -376,7 +376,7 @@ namespace BlackjackWpf
                             foreach (var decision in decisionChecks)
                             {
                                 SetRowColumn(row, col, decision);
-                                var units = await SimulateRTP(simulationCount, cards, dealserValues[j]) / simulationCount;
+                                var units = await SimulateRTP(simulationCount, cards, dealerValues[j]) / simulationCount;
 
                                 var diff = double.Abs(units - maxUnits);
                                 if (diff < minDiff)
