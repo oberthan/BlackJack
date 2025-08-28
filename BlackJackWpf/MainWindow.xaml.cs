@@ -441,7 +441,7 @@ namespace BlackjackWpf
         }
 
         // Run a simulation and return RTP
-        private async Task<double> SimulateRTP(int rounds, List<CardValue> playerHand, CardValue upCard)
+        private async Task<double> SimulateRTP(long rounds, List<CardValue> playerHand, CardValue upCard)
         {
             var nTasks = Environment.ProcessorCount;
             var simulators = new BlackjackSimulator[nTasks];
