@@ -227,16 +227,78 @@ namespace BlackjackWpf
             SimulationProgress.Value = 0;
             UpdateStatus("Starting search...");
             var decisions = new[] { Decision.P, Decision.N };
-            var values = new[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-            SearchStrategy(Strategy.Instance.PairStrategy, decisions);
+            List<List<CardValue>> hands = 
+                [
+                    [CardValue.Two, CardValue.Two], [CardValue.Three, CardValue.Three],
+                    [CardValue.Four,CardValue.Four], [CardValue.Five,CardValue.Five], [CardValue.Six,CardValue.Six],
+                    [CardValue.Seven,CardValue.Seven], [CardValue.Eight,CardValue.Eight], [CardValue.Nine,CardValue.Nine],
+                    [CardValue.Ten,CardValue.Ten], [CardValue.Ace, CardValue.Ace]
+                ]; 
+
+            await SearchStrategy(Strategy.Instance.PairStrategy,hands, decisions);
 
             if (button != null)
                 button.IsEnabled = true;
         }
 
-        private async void SearchStrategy(IEnumerable<StrategyRow> rowsIE, Decision[] decisionChecks)
+        private async void SearchStrategySoft_Click(object sender, RoutedEventArgs e)
         {
-            var rows = rowsIE.ToList();
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+                button.IsEnabled = false;
+
+            ResultsText.Text = "Searching for optimal soft strategy...";
+            SimulationProgress.Value = 0;
+            UpdateStatus("Starting search...");
+            var decisions = new[] { Decision.H, Decision.D, Decision.Ds, Decision.S };
+            List<List<CardValue>> hands =
+            [
+                [CardValue.Ace, CardValue.Two], [CardValue.Ace, CardValue.Three],
+                [CardValue.Ace,CardValue.Four], [CardValue.Ace,CardValue.Five], [CardValue.Ace,CardValue.Six],
+                [CardValue.Ace,CardValue.Seven], [CardValue.Ace,CardValue.Eight], [CardValue.Ace,CardValue.Nine], 
+                [CardValue.Ace, CardValue.Ace]
+            ];
+
+            var preRules = Rules.Instance.AllowSplit;
+            Rules.Instance.AllowSplit = false; // Disable splitting for hard strategy search
+
+            await SearchStrategy(Strategy.Instance.PairStrategy, hands, decisions);
+
+            Rules.Instance.AllowSplit = preRules; // Restore original setting
+
+            if (button != null)
+                button.IsEnabled = true;
+        }
+
+        private async void SearchStrategyHard_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+                button.IsEnabled = false;
+
+            ResultsText.Text = "Searching for optimal hard strategy...";
+            SimulationProgress.Value = 0;
+            UpdateStatus("Starting search...");
+            var decisions = new[] { Decision.D, Decision.S, Decision.H };
+            List<List<CardValue>> hands =
+            [
+                [CardValue.Two, CardValue.Six], [CardValue.Three, CardValue.Six],
+                [CardValue.Four,CardValue.Six], [CardValue.Five,CardValue.Six], [CardValue.Five,CardValue.Seven],
+                [CardValue.Seven,CardValue.Six], [CardValue.Eight,CardValue.Six], [CardValue.Nine,CardValue.Six],
+                [CardValue.Ten,CardValue.Six], [CardValue.Ten, CardValue.Seven]
+            ];
+
+
+            await SearchStrategy(Strategy.Instance.PairStrategy, hands, decisions);
+
+
+            if (button != null)
+                button.IsEnabled = true;
+        }
+
+        private async Task<bool> SearchStrategy(IEnumerable<StrategyRow> rowsIe, List<List<CardValue>> hands, Decision[] decisionChecks)
+        {
+            var rows = rowsIe.ToList();
 
             int firstPassSimulations = 10_000_000;
             int secondPassSimulations = 50_000_000; // Fast, low-accuracy pass
@@ -263,8 +325,7 @@ namespace BlackjackWpf
             {
                 for (int i = 0; i < rows.Count; i++)
                 {
-                    var pair = dealserValues[i];
-                    List<CardValue> cards = [pair, pair];
+                    List<CardValue> cards = hands[i];
                     // Find the row in PairStrategy where Pair == pair
                     var row = rows[i];
 
@@ -275,74 +336,55 @@ namespace BlackjackWpf
                         string col = colNames[j];
 
 
+                        (Decision dec, double diff) = (0,0);
 
-
-                        var (dec, diff) = await FindBestDecision(firstPassSimulations);
-
-
-
-
-
-
-
-                        SetRowColumn(row, col,  Decision.P);
-                        double rtpY = await SimulateRTP(firstPassSimulations, cards, dealserValues[j]) / firstPassSimulations;
-
-                        SetRowColumn(row, col, Decision.N);
-                        double rtpN = await SimulateRTP(firstPassSimulations, cards,dealserValues[j]) / firstPassSimulations;
+                        (dec, diff) = await FindBestDecision(firstPassSimulations);
 
 
                         // If results are close, re-run with higher accuracy
-                        var firstPass = Math.Abs(rtpY - rtpN);
-                        differences[i, j, 0] = firstPass;
-                        if (firstPass < firstThreshold)
+
+                        differences[i, j, 0] = diff;
+                        if (diff < firstThreshold)
                         {
-                            SetRowColumn(row, col, Decision.P);
-                            rtpY = await SimulateRTP(secondPassSimulations, cards, dealserValues[j]) / secondPassSimulations;
+                            (dec, diff) = await FindBestDecision(secondPassSimulations);
+                            differences[i,j,1] = diff;
 
-                            SetRowColumn(row, col, Decision.N);
-                            rtpN = await SimulateRTP(secondPassSimulations, cards, dealserValues[j]) / secondPassSimulations;
-
-                            var secondPass = Math.Abs(rtpY - rtpN);
-                            differences[i,j,1] = secondPass;
-
-                            if (secondPass < secondThreshold)
+                            if (diff < secondThreshold)
                             {
-                                SetRowColumn(row, col, Decision.P);
-                                rtpY = await SimulateRTP(finalSimulations, cards, dealserValues[j]) / finalSimulations;
-
-                                SetRowColumn(row, col, Decision.N);
-                                rtpN = await SimulateRTP(finalSimulations, cards, dealserValues[j]) / finalSimulations;
-                       
-                                var finalPass = Math.Abs(rtpY - rtpN);
-                                differences[i,j,2] = finalPass;
+                                (dec, diff) = await FindBestDecision(firstPassSimulations);
+                                differences[i,j,2] = diff;
                             }
                         }
 
 
 
 
-                        SetRowColumn(row, col, rtpY >= rtpN ? Decision.P : Decision.N);
+                        SetRowColumn(row, col, dec);
 
                         currentStep++;
                         UpdateProgress((float)currentStep / totalSteps);
 
                         async Task<(Decision, double)> FindBestDecision(int simulationCount)
                         {
-                            double maxUnits = 0;
-                            Decision bestDecision = Decision.P;
+                            double maxUnits = -10;
+                            double minDiff = 10;
+                            Decision bestDecision = Decision.H;
 
                             foreach (var decision in decisionChecks)
                             {
                                 SetRowColumn(row, col, decision);
                                 var units = await SimulateRTP(simulationCount, cards, dealserValues[j]) / simulationCount;
+
+                                var diff = double.Abs(units - maxUnits);
+                                if (diff < minDiff)
+                                    minDiff = diff;
                                 if (units > maxUnits)
                                 {
                                     maxUnits = units;
                                     bestDecision = decision;
                                 }
                             }
-                            return (bestDecision, maxUnits);
+                            return (bestDecision, minDiff);
                         }
                     }
                 }
@@ -368,6 +410,7 @@ namespace BlackjackWpf
                 }
 
                 ResultsText.Text = str.ToString();
+                
             }
             catch (Exception ex)
             {
@@ -375,6 +418,7 @@ namespace BlackjackWpf
             }
 
 
+            return true;
         }
 
         // Helper to set a cell value by column name
@@ -515,6 +559,8 @@ namespace BlackjackWpf
                 Strategy.Instance.PairStrategy = viewModel.PairStrategy.ToList();
             }
         }
+
+
     }
 
 }
