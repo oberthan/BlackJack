@@ -71,7 +71,7 @@ namespace BlackjackWpf
             long splits = 0;
             long doubles = 0;
             long stake = 0;
-            double unitsSquared = 0; // <-- Add this variable to store units squared
+            double unitsSquared = 0;
             Dictionary<double, long> dict = new();
 
             var nTasks = Environment.ProcessorCount-1;
