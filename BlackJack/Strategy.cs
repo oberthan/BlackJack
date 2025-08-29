@@ -99,9 +99,9 @@ public class Strategy
         if (isSoft)
         {
             // six card charlie strats
-            if (cards.Count == 5) return Move.Hit;
-            if (cards.Count == 4 && total == 18 && (upValue is >= 8 and <= 11)) return Move.Hit;
-            if (cards.Count == 4 && total == 19 && upValue == 10) return Move.Hit;
+            if (cards.Count == 5 && total >= 19) return Move.Hit;
+            if (cards.Count >= 4 && total == 18 && !(upValue is >= 3 and <= 6)) return Move.Hit;
+            if (cards.Count >= 4 && total == 19 && upValue == 10) return Move.Hit;
 
 
             var row = SoftStrategy[total-softStrategyMinTotal];
@@ -114,8 +114,8 @@ public class Strategy
         {
 
             // six card charlie strats
-            if (cards.Count == 5 && total == 12 && upValue is >= 4 and <= 6) return Move.Hit;
-            if (cards.Count == 5 && total == 13 && (upValue == 2 || upValue == 3)) return Move.Hit;
+            if (cards.Count >= 4 && total == 12 && upValue is >= 4 and <= 6) return Move.Hit;
+            if (cards.Count >= 4 && total == 13 && (upValue == 2 || upValue == 3)) return Move.Hit;
             if (cards.Count == 5 && total >= 13 && total <= 15 && upValue >= 2 && upValue <= 6) return Move.Hit;
             if (cards.Count == 5 && total == 16 && (upValue == 2 || upValue == 3)) return Move.Hit;
             if (cards.Count == 5 && total == 17 && upValue >= 9 && upValue <= 11) return Move.Hit;
