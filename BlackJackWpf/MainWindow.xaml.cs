@@ -302,7 +302,7 @@ namespace BlackjackWpf
 
             long firstPassSimulations = 50_000_000;
             long secondPassSimulations = 500_000_000; // Fast, low-accuracy pass
-            long finalSimulations = 10_000_000_000; // High-accuracy for close results
+            long finalSimulations = 5_000_000_000; // High-accuracy for close results
             double firstThreshold = 0.05; // Margin for "close" results
             double secondThreshold = 0.005;
 
@@ -327,7 +327,7 @@ namespace BlackjackWpf
                 {
                     List<CardValue> cards = hands[i];
                     // Find the row in PairStrategy where Pair == pair
-                    var row = rows.Find(x=> x.Total == HandEvaluator.Evaluate(cards, false).Total);
+                    var row = rows[i];
 
                     //if (row == null) continue;
 
