@@ -43,7 +43,7 @@ public class Strategy
     public List<SoftStrategyRow> SoftStrategy { get; set; } = new()
     {
         new SoftStrategyRow { Total = 12, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.H, Vs6 = Decision.H, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
-        new SoftStrategyRow { Total = 13, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
+        new SoftStrategyRow { Total = 13, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.H, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
         new SoftStrategyRow { Total = 14, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
         new SoftStrategyRow { Total = 15, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
         new SoftStrategyRow { Total = 16, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
