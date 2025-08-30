@@ -376,7 +376,7 @@ namespace BlackjackWpf
                             foreach (var decision in decisionChecks)
                             {
                                 SetRowColumn(row, col, decision);
-                                var units = await SimulateRTP(simulationCount, cards, dealerValues[j]) / simulationCount;
+                                var units = await SimulateRTP(simulationCount, cards, dealerValues[j]);
 
                                 var diff = double.Abs(units - maxUnits);
                                 if (diff < minDiff)
@@ -494,8 +494,36 @@ namespace BlackjackWpf
             await Task.WhenAll(tasks);
             stopwatch.Stop();
 
+            var dict = sum.limitOverShoots;
+
+            double kelly = 0;
+            double ev_sum = 0;
+            double sigma_squared = 0;
+            long sessions_sum = dict.Sum(x => x.Value);
+
+            foreach (var kvp in dict)
+            {
+                if (kvp.Key < 0)
+                {
+                    ev_sum += kvp.Key * kvp.Value * (1 - Rules.Instance.Cashback);
+                    sigma_squared += kvp.Value * (kvp.Key * (1 - Rules.Instance.Cashback) * kvp.Key * (1 - Rules.Instance.Cashback));
+                }
+                else
+                {
+                    ev_sum += kvp.Key * kvp.Value;
+                    sigma_squared += kvp.Key * kvp.Key * kvp.Value;
+                }
+
+            }
+            double ev = ev_sum / sessions_sum;
+
+            sigma_squared /= sessions_sum;
+            sigma_squared -= ev * ev;
+
+            kelly = ev / sigma_squared;
+
             // RTP = (units + stake) / stake
-            return sum.units;
+            return (ev);
 
             void UpdateResults(BlackjackSimulator sum, long previous = 0)
             {
