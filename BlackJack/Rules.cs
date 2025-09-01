@@ -38,7 +38,7 @@ public class Rules
         return (int)a == (int)b;
     }
 
-    public double UpperLimit = 3;
+    public double UpperLimit = 2;
     public double LowerLimit = -3;
     public double Cashback = 0.1; // 10% cashback on losses
 }

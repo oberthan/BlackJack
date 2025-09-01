@@ -301,10 +301,10 @@ namespace BlackjackWpf
             var rows = rowsIe.ToList();
 
             long firstPassSimulations = 50_000_000;
-            long secondPassSimulations = 500_000_000; // Fast, low-accuracy pass
-            long finalSimulations = 5_000_000_000; // High-accuracy for close results
-            double firstThreshold = 0.05; // Margin for "close" results
-            double secondThreshold = 0.005;
+            long secondPassSimulations = 200_000_000; // Fast, low-accuracy pass
+            long finalSimulations = 1_000_000_000; // High-accuracy for close results
+            double firstThreshold = 0.00005; // Margin for "close" results
+            double secondThreshold = 0.000008;
 
 
             // Map from "2"-"A" to the corresponding row in PairStrategy
@@ -474,7 +474,7 @@ namespace BlackjackWpf
             for (int i = 0; i < nTasks; i++)
             {
                 int idx = i;
-                tasks[i] = Task.Run(() => simulators[idx].ForceStartingHand(playerHand, upCard));
+                tasks[i] = Task.Run(() => simulators[idx].RunSimulation());
             }
             while (!tasks.All(x => x.IsCompleted))
             {
@@ -523,7 +523,7 @@ namespace BlackjackWpf
             kelly = ev / sigma_squared;
 
             // RTP = (units + stake) / stake
-            return (ev);
+            return (ev*kelly);
 
             void UpdateResults(BlackjackSimulator sum, long previous = 0)
             {
