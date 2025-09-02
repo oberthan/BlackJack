@@ -1,10 +1,9 @@
-
 using System;
 using System.Diagnostics;
 using ILGPU;
 using ILGPU.Runtime;
 using ILGPU.Algorithms;
-using ILGPU.Runtime.OpenCL;
+using Blackjack;
 
 namespace Blackjack.Gpu
 {
@@ -19,27 +18,22 @@ namespace Blackjack.Gpu
         {
             if (roundsPerThread < 1) roundsPerThread = 1;
 
-            using Context context = Context.Create(builder => builder.Default().EnableAlgorithms());
-
-            foreach (Device device in context)
-            {
-                Console.WriteLine(device);
-            }
-
-            Accelerator accelerator = context.CreateCLAccelerator(0);
-            //Accelerator accelerator = context.GetPreferredDevice(preferCPU: false).CreateAccelerator(context);
-
+            using Context context = Context.Create(builder =>
+                builder.Default().EnableAlgorithms().Optimize(OptimizationLevel.O2));
+            Device device = context.GetPreferredDevice(preferCPU: false);
+            //device.PrintInformation();
+            Accelerator accelerator = device.CreateAccelerator(context);
 
             using (accelerator)
             {
                 if (verbose)
                     Console.WriteLine($"[ILGPU] Using {accelerator.AcceleratorType} accelerator: {accelerator.Name}");
 
-                long threadsLong = explicitThreads ?? Math.Clamp(Environment.ProcessorCount * 1024, 8_192, 1_048_576);
+                long threadsLong = explicitThreads ?? device.MaxNumThreads;
                 long neededThreads = Math.Max(1, (totalRounds + roundsPerThread - 1) / roundsPerThread);
                 if (threadsLong > neededThreads) threadsLong = neededThreads;
                 int threads = (int)Math.Clamp(threadsLong, 1, int.MaxValue);
-                roundsPerThread = totalRounds / threads;
+                roundsPerThread = totalRounds/threads;
                 long scheduledRounds = (long)threads * roundsPerThread;
 
                 if (verbose)
@@ -50,31 +44,36 @@ namespace Blackjack.Gpu
 
                 var kernel = accelerator.LoadAutoGroupedStreamKernel<
                     Index1D,
-                    ArrayView<long>,
+                    ArrayView<int>,
                     ArrayView<ulong>,
-                    long,
-                    DeviceRules,
-                    DeviceTables>(GpuKernel.SimKernel);
+                    long,             // roundsPerThread
+                    DeviceRules,     // rules
+                    DeviceTables,    // tables
+                    int              // bjTimes2
+                >(GpuKernel.SimKernel);
 
-                using var outUnits = accelerator.Allocate1D<long>(threads);
+                using var outUnitsTimes2 = accelerator.Allocate1D<int>(threads);
                 using var seeds = accelerator.Allocate1D<ulong>(threads);
 
-                // Seed array
+                // Seeds
                 ulong[] seedsHost = new ulong[threads];
                 for (int i = 0; i < threads; i++)
                     seedsHost[i] = SplitMix64(seed + (ulong)i * 0x9E3779B97F4A7C15UL);
                 seeds.CopyFromCPU(seedsHost);
 
                 // Strategy
-                StrategyTables hostTables = StrategyTables.FromDefaults();
-                using StrategyTablesDevice devTables = hostTables.Upload(accelerator);
-                DeviceTables deviceTables = devTables.Tables; // ArrayViews for kernel
+                //StrategyTables hostTables = Blackjack.Strategy.Instance.ToTables();
 
-                // Rules (Phase 1 defaults per your table)
+                StrategyTables hostTables = StrategyTables.FromDefaults();
+                
+                using StrategyTablesDevice devTables = hostTables.Upload(accelerator);
+                DeviceTables deviceTables = devTables.Tables;
+
+                // Rules
                 DeviceRules rules = new DeviceRules
                 {
-                    HitSoft17 = DeviceRules.B(false),                  // S17
-                    DoubleAfterSplitAllowed = DeviceRules.B(true),     // DAS
+                    HitSoft17 = DeviceRules.B(false),
+                    DoubleAfterSplitAllowed = DeviceRules.B(true),
                     DoubleAfterSplitAcesAllowed = DeviceRules.B(false),
                     AllowSplit = DeviceRules.B(true),
                     ResplitAllowed = DeviceRules.B(false),
@@ -84,21 +83,25 @@ namespace Blackjack.Gpu
                     BlackjackPayoutDenominator = 2,
                 };
 
+                // Blackjack payout in ×2 units (3 for 3:2)
+                int bjTimes2 = (rules.BlackjackPayoutNumerator * 2) / rules.BlackjackPayoutDenominator;
 
                 Stopwatch sw = Stopwatch.StartNew();
-                kernel(threads, outUnits.View, seeds.View, roundsPerThread, rules, deviceTables);
+                kernel(threads, outUnitsTimes2.View, seeds.View,
+                       roundsPerThread, rules, deviceTables, bjTimes2);
                 accelerator.Synchronize();
                 sw.Stop();
 
-                // Reduce on host
-                var hostUnits = outUnits.GetAsArray1D();
-                long totalUnits = 0;
-                for (int i = 0; i < hostUnits.Length; i++) totalUnits += hostUnits[i];
+                var hostUnits2 = outUnitsTimes2.GetAsArray1D();
+                double totalUnitsTimes2 = 0;
+                for (int i = 0; i < hostUnits2.Length; i++) totalUnitsTimes2 += hostUnits2[i];
 
-                float rtp = 1 + (float)((float)totalUnits / (float)scheduledRounds);
+                double rtp = 1.0 + (totalUnitsTimes2 / 2.0) / scheduledRounds;
                 Console.WriteLine($"[ILGPU] GPU time: {sw.Elapsed.TotalSeconds:F3}s");
-                Console.WriteLine($"[ILGPU] Units delta = {totalUnits:n0} over {scheduledRounds:n0} rounds");
+                Console.WriteLine($"[ILGPU] GPU rounds per second: {scheduledRounds / sw.Elapsed.TotalSeconds:n0}/s");
+                Console.WriteLine($"[ILGPU] Units delta = {totalUnitsTimes2/2:n1} over {scheduledRounds:n0} rounds");
                 Console.WriteLine($"[ILGPU] RTP (initial wager) ≈ {rtp:P5}");
+
             }
         }
 

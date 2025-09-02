@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using Blackjack;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Blackjack;
 
@@ -238,4 +240,6 @@ public class Strategy
         Decision.P => true,
         _ => Rules.Instance.DoubleAfterSplit
     };
+
 }
+
