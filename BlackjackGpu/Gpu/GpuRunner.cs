@@ -4,6 +4,7 @@ using System.Diagnostics;
 using ILGPU;
 using ILGPU.Runtime;
 using ILGPU.Algorithms;
+using ILGPU.Runtime.OpenCL;
 
 namespace Blackjack.Gpu
 {
@@ -20,7 +21,13 @@ namespace Blackjack.Gpu
 
             using Context context = Context.Create(builder => builder.Default().EnableAlgorithms());
 
-            Accelerator accelerator = context.GetPreferredDevice(preferCPU: false).CreateAccelerator(context);
+            foreach (Device device in context)
+            {
+                Console.WriteLine(device);
+            }
+
+            Accelerator accelerator = context.CreateCLAccelerator(0);
+            //Accelerator accelerator = context.GetPreferredDevice(preferCPU: false).CreateAccelerator(context);
 
 
             using (accelerator)
