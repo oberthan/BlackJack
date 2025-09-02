@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using ILGPU;
 using ILGPU.Algorithms;
 using System.Runtime.CompilerServices;
@@ -112,7 +113,7 @@ namespace Blackjack.Gpu
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int UpIdx(int up) => up == 11 ? 9 : up - 2; // 2..A -> 0..9
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int ClampHard(int total) => total < 4 ? 0 : (total > 20 ? 16 : total - 4);
+        private static int ClampHard(int total) => total < 8 ? 0 : (total > 17 ? 9 : total - 8);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int ClampSoft(int total) => total < 12 ? 0 : (total > 20 ? 8 : total - 12);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -278,6 +279,7 @@ namespace Blackjack.Gpu
             }
 
             bool doubled = false;
+            
             float cont = PlayPlayerHand(ref rng, rules, t, up, ref pTotal, ref pSoft, ref pCards, allowDouble: true, ref doubled);
             if (float.IsNegativeInfinity(cont)) return -(doubled ? 4 : 2);
             if (rules.SixCardCharlie == 1 && pCards >= 6 && pTotal <= 21) return (doubled ? 4 : 2);
@@ -310,19 +312,35 @@ namespace Blackjack.Gpu
                 if (rules.SixCardCharlie == 1 && cards >= 6) return 0;
 
                 byte action;
-                if (firstDecision && cards == 2 && ((soft == 2 && total == 22) || (soft == 0 && ((total & 1) == 0) && total is >= 4 and <= 20)))
-                {
-                    int pairRank = (soft == 2 && total == 22) ? 11 : (total / 2);
-                    action = DecidePair(t, pairRank, up);
-                }
-                else if (soft > 0 && total >= 12)
+
+                
+                if (soft > 0 && total >= 12) // TODO: Uhm 12??
                 {
                     action = DecideSoft(t, total, up);
                 }
                 else
                 {
-                    action = DecideHard(t, total, up);
+                    // --- HARD TOTALS ---
+
+                    // Add the same fallback logic as in Strategy:
+                    // if total > hardStrategyMaxTotal -> Stand
+                    // if total < hardStrategyMinTotal -> Hit
+                    if (total > 17)
+                    {
+                        action = 1; // Stand
+                    }
+                    else if (total < 8)
+                    {
+                        action = 0; // Hit
+                    }
+                    else
+                    {
+                        // inside strategy table range -> consult table
+                        action = DecideHard(t, total, up);
+                    }
                 }
+
+                //Debug.Assert(action == Strategy.Instance.DecideGpuCheck(total, soft > 0 && total >= 12, cards, up, firstDecision && allowDouble));
 
                 switch (action)
                 {
@@ -345,7 +363,7 @@ namespace Blackjack.Gpu
                     case 3: // Split (handled by caller) -> treat like Hit here
                         AddCardNoBJ(ref total, ref soft, ref cards, ref rng);
 
-                        firstDecision = true; // TODO: It should still be first decision
+                        firstDecision = false; // TODO: It should still be first decision
 
                         continue;
                     default: // N/unknown => Hit

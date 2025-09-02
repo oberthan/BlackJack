@@ -69,7 +69,7 @@ namespace Blackjack.Gpu
 
         public void SetPair(int rank, int up, byte v) => Pairs[(rank - 2) * 10 + (up == 11 ? 9 : up - 2)] = v;
         public void SetSoft(int total, int up, byte v) => Soft[(total - 12) * 10 + (up == 11 ? 9 : up - 2)] = v;
-        public void SetHard(int total, int up, byte v) => Hard[(total - 4) * 10 + (up == 11 ? 9 : up - 2)] = v;
+        public void SetHard(int total, int up, byte v) => Hard[(total - 8) * 10 + (up == 11 ? 9 : up - 2)] = v;
 
         public StrategyTablesDevice Upload(Accelerator acc)
         {

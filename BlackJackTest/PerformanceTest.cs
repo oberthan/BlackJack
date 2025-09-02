@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Diagnostics;
-using static Blackjack.Program;
+using Blackjack;
 
 namespace BlackJackTest
 {
@@ -10,7 +10,7 @@ namespace BlackJackTest
         [Test]
         public void SingleThreadTest()
         {
-            var simulator = new BlackjackSimulator
+            var simulator = new Program.BlackjackSimulator
             {
                 Rounds = 100000
             };
@@ -29,7 +29,7 @@ namespace BlackJackTest
         [Test]
         public void MultiThreadFixedRoundsTest()
         {
-            var warmUpSimulator = new BlackjackSimulator
+            var warmUpSimulator = new Program.BlackjackSimulator
             {
                 Rounds = 10000
             };
@@ -39,10 +39,10 @@ namespace BlackJackTest
 
             var threads = Environment.ProcessorCount-1;
             if (threads < 1) threads = 1;
-            var simulators = new BlackjackSimulator[threads];
+            var simulators = new Program.BlackjackSimulator[threads];
             for (var i = 0; i < threads; i++)
             {
-                simulators[i] = new BlackjackSimulator { Rounds = (50_000_000+threads-1) / threads };
+                simulators[i] = new Program.BlackjackSimulator { Rounds = (50_000_000+threads-1) / threads };
             }
 
             var sw = Stopwatch.StartNew();
@@ -64,7 +64,7 @@ namespace BlackJackTest
                 TestContext.WriteLine(e);
                 throw;
             }
-            var sum = BlackjackSimulator.Sum(simulators);
+            var sum = Program.BlackjackSimulator.Sum(simulators);
 
             sw.Stop();
             TestContext.Out.WriteLine(
@@ -74,7 +74,7 @@ namespace BlackJackTest
         [Test]
         public void MultiThreadMinRoundsTest()
         {
-            var warmUpSimulator = new BlackjackSimulator
+            var warmUpSimulator = new Program.BlackjackSimulator
             {
                 Rounds = 10000
             };
@@ -88,10 +88,10 @@ namespace BlackJackTest
             var threads = Environment.ProcessorCount-1;
             if (threads < 1) threads = 1;
 
-            var simulators = new BlackjackSimulator[threads];
+            var simulators = new Program.BlackjackSimulator[threads];
             for (var i = 0; i < threads; i++)
             {
-                simulators[i] = new BlackjackSimulator();
+                simulators[i] = new Program.BlackjackSimulator();
             }
 
             var sw = Stopwatch.StartNew();
@@ -120,7 +120,7 @@ namespace BlackJackTest
             cts.Cancel();
             Task.WaitAll(tasks);
             
-            var sum = BlackjackSimulator.Sum(simulators);
+            var sum = Program.BlackjackSimulator.Sum(simulators);
             sw.Stop();
             TestContext.Out.WriteLine(
                 $"Multi-threaded ({threads} threads): {sum.rounds:N0} rounds in {sw.Elapsed.TotalSeconds:F2} seconds ({sum.rounds / sw.Elapsed.TotalSeconds:N0} rounds/sec)");

@@ -1,14 +1,16 @@
+using Blackjack;
+using ILGPU;
+using ILGPU.Algorithms;
+using ILGPU.Algorithms.Random;
+using ILGPU.Runtime;
 using System;
 using System.Diagnostics;
-using ILGPU;
-using ILGPU.Runtime;
-using ILGPU.Algorithms;
-using Blackjack;
 
 namespace Blackjack.Gpu
 {
     public static class GpuRunner
     {
+        private static readonly Random Rnd = new Random();
         public static void Run(
             long totalRounds,
             int? explicitThreads = null,
@@ -56,15 +58,16 @@ namespace Blackjack.Gpu
                 using var seeds = accelerator.Allocate1D<ulong>(threads);
 
                 // Seeds
+                seed = ((ulong)Rnd.Next() << 32) | (uint)Rnd.Next();
                 ulong[] seedsHost = new ulong[threads];
                 for (int i = 0; i < threads; i++)
                     seedsHost[i] = SplitMix64(seed + (ulong)i * 0x9E3779B97F4A7C15UL);
                 seeds.CopyFromCPU(seedsHost);
 
                 // Strategy
-                //StrategyTables hostTables = Blackjack.Strategy.Instance.ToTables();
+                StrategyTables hostTables = Strategy.Instance.ToTables();
 
-                StrategyTables hostTables = StrategyTables.FromDefaults();
+                //StrategyTables hostTables = StrategyTables.FromDefaults();
                 
                 using StrategyTablesDevice devTables = hostTables.Upload(accelerator);
                 DeviceTables deviceTables = devTables.Tables;

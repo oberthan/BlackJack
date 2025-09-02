@@ -2,14 +2,14 @@
 using System;
 using Blackjack.Gpu;
 
-namespace Blackjack
+namespace Blackjack.Gpu
 {
     public partial class Program
     {
         private static void Main(string[] args)
         {
             bool useGpu = true;
-            long rounds = 10_000_000_000;
+            long rounds = 1_000_000_000;
             int? threads = null;
             int rpt = 2048;
 

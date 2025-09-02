@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BlackjackGpu\BlackjackGpu.csproj" />
     <ProjectReference Include="..\Blackjack\Blackjack.csproj" />
   </ItemGroup>
 

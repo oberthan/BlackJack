@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 
 namespace Blackjack;
 
@@ -133,6 +134,63 @@ public class Strategy
         }
 
         return Move.Hit;
+    }
+
+    public int DecideGpuCheck(int total, bool isSoft, int cards, int up, bool canDouble)
+    {
+
+        // --- Soft Totals ---
+        if (isSoft)
+        {
+            // six card charlie strats
+            /*if (cards == 5) return Move.Hit;
+            if (cards.Count == 4 && total == 18 && (upValue != 7)) return Move.Hit;
+            if (cards.Count == 4 && total == 19 && upValue == 10) return Move.Hit;*/
+
+
+            var row = SoftStrategy[total - softStrategyMinTotal];
+            Debug.Assert(row.Total == total);
+            switch (ParseMove(LookupAction(row, up), canDouble))
+            {
+                case Move.Hit: return 0;
+                case Move.Stand: return 1;
+                case Move.Double: return 2;
+                case Move.Split: return 3;
+                default: return 4;
+            }
+        }
+
+        // --- Hard Totals ---
+        if (!isSoft)
+        {
+
+            // six card charlie strats
+            if (cards == 5 && total <= 15) return 0;
+            if (cards == 5 && total == 16 && (up == 2 || up == 3)) return 0;
+            if (cards == 5 && total == 17 && up >= 8 && up <= 11) return 0;
+            if (cards >= 4 && total <= 12) return 0;
+            if (cards >= 4 && total == 13 && up == 2) return 0;
+
+
+            if (total > hardStrategyMaxTotal)
+                return 1; // fallback for totals outside the strategy range
+            if (total < hardStrategyMinTotal)
+                return 0; // fallback for totals outside the strategy range
+            var row = HardStrategy[total - hardStrategyMinTotal];
+            Debug.Assert(row.Total == total);
+            
+            switch (ParseMove(LookupAction(row, up), canDouble))
+            {
+                case Move.Hit: return 0;
+                case Move.Stand: return 1;
+                case Move.Double: return 2;
+                case Move.Split: return 3;
+                default: return 4;
+            }
+            
+        }
+
+        return 0;
     }
     public static Move DecideOld(Player player, CardValue dealerUp, bool afterSplit)
     {
