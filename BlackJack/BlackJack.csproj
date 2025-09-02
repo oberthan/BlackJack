@@ -8,6 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="ILGPU.Algorithms" Version="1.5.3" />
 	  <PackageReference Include="NUnit" Version="4.4.0" />
 	</ItemGroup>
 

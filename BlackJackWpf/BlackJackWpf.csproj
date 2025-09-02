@@ -25,6 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ILGPU.Algorithms" Version="1.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Blackjack\Blackjack.csproj" />
   </ItemGroup>
 
