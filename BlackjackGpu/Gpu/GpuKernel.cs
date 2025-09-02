@@ -76,7 +76,7 @@ namespace Blackjack.Gpu
             Index1D index,
             ArrayView<long> outUnits,
             ArrayView<ulong> seeds,
-            int roundsPerThread,
+            long roundsPerThread,
             DeviceRules rules,
             DeviceTables t)
         {
