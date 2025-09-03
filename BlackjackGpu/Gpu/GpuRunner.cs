@@ -16,13 +16,15 @@ namespace Blackjack.Gpu
             int? explicitThreads = null,
             long roundsPerThread = 2048,
             ulong seed = 0xC0FFEE1234567890UL,
-            bool verbose = true)
+            bool verbose = true,
+            bool preferCPU = false
+            )
         {
             if (roundsPerThread < 1) roundsPerThread = 1;
 
             using Context context = Context.Create(builder =>
                 builder.Default().EnableAlgorithms().Optimize(OptimizationLevel.O2));
-            Device device = context.GetPreferredDevice(preferCPU: false);
+            Device device = context.GetPreferredDevice(preferCPU: preferCPU);
             //device.PrintInformation();
             Accelerator accelerator = device.CreateAccelerator(context);
 
@@ -99,7 +101,7 @@ namespace Blackjack.Gpu
                 double totalUnitsTimes2 = 0;
                 for (int i = 0; i < hostUnits2.Length; i++) totalUnitsTimes2 += hostUnits2[i];
 
-                double rtp = 1.0 + (totalUnitsTimes2 / 2.0) / scheduledRounds;
+                double rtp = 1.0 + ((totalUnitsTimes2 / 2.0) / scheduledRounds);
                 Console.WriteLine($"[ILGPU] GPU time: {sw.Elapsed.TotalSeconds:F3}s");
                 Console.WriteLine($"[ILGPU] GPU rounds per second: {scheduledRounds / sw.Elapsed.TotalSeconds:n0}/s");
                 Console.WriteLine($"[ILGPU] Units delta = {totalUnitsTimes2/2:n1} over {scheduledRounds:n0} rounds");

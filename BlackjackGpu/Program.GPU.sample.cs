@@ -9,7 +9,7 @@ namespace Blackjack.Gpu
         private static void Main(string[] args)
         {
             bool useGpu = true;
-            long rounds = 1_000_000_000;
+            long rounds = 100_000_000;
             int? threads = null;
             int rpt = 2048;
 
@@ -33,7 +33,7 @@ namespace Blackjack.Gpu
             if (useGpu)
             {
                 Console.WriteLine("Running GPU simulation via ILGPU 1.5.3...");
-                GpuRunner.Run(rounds, threads, rpt);
+                GpuRunner.Run(rounds, threads, rpt, preferCPU:true);
                 return;
             }
 

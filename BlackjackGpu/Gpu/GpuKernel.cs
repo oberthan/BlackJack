@@ -212,7 +212,7 @@ namespace Blackjack.Gpu
 
             if (rules.AllowSplit == 1 && isPair)
             {
-                int pairRank = (pSoft == 2 && pTotal == 22) ? 11 : (pTotal / 2);
+                int pairRank =  pTotal / 2;
                 byte pairDecision = DecidePair(t, pairRank, up);
                 if (pairDecision == 3) // Split
                 {
@@ -229,28 +229,32 @@ namespace Blackjack.Gpu
                     }
                     else
                     {
-                        h1Cards = 1; h1Total = (pairRank == 10) ? 10 : pairRank; h1Soft = 0;
-                        h2Cards = 1; h2Total = (pairRank == 10) ? 10 : pairRank; h2Soft = 0;
+                        h1Cards = 1; h1Total = pairRank; h1Soft = 0;
+                        h2Cards = 1; h2Total = pairRank; h2Soft = 0;
 
                         AddCardNoBJ(ref h1Total, ref h1Soft, ref h1Cards, ref rng);
                         AddCardNoBJ(ref h2Total, ref h2Soft, ref h2Cards, ref rng);
 
                         bool d1 = false, d2 = false;
-                        float u1 = PlayPlayerHand(ref rng, rules, t, up, ref h1Total, ref h1Soft, ref h1Cards, allowDouble: rules.DoubleAfterSplitAllowed == 1, ref d1);
-                        if (float.IsNegativeInfinity(u1)) h1Bust = true;
+                        bool u1 = PlayPlayerHand(ref rng, rules, t, up, ref h1Total, ref h1Soft, ref h1Cards, allowDouble: rules.DoubleAfterSplitAllowed == 1, ref d1);
+                        if (u1) h1Bust = true;
                         h1Stake = d1 ? 2 : 1;
 
-                        float u2 = PlayPlayerHand(ref rng, rules, t, up, ref h2Total, ref h2Soft, ref h2Cards, allowDouble: rules.DoubleAfterSplitAllowed == 1, ref d2);
-                        if (float.IsNegativeInfinity(u2)) h2Bust = true;
+                        bool u2 = PlayPlayerHand(ref rng, rules, t, up, ref h2Total, ref h2Soft, ref h2Cards, allowDouble: rules.DoubleAfterSplitAllowed == 1, ref d2);
+                        if (u2) h2Bust = true;
                         h2Stake = d2 ? 2 : 1;
 
-                        if (rules.SixCardCharlie == 1 && !h1Bust && h1Cards >= 6 && h1Total <= 21) unitsTimes2 += h1Stake * 2;
-                        if (rules.SixCardCharlie == 1 && !h2Bust && h2Cards >= 6 && h2Total <= 21) unitsTimes2 += h2Stake * 2;
-                        if ((rules.SixCardCharlie == 1 && h1Cards >= 6 && h1Total <= 21) &&
-                            (rules.SixCardCharlie == 1 && h2Cards >= 6 && h2Total <= 21))
+                        if (rules.SixCardCharlie == 1)
                         {
-                            return unitsTimes2;
+                            if (!h1Bust && h1Cards >= 6) unitsTimes2 += h1Stake * 2;
+                            if (!h2Bust && h2Cards >= 6) unitsTimes2 += h2Stake * 2;
+                            if ((h1Cards >= 6 && h1Total <= 21) &&
+                                (h2Cards >= 6 && h2Total <= 21))
+                            {
+                                return unitsTimes2;
+                            }
                         }
+
                     }
 
                     DealerPlay(ref rng, rules, ref dTotal, ref dSoft, ref dCards);
@@ -273,27 +277,28 @@ namespace Blackjack.Gpu
                         else if (dTotal > 21 || h2Total > dTotal) unitsTimes2 += h2Stake * 2;
                         else if (h2Total < dTotal) unitsTimes2 -= h2Stake * 2;
                     }
-
+                    // do nothing on push
+                    
                     return unitsTimes2;
                 }
             }
 
             bool doubled = false;
             
-            float cont = PlayPlayerHand(ref rng, rules, t, up, ref pTotal, ref pSoft, ref pCards, allowDouble: true, ref doubled);
-            if (float.IsNegativeInfinity(cont)) return -(doubled ? 4 : 2);
+            bool cont = PlayPlayerHand(ref rng, rules, t, up, ref pTotal, ref pSoft, ref pCards, allowDouble: true, ref doubled);
+            if (cont) return (doubled ? -4 : -2);
             if (rules.SixCardCharlie == 1 && pCards >= 6 && pTotal <= 21) return (doubled ? 4 : 2);
 
             DealerPlay(ref rng, rules, ref dTotal, ref dSoft, ref dCards);
 
             if (dTotal > 21) return (doubled ? 4 : 2);
             if (pTotal > dTotal) return (doubled ? 4 : 2);
-            if (pTotal < dTotal) return -(doubled ? 4 : 2);
-            return 0;
+            if (pTotal < dTotal) return (doubled ? -4 : -2);
+            return 0; //push
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static float PlayPlayerHand(
+        private static bool PlayPlayerHand(
             ref XorShift128Plus rng,
             DeviceRules rules,
             DeviceTables t,
@@ -308,8 +313,8 @@ namespace Blackjack.Gpu
 
             while (true)
             {
-                if (total > 21) return float.NegativeInfinity;
-                if (rules.SixCardCharlie == 1 && cards >= 6) return 0;
+                if (total > 21) return true;
+                if (rules.SixCardCharlie == 1 && cards >= 6) return false;
 
                 byte action;
 
@@ -349,13 +354,13 @@ namespace Blackjack.Gpu
                         firstDecision = false;
                         continue;
                     case 1: // Stand
-                        return 0;
+                        return false;
                     case 2: // Double
                         if (firstDecision && allowDouble)
                         {
                             doubled = true;
                             AddCardNoBJ(ref total, ref soft, ref cards, ref rng);
-                            return 0;
+                            return false;
                         }
                         AddCardNoBJ(ref total, ref soft, ref cards, ref rng);
                         firstDecision = false;
