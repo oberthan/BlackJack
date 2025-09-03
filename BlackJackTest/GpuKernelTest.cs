@@ -92,5 +92,35 @@ namespace BlackJackTest
 
             }
         }
+
+        [Test]
+        public void NextInt_DistributionIsUniform()
+        {
+            const int bound = 10;
+            const int numSamples = 1000000;
+            const double expectedFrequency = numSamples / (double)bound;
+            const double tolerance = 0.01; // 1% tolerance
+
+            ulong seed = 123456789UL;
+            var rng = new XorShift128Plus(seed, 0);
+
+            int[] counts = new int[bound];
+
+            // Generate samples
+            for (int i = 0; i < numSamples; i++)
+            {
+                int value = rng.NextInt(bound);
+                counts[value]++;
+            }
+
+            // Check distribution
+            for (int i = 0; i < bound; i++)
+            {
+                double frequency = counts[i];
+                double ratio = frequency / expectedFrequency;
+                Assert.That(ratio, Is.EqualTo(1.0).Within(tolerance),
+                    $"Value {i} occurred {frequency} times (expected ~{expectedFrequency})");
+            }
+        }
     }
 }
