@@ -33,7 +33,7 @@ namespace Blackjack.Gpu
                 if (verbose)
                     Console.WriteLine($"[ILGPU] Using {accelerator.AcceleratorType} accelerator: {accelerator.Name}");
 
-                long threadsLong = explicitThreads ?? device.MaxNumThreads;
+                long threadsLong = explicitThreads ?? device.MaxNumThreads * 64;
                 long neededThreads = Math.Max(1, (totalRounds + roundsPerThread - 1) / roundsPerThread);
                 if (threadsLong > neededThreads) threadsLong = neededThreads;
                 int threads = (int)Math.Clamp(threadsLong, 1, int.MaxValue);

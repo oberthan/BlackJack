@@ -120,9 +120,10 @@ namespace Blackjack.Gpu
         private static int PairIdx(int rank) => rank - 2;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void AddCardPlayer(ref int total, ref int softAces, ref int cards, ref bool bjEligible, ref XorShift128Plus rng)
+        private static void AddCardPlayer(ref int total, ref int softAces, ref int cards, ref bool bjEligible, ref XorShift128Plus rng, ref bool pair)
         {
             int v = DrawCard(ref rng, out var ace);
+            if (cards == 1 && total == v) pair = true;
             cards++;
             if (ace) { softAces++; total += 11; }
             else total += v;
@@ -176,15 +177,16 @@ namespace Blackjack.Gpu
         {
             int pTotal = 0, pSoft = 0, pCards = 0;
             int dTotal = 0, dSoft = 0, dCards = 0;
-            bool pBJElig = true, dBJElig = true;
+            bool pBJElig = true, dBJElig = true; 
+            bool isPair = false;
 
-            AddCardPlayer(ref pTotal, ref pSoft, ref pCards, ref pBJElig, ref rng); // P1
+            AddCardPlayer(ref pTotal, ref pSoft, ref pCards, ref pBJElig, ref rng, ref isPair); // Player card 1
 
-            int up = DrawCard(ref rng, out var upAce);
+            int up = DrawCard(ref rng, out var upAce); // up card
             if (upAce) dSoft++;
             dTotal += up; dCards++;
 
-            AddCardPlayer(ref pTotal, ref pSoft, ref pCards, ref pBJElig, ref rng); // P2
+            AddCardPlayer(ref pTotal, ref pSoft, ref pCards, ref pBJElig, ref rng, ref isPair ); // Player card 2
 
             AddCardNoBJ(ref dTotal, ref dSoft, ref dCards, ref rng); // hole
 
@@ -205,10 +207,6 @@ namespace Blackjack.Gpu
             }
 
             int unitsTimes2 = 0;
-
-            bool isPair = (pCards == 2) &&
-                          ((pSoft == 2 && pTotal == 22) ||
-                           (pSoft == 0 && ((pTotal & 1) == 0) && pTotal is >= 4 and <= 20));
 
             if (rules.AllowSplit == 1 && isPair)
             {
@@ -319,7 +317,7 @@ namespace Blackjack.Gpu
                 byte action;
 
                 
-                if (soft > 0 && total >= 12) // TODO: Uhm 12??
+                if (soft > 0 && total >= 12) // checks for soft hand
                 {
                     action = DecideSoft(t, total, up);
                 }
