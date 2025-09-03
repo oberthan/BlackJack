@@ -26,11 +26,12 @@ namespace Blackjack.Gpu
     }
 
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly struct DeviceTables(ArrayView<byte> pairs, ArrayView<byte> soft, ArrayView<byte> hard)
+    public readonly struct DeviceTables(ArrayView<byte> pairs, ArrayView<byte> soft, ArrayView<byte> hard, ArrayView<byte> FiveCardsCharlieSoft)
     {
         public readonly ArrayView<byte> Pairs = pairs;
         public readonly ArrayView<byte> Soft = soft;
         public readonly ArrayView<byte> Hard = hard;
+        public readonly ArrayView<byte> FiveCardsCharlieSoft = FiveCardsCharlieSoft;
     }
 
     // PRNG: xorshift128+ with fast bounded int
@@ -117,6 +118,8 @@ namespace Blackjack.Gpu
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int ClampSoft(int total) => total < 12 ? 0 : (total > 20 ? 8 : total - 12);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int ClampFiveCardsCharlieSoft(int total) => total < 18 ? 0 : (total - 18);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int PairIdx(int rank) => rank - 2;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -155,6 +158,9 @@ namespace Blackjack.Gpu
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static byte DecideSoft(DeviceTables t, int total, int up)
             => t.Soft[ClampSoft(total) * 10 + UpIdx(up)];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static byte DecideFiveCardsCharlieSoft(DeviceTables t, int total, int up)
+            => t.FiveCardsCharlieSoft[ClampFiveCardsCharlieSoft(total) * 10 + UpIdx(up)];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void DealerPlay(ref XorShift128Plus rng, DeviceRules rules, ref int dTotal, ref int dSoft, ref int dCards)
@@ -316,7 +322,11 @@ namespace Blackjack.Gpu
 
                 byte action;
 
-                
+                if (cards == 5)
+                {
+                    action = DecideFiveCardsCharlieSoft(t, total, up);
+                }
+
                 if (soft > 0 && total >= 12) // checks for soft hand
                 {
                     action = DecideSoft(t, total, up);

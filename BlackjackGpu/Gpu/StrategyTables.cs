@@ -1,5 +1,6 @@
 
 using System;
+using System.Buffers;
 using ILGPU;
 using ILGPU.Runtime;
 
@@ -11,6 +12,7 @@ namespace Blackjack.Gpu
         public byte[] Pairs = new byte[10 * 10]; // ranks 2..A vs up 2..A
         public byte[] Soft  = new byte[9 * 10];  // totals 12..20 vs up 2..A
         public byte[] Hard  = new byte[17 * 10]; // totals 4..20 vs up 2..A
+        public byte[] FiveCardsCharlieSoft = new byte[4 * 10]; // totals 18 .. 21 vs up 2..A
 
         // Encodings
         // 0=H,1=S,2=D,3=P,4=N
@@ -23,6 +25,7 @@ namespace Blackjack.Gpu
             Array.Fill(t.Pairs, H);
             Array.Fill(t.Soft, H);
             Array.Fill(t.Hard, H);
+            Array.Fill(t.FiveCardsCharlieSoft, H);
 
             // HARD
             for (int up = 2; up <= 11; up++)
@@ -63,25 +66,35 @@ namespace Blackjack.Gpu
                 t.SetPair(3, up, (up >= 2 && up <= 7) ? P : H);
                 t.SetPair(2, up, (up >= 2 && up <= 7) ? P : H);
             }
-
+            // CHARLIE 6-CARD SOFT
+            for (int up = 2; up <= 11; up++)
+            {
+                if ((up == 2) || (up >= 7 && up <= 11)) t.SetCharlieFiveCardsSoft(18,up,H); else t.SetCharlieFiveCardsSoft(18,up,S);
+                t.SetCharlieFiveCardsSoft(19, up, H);
+                t.SetCharlieFiveCardsSoft(20, up, H);
+                t.SetCharlieFiveCardsSoft(21, up, H);
+            }
             return t;
         }
 
-        public void SetPair(int rank, int up, byte v) => Pairs[(rank - 2) * 10 + (up == 11 ? 9 : up - 2)] = v;
-        public void SetSoft(int total, int up, byte v) => Soft[(total - 12) * 10 + (up == 11 ? 9 : up - 2)] = v;
-        public void SetHard(int total, int up, byte v) => Hard[(total - 8) * 10 + (up == 11 ? 9 : up - 2)] = v;
+        public void SetPair(int rank, int up, byte v) => Pairs[(rank - 2) * 10 + (up - 2)] = v;
+        public void SetSoft(int total, int up, byte v) => Soft[(total - 12) * 10 + (up - 2)] = v;
+        public void SetHard(int total, int up, byte v) => Hard[(total - 8) * 10 + (up - 2)] = v;
+        public void SetCharlieFiveCardsSoft(int total, int up, byte v) => FiveCardsCharlieSoft[(total - 18) * 10 + (up - 2)] = v;
 
         public StrategyTablesDevice Upload(Accelerator acc)
         {
             var pairs = acc.Allocate1D<byte>(Pairs.Length);
             var soft  = acc.Allocate1D<byte>(Soft.Length);
             var hard  = acc.Allocate1D<byte>(Hard.Length);
+            var fiveCardsCharlieSoft = acc.Allocate1D<byte>(FiveCardsCharlieSoft.Length);
 
             pairs.CopyFromCPU(Pairs);
             soft.CopyFromCPU(Soft);
             hard.CopyFromCPU(Hard);
+            fiveCardsCharlieSoft.CopyFromCPU(FiveCardsCharlieSoft);
 
-            return new StrategyTablesDevice(pairs, soft, hard);
+            return new StrategyTablesDevice(pairs, soft, hard, fiveCardsCharlieSoft);
         }
     }
 
@@ -90,22 +103,25 @@ namespace Blackjack.Gpu
         public MemoryBuffer1D<byte, Stride1D.Dense> Pairs { get; }
         public MemoryBuffer1D<byte, Stride1D.Dense> Soft { get; }
         public MemoryBuffer1D<byte, Stride1D.Dense> Hard { get; }
+        public MemoryBuffer1D<byte, Stride1D.Dense> FiveCardsCharlieSoft { get; }
 
         public StrategyTablesDevice(
             MemoryBuffer1D<byte, Stride1D.Dense> pairs,
             MemoryBuffer1D<byte, Stride1D.Dense> soft,
-            MemoryBuffer1D<byte, Stride1D.Dense> hard)
+            MemoryBuffer1D<byte, Stride1D.Dense> hard,
+            MemoryBuffer1D<byte, Stride1D.Dense> fiveCardsCharlieSoft)
         {
-            Pairs = pairs; Soft = soft; Hard = hard;
+            Pairs = pairs; Soft = soft; Hard = hard; FiveCardsCharlieSoft = fiveCardsCharlieSoft;
         }
 
-        public DeviceTables Tables => new DeviceTables(Pairs.View, Soft.View, Hard.View);
+        public DeviceTables Tables => new DeviceTables(Pairs.View, Soft.View, Hard.View, FiveCardsCharlieSoft.View);
 
         public void Dispose()
         {
             Pairs.Dispose();
             Soft.Dispose();
             Hard.Dispose();
+            FiveCardsCharlieSoft.Dispose();
         }
     }
 }
