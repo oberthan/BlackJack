@@ -9,7 +9,7 @@ namespace Blackjack.Gpu
         private static void Main(string[] args)
         {
             bool useGpu = true;
-            long rounds = 100_000_000_000;
+            long rounds = 1_000_000_000;
             int? threads = null;
             int rpt = 2048;
 
