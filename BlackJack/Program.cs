@@ -105,6 +105,7 @@ public class Program
     {
         public long Rounds { get; set; } = 10000000;
         public Game Game { get; } = new();
+        public StrategyManager StrategyManager { get; } = new();
 
         public long wins = 0, losses = 0, pushes = 0;
         public double units = 0;
@@ -165,6 +166,7 @@ public class Program
 
         private double RunRound(double localUnits)
         {
+            Game.strategy = StrategyManager.GetStrategy(localUnits);
             var res = Game.PlayOneRound();
 
             units += res.UnitsWonOrLost;
@@ -203,9 +205,8 @@ public class Program
         }
 
 
-        public void ForceStartingHand(List<CardValue> playerHand, CardValue upCard)
+        public void ForceStartingHand(List<CardValue> playerHand, CardValue upCard, double localUnits = 0, Move? firstMove = null)
         {
-            double localUnits = 0;
             for (rounds = 0; rounds < Rounds; rounds++)
             {
                 Game.Player.Reset();
@@ -216,7 +217,7 @@ public class Program
 
                 Game.Dealer.AddCard(upCard);
                 Game.Dealer.AddCard(Game.Deck.DrawCard());
-                var res = Game.PlayOneRoundWithHand();
+                var res = Game.PlayOneRoundWithHand(firstMove);
 
                 units += res.UnitsWonOrLost;
 

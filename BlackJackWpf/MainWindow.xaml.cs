@@ -25,6 +25,7 @@ namespace BlackjackWpf
     {
         public MainWindow() => InitializeComponent();
         private long rounds = 10_000_000;
+        private readonly StrategyManager _strategyManager = new();
 
         private async void StartSimulation_Click(object sender, RoutedEventArgs e)
         {
@@ -84,6 +85,7 @@ namespace BlackjackWpf
                 simulators[i] = new BlackjackSimulator
                 {
                     Rounds = (rounds / nTasks) + ((i < (rounds % nTasks)) ? 1 : 0),
+                    StrategyManager = _strategyManager
                 };
             }
 
@@ -215,9 +217,9 @@ namespace BlackjackWpf
             }
         }
 
-        private async void SearchStrategyPair_Click(object sender, RoutedEventArgs e)
+        private async Task SearchStrategyPair_Click(object sender, RoutedEventArgs e, Strategy strategy = null, double localUnit = 0)
         {
-
+            if (strategy == null) strategy = Strategy.Instance;
 
             var button = sender as System.Windows.Controls.Button;
             if (button != null)
@@ -227,22 +229,23 @@ namespace BlackjackWpf
             SimulationProgress.Value = 0;
             UpdateStatus("Starting search...");
             var decisions = new[] { Decision.P, Decision.N };
-            List<List<CardValue>> hands = 
+            List<List<CardValue>> hands =
                 [
                     [CardValue.Two, CardValue.Two], [CardValue.Three, CardValue.Three],
                     [CardValue.Four,CardValue.Four], [CardValue.Five,CardValue.Five], [CardValue.Six,CardValue.Six],
                     [CardValue.Seven,CardValue.Seven], [CardValue.Eight,CardValue.Eight], [CardValue.Nine,CardValue.Nine],
                     [CardValue.Ten,CardValue.Ten], [CardValue.Ace, CardValue.Ace]
-                ]; 
+                ];
 
-            await SearchStrategy(Strategy.Instance.PairStrategy,hands, decisions);
+            await SearchStrategy(strategy, strategy.PairStrategy, hands, decisions, localUnit);
 
             if (button != null)
                 button.IsEnabled = true;
         }
 
-        private async void SearchStrategySoft_Click(object sender, RoutedEventArgs e)
+        private async Task SearchStrategySoft_Click(object sender, RoutedEventArgs e, Strategy strategy = null, double localUnit = 0)
         {
+            if (strategy == null) strategy = Strategy.Instance;
             var button = sender as System.Windows.Controls.Button;
             if (button != null)
                 button.IsEnabled = false;
@@ -256,13 +259,13 @@ namespace BlackjackWpf
                 [CardValue.Ace, CardValue.Ace], [CardValue.Ace, CardValue.Two], [CardValue.Ace, CardValue.Three],
                 [CardValue.Ace,CardValue.Four], [CardValue.Ace,CardValue.Five], [CardValue.Ace,CardValue.Six],
                 [CardValue.Ace,CardValue.Seven], [CardValue.Ace,CardValue.Eight], [CardValue.Ace,CardValue.Nine]
-                
+
             ];
 
             var preRules = Rules.Instance.AllowSplit;
             Rules.Instance.AllowSplit = false; // Disable splitting for hard strategy search
 
-            await SearchStrategy(Strategy.Instance.SoftStrategy, hands, decisions);
+            await SearchStrategy(strategy, strategy.SoftStrategy, hands, decisions, localUnit);
 
             Rules.Instance.AllowSplit = preRules; // Restore original setting
 
@@ -270,8 +273,9 @@ namespace BlackjackWpf
                 button.IsEnabled = true;
         }
 
-        private async void SearchStrategyHard_Click(object sender, RoutedEventArgs e)
+        private async Task SearchStrategyHard_Click(object sender, RoutedEventArgs e, Strategy strategy = null, double localUnit = 0)
         {
+            if (strategy == null) strategy = Strategy.Instance;
             var button = sender as System.Windows.Controls.Button;
             if (button != null)
                 button.IsEnabled = false;
@@ -279,7 +283,7 @@ namespace BlackjackWpf
             ResultsText.Text = "Searching for optimal hard strategy...";
             SimulationProgress.Value = 0;
             UpdateStatus("Starting search...");
-            var decisions = new[] {  Decision.S, Decision.H, Decision.D };
+            var decisions = new[] { Decision.S, Decision.H, Decision.D };
             List<List<CardValue>> hands =
             [
                 [CardValue.Two, CardValue.Six], [CardValue.Three, CardValue.Six],
@@ -289,14 +293,14 @@ namespace BlackjackWpf
             ];
 
 
-            await SearchStrategy(Strategy.Instance.HardStrategy, hands, decisions);
+            await SearchStrategy(strategy, strategy.HardStrategy, hands, decisions, localUnit);
 
 
             if (button != null)
                 button.IsEnabled = true;
         }
 
-        private async Task<bool> SearchStrategy(IEnumerable<StrategyRow> rowsIe, List<List<CardValue>> hands, Decision[] decisionChecks)
+        private async Task<bool> SearchStrategy(Strategy strategy, IEnumerable<StrategyRow> rowsIe, List<List<CardValue>> hands, Decision[] decisionChecks, double localUnit = 0)
         {
             var rows = rowsIe.ToList();
 
@@ -338,7 +342,7 @@ namespace BlackjackWpf
 
                         (Decision dec, double diff) = (0,0);
 
-                        (dec, diff) = await FindBestDecision(firstPassSimulations);
+                        (dec, diff) = await FindBestDecision(firstPassSimulations, localUnit);
 
 
                         // If results are close, re-run with higher accuracy
@@ -346,12 +350,12 @@ namespace BlackjackWpf
                         differences[i, j, 0] = diff;
                         if (diff < firstThreshold)
                         {
-                            (dec, diff) = await FindBestDecision(secondPassSimulations);
+                            (dec, diff) = await FindBestDecision(secondPassSimulations, localUnit);
                             differences[i,j,1] = diff;
 
                             if (diff < secondThreshold)
                             {
-                                (dec, diff) = await FindBestDecision(finalSimulations);
+                                (dec, diff) = await FindBestDecision(finalSimulations, localUnit);
                                 differences[i,j,2] = diff;
                             }
                         }
@@ -364,7 +368,7 @@ namespace BlackjackWpf
                         currentStep++;
                         UpdateProgress((float)currentStep / totalSteps);
 
-                        async Task<(Decision, double)> FindBestDecision(long simulationCount)
+                        async Task<(Decision, double)> FindBestDecision(long simulationCount, double localUnit = 0)
                         {
                             double maxUnits = -10;
                             double secondMax = -10;
@@ -376,7 +380,8 @@ namespace BlackjackWpf
                             foreach (var decision in decisionChecks)
                             {
                                 SetRowColumn(row, col, decision);
-                                var units = await SimulateRTP(simulationCount, cards, dealerValues[j]);
+                                var move = Strategy.ParseMove(decision, true);
+                                var units = await SimulateRTP(strategy, simulationCount, cards, dealerValues[j], localUnit, move);
 
                                 var diff = double.Abs(units - maxUnits);
                                 if (diff < minDiff)
@@ -457,7 +462,7 @@ namespace BlackjackWpf
         }
 
         // Run a simulation and return RTP
-        private async Task<double> SimulateRTP(long rounds, List<CardValue> playerHand, CardValue upCard)
+        private async Task<double> SimulateRTP(Strategy strategy, long rounds, List<CardValue> playerHand, CardValue upCard, double localUnits = 0, Move? firstMove = null)
         {
             var nTasks = Environment.ProcessorCount;
             var simulators = new BlackjackSimulator[nTasks];
@@ -469,12 +474,12 @@ namespace BlackjackWpf
             var previousTime = stopwatch.Elapsed;
 
             for (int i = 0; i < nTasks; i++)
-                simulators[i] = new BlackjackSimulator { Rounds = rounds / nTasks };
+                simulators[i] = new BlackjackSimulator { Rounds = rounds / nTasks, Game = { strategy = strategy } };
 
             for (int i = 0; i < nTasks; i++)
             {
                 int idx = i;
-                tasks[i] = Task.Run(() => simulators[idx].ForceStartingHand(playerHand, upCard));
+                tasks[i] = Task.Run(() => simulators[idx].ForceStartingHand(playerHand, upCard, localUnits, firstMove));
             }
             while (!tasks.All(x => x.IsCompleted))
             {
@@ -588,6 +593,30 @@ namespace BlackjackWpf
 
             }
         }
+        private async void SearchAllStrategies_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+                button.IsEnabled = false;
+
+            ResultsText.Text = "Searching for all optimal strategies...";
+            SimulationProgress.Value = 0;
+            UpdateStatus("Starting search...");
+
+            for (double localUnit = Rules.Instance.LowerLimit; localUnit <= Rules.Instance.UpperLimit; localUnit += 0.5)
+            {
+                var strategy = Strategy.Instance.Clone();
+                _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
+
+                await SearchStrategyPair_Click(sender, e, strategy, localUnit);
+                await SearchStrategySoft_Click(sender, e, strategy, localUnit);
+                await SearchStrategyHard_Click(sender, e, strategy, localUnit);
+            }
+
+            if (button != null)
+                button.IsEnabled = true;
+        }
+
         private void ShowStrategy_Click(object sender, RoutedEventArgs e)
         {
             var strategyWindow = new StrategyWindow();

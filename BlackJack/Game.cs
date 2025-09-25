@@ -44,7 +44,13 @@ public class Game
         return PlayOneRoundWithHand();
     }
 
-    public RoundResult PlayOneRoundWithHand()
+    public RoundResult PlayOneRoundWithMove(Move move)
+    {
+        var result = PlayOneRoundWithHand(move);
+        return result;
+    }
+
+    public RoundResult PlayOneRoundWithHand(Move? firstMove = null)
     {
         // evaluate Blackjacks (initial only)
         var pEval = HandEvaluator.Evaluate(Player.Hand, true);
@@ -55,7 +61,7 @@ public class Game
 
 
         // PLAYER TURN(s)
-        var netUnits = PlayerTurn();
+        var netUnits = PlayerTurn(firstMove);
 
         // DEALER TURN
         if (DealerTurn(dEval, out var roundResult)) return roundResult;
@@ -119,7 +125,7 @@ public class Game
         return false;
     }
 
-    private int PlayerTurn()
+    private int PlayerTurn(Move? firstMove)
     {
         var netUnits = 0;
         var afterSplit = false;
@@ -129,7 +135,7 @@ public class Game
 
 
         // Play a single hand and (optionally) the split hand
-        PlaySingleHand(Player, afterSplit, false);
+        PlaySingleHand(Player, afterSplit, false, firstMove);
         if (Player.SplitHandPlayer != null)
         {
             var unitsSplit = PlaySingleHand(Player.SplitHandPlayer, true,
@@ -215,7 +221,7 @@ public class Game
     }
 
 
-    private int PlaySingleHand(Player handOwner, bool afterSplit, bool isSplitAces)
+    private int PlaySingleHand(Player handOwner, bool afterSplit, bool isSplitAces, Move? firstMove = null)
     {
 
 
@@ -230,8 +236,9 @@ public class Game
                 return 0;
 
             // Get strategy action
-            var action = strategy.Decide(handOwner, Dealer.Hand[0], afterSplit);
-/*            var oldAction = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
+            var action = firstMove ?? strategy.Decide(handOwner, Dealer.Hand[0], afterSplit);
+            firstMove = null;
+            /*            var oldAction = Strategy.DecideOld(handOwner, dealer.Hand[0], afterSplit);
             if (action != oldAction)
             {
                 throw new InvalidOperationException(

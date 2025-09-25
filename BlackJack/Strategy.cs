@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
 
 namespace Blackjack;
@@ -292,12 +293,22 @@ public class Strategy
         Decision.Ds => canDouble ? Move.Double : Move.Stand,
         _ => Move.Hit
     };
-    private static bool ParseBool(Decision value) => value switch
+    public static bool ParseBool(Decision value) => value switch
     {
         Decision.N => false,
         Decision.P => true,
         _ => Rules.Instance.DoubleAfterSplit
     };
 
+    public Strategy Clone()
+    {
+        var newStrategy = new Strategy
+        {
+            PairStrategy = PairStrategy.Select(row => row.Clone()).ToList(),
+            SoftStrategy = SoftStrategy.Select(row => row.Clone()).ToList(),
+            HardStrategy = HardStrategy.Select(row => row.Clone()).ToList()
+        };
+        return newStrategy;
+    }
 }
 

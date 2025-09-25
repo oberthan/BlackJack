@@ -2,6 +2,11 @@
 
 public class StrategyRow
 {
+    public StrategyRow Clone()
+    {
+        return (StrategyRow)this.MemberwiseClone();
+    }
+
     public int Total { get; set; }
     public Decision Vs2 { get; set; }
     public Decision Vs3 { get; set; }
@@ -17,15 +22,25 @@ public class StrategyRow
 
 public class PairStrategyRow : StrategyRow
 {
+    public new PairStrategyRow Clone()
+    {
+        return (PairStrategyRow)base.Clone();
+    }
     public CardValue Pair { get; set; }
 }
 
 public class SoftStrategyRow : StrategyRow
 {
-
+    public new SoftStrategyRow Clone()
+    {
+        return (SoftStrategyRow)base.Clone();
+    }
 }
 
 public class HardStrategyRow : StrategyRow
 {
-
+    public new HardStrategyRow Clone()
+    {
+        return (HardStrategyRow)base.Clone();
+    }
 }
