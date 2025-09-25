@@ -21,5 +21,10 @@ namespace Blackjack
         {
             return _strategies.GetValueOrDefault(localUnit, _defaultStrategy);
         }
+
+        public IEnumerable<double> GetLocalUnits()
+        {
+            return _strategies.Keys.OrderBy(k => k);
+        }
     }
 }

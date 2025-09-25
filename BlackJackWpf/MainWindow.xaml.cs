@@ -608,8 +608,11 @@ namespace BlackjackWpf
 
         private void ShowStrategy_Click(object sender, RoutedEventArgs e)
         {
-            var strategyWindow = new StrategyWindow();
-            strategyWindow.Owner = this;
+            var strategyWindow = new StrategyWindow
+            {
+                Owner = this,
+                StrategyManager = _strategyManager
+            };
 
             var viewModel = new StrategyViewModel();
             strategyWindow.ViewModel = viewModel;
@@ -617,9 +620,10 @@ namespace BlackjackWpf
             var isAccepted = strategyWindow.ShowDialog();
             if (isAccepted == true)
             {
-                Strategy.Instance.HardStrategy = viewModel.HardStrategy.OrderBy(x => x.Total).ToList();
-                Strategy.Instance.SoftStrategy = viewModel.SoftStrategy.OrderBy(x => x.Total).ToList();
-                Strategy.Instance.PairStrategy = viewModel.PairStrategy.OrderBy(x => (int)x.Pair).ToList();
+                var selectedStrategy = _strategyManager.GetStrategy(viewModel.SelectedLocalUnit);
+                selectedStrategy.HardStrategy = viewModel.HardStrategy.OrderBy(x => x.Total).ToList();
+                selectedStrategy.SoftStrategy = viewModel.SoftStrategy.OrderBy(x => x.Total).ToList();
+                selectedStrategy.PairStrategy = viewModel.PairStrategy.OrderBy(x => (int)x.Pair).ToList();
             }
         }
 
