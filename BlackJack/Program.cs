@@ -105,7 +105,7 @@ public class Program
     {
         public long Rounds { get; set; } = 10000000;
         public Game Game { get; } = new();
-        public StrategyManager StrategyManager { get; } = new();
+        public StrategyManager StrategyManager { get; set; } = new();
 
         public long wins = 0, losses = 0, pushes = 0;
         public double units = 0;

@@ -217,14 +217,13 @@ namespace BlackjackWpf
             }
         }
 
-        private async Task SearchStrategyPair_Click(object sender, RoutedEventArgs e, Strategy strategy = null, double localUnit = 0)
+        private async void SearchStrategyPair_Click(object sender, RoutedEventArgs e)
         {
-            if (strategy == null) strategy = Strategy.Instance;
+            await SearchStrategyPair(Strategy.Instance);
+        }
 
-            var button = sender as System.Windows.Controls.Button;
-            if (button != null)
-                button.IsEnabled = false;
-
+        private async Task SearchStrategyPair(Strategy strategy, double localUnit = 0)
+        {
             ResultsText.Text = "Searching for optimal pair strategy...";
             SimulationProgress.Value = 0;
             UpdateStatus("Starting search...");
@@ -238,18 +237,15 @@ namespace BlackjackWpf
                 ];
 
             await SearchStrategy(strategy, strategy.PairStrategy, hands, decisions, localUnit);
-
-            if (button != null)
-                button.IsEnabled = true;
         }
 
-        private async Task SearchStrategySoft_Click(object sender, RoutedEventArgs e, Strategy strategy = null, double localUnit = 0)
+        private async void SearchStrategySoft_Click(object sender, RoutedEventArgs e)
         {
-            if (strategy == null) strategy = Strategy.Instance;
-            var button = sender as System.Windows.Controls.Button;
-            if (button != null)
-                button.IsEnabled = false;
+            await SearchStrategySoft(Strategy.Instance);
+        }
 
+        private async Task SearchStrategySoft(Strategy strategy, double localUnit = 0)
+        {
             ResultsText.Text = "Searching for optimal soft strategy...";
             SimulationProgress.Value = 0;
             UpdateStatus("Starting search...");
@@ -268,18 +264,15 @@ namespace BlackjackWpf
             await SearchStrategy(strategy, strategy.SoftStrategy, hands, decisions, localUnit);
 
             Rules.Instance.AllowSplit = preRules; // Restore original setting
-
-            if (button != null)
-                button.IsEnabled = true;
         }
 
-        private async Task SearchStrategyHard_Click(object sender, RoutedEventArgs e, Strategy strategy = null, double localUnit = 0)
+        private async void SearchStrategyHard_Click(object sender, RoutedEventArgs e)
         {
-            if (strategy == null) strategy = Strategy.Instance;
-            var button = sender as System.Windows.Controls.Button;
-            if (button != null)
-                button.IsEnabled = false;
+            await SearchStrategyHard(Strategy.Instance);
+        }
 
+        private async Task SearchStrategyHard(Strategy strategy, double localUnit = 0)
+        {
             ResultsText.Text = "Searching for optimal hard strategy...";
             SimulationProgress.Value = 0;
             UpdateStatus("Starting search...");
@@ -294,10 +287,6 @@ namespace BlackjackWpf
 
 
             await SearchStrategy(strategy, strategy.HardStrategy, hands, decisions, localUnit);
-
-
-            if (button != null)
-                button.IsEnabled = true;
         }
 
         private async Task<bool> SearchStrategy(Strategy strategy, IEnumerable<StrategyRow> rowsIe, List<List<CardValue>> hands, Decision[] decisionChecks, double localUnit = 0)
@@ -608,9 +597,9 @@ namespace BlackjackWpf
                 var strategy = Strategy.Instance.Clone();
                 _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
 
-                await SearchStrategyPair_Click(sender, e, strategy, localUnit);
-                await SearchStrategySoft_Click(sender, e, strategy, localUnit);
-                await SearchStrategyHard_Click(sender, e, strategy, localUnit);
+                await SearchStrategyPair(strategy, localUnit);
+                await SearchStrategySoft(strategy, localUnit);
+                await SearchStrategyHard(strategy, localUnit);
             }
 
             if (button != null)

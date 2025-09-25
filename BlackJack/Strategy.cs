@@ -284,7 +284,7 @@ public class Strategy
     //        _ => "H"
     //    };
 
-    private static Move ParseMove(Decision action, bool canDouble) => action switch
+    public static Move ParseMove(Decision action, bool canDouble) => action switch
     {
         Decision.H => Move.Hit,
         Decision.S => Move.Stand,
