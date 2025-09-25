@@ -33,7 +33,7 @@ namespace Blackjack.Gpu
             if (useGpu)
             {
                 Console.WriteLine("Running GPU simulation via ILGPU 1.5.3...");
-                GpuRunner.Run(rounds, threads, rpt, preferCPU:true);
+                GpuRunner.Run(rounds, threads, rpt, preferCPU:false);
                 return;
             }
 

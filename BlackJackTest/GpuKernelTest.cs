@@ -96,12 +96,13 @@ namespace BlackJackTest
         [Test]
         public void NextInt_DistributionIsUniform()
         {
-            const int bound = 10;
-            const int numSamples = 1000000;
+            const int bound = 13;
+            const int numSamples = 1000000000;
             const double expectedFrequency = numSamples / (double)bound;
             const double tolerance = 0.01; // 1% tolerance
 
-            ulong seed = 123456789UL;
+            Random rngSeed = new Random();
+            ulong seed = (ulong)rngSeed.NextInt64(long.MaxValue);
             var rng = new XorShift128Plus(seed, 0);
 
             int[] counts = new int[bound];
@@ -118,8 +119,9 @@ namespace BlackJackTest
             {
                 double frequency = counts[i];
                 double ratio = frequency / expectedFrequency;
+                TestContext.WriteLine($"{i+1}: {frequency}");
                 Assert.That(ratio, Is.EqualTo(1.0).Within(tolerance),
-                    $"Value {i} occurred {frequency} times (expected ~{expectedFrequency})");
+                    $"Value {i+1} occurred {frequency} times (expected ~{expectedFrequency})");
             }
         }
     }

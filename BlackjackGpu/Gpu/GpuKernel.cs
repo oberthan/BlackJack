@@ -160,7 +160,6 @@ namespace Blackjack.Gpu
         {
             while (true)
             {
-                if (dTotal > 21) break;
                 if (dTotal > 17) break;
                 if (dTotal == 17)
                 {
@@ -189,17 +188,16 @@ namespace Blackjack.Gpu
             AddCardNoBJ(ref dTotal, ref dSoft, ref dCards, ref rng); // hole
 
             bool playerBJ = IsBlackjack(pTotal, pBJElig);
+            bool dealerBJ = IsBlackjack(dTotal, dBJElig);
 
             // Peek only on Ace
             if (rules.PeekOnlyOnAce == 1 && up == 11)
             {
-                bool dealerBJ = IsBlackjack(dTotal, dBJElig);
                 if (dealerBJ) return playerBJ ? 0 : -2;
                 if (playerBJ) return bjTimes2; // 3 (in ×2 units) for 3:2
             }
             else if (playerBJ)
             {
-                bool dealerBJ = IsBlackjack(dTotal, dBJElig);
                 if (dealerBJ) return 0;
                 return bjTimes2;
             }
@@ -291,6 +289,7 @@ namespace Blackjack.Gpu
 
             DealerPlay(ref rng, rules, ref dTotal, ref dSoft, ref dCards);
 
+            if (dealerBJ) return (doubled ? -4 : -2);
             if (dTotal > 21) return (doubled ? 4 : 2);
             if (pTotal > dTotal) return (doubled ? 4 : 2);
             if (pTotal < dTotal) return (doubled ? -4 : -2);
