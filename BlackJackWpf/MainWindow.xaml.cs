@@ -293,9 +293,9 @@ namespace BlackjackWpf
         {
             var rows = rowsIe.ToList();
 
-            long firstPassSimulations = 50_000_000;
-            long secondPassSimulations = 500_000_000; // Fast, low-accuracy pass
-            long finalSimulations = 5_000_000_000; // High-accuracy for close results
+            long firstPassSimulations = 10_000;
+            long secondPassSimulations = 100_000; // Fast, low-accuracy pass
+            long finalSimulations = 200_000; // High-accuracy for close results
             double firstThreshold = 0.05; // Margin for "close" results
             double secondThreshold = 0.005;
 
@@ -592,7 +592,7 @@ namespace BlackjackWpf
             SimulationProgress.Value = 0;
             UpdateStatus("Starting search...");
 
-            for (double localUnit = Rules.Instance.LowerLimit; localUnit <= Rules.Instance.UpperLimit; localUnit += 0.5)
+            for (double localUnit = Rules.Instance.LowerLimit + 0.5; localUnit < Rules.Instance.UpperLimit; localUnit += 0.5)
             {
                 var strategy = Strategy.Instance.Clone();
                 _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
