@@ -26,5 +26,9 @@ namespace Blackjack
         {
             return _strategies.Keys.OrderBy(k => k);
         }
+        public IReadOnlyDictionary<double, Strategy> GetAllStrategies()
+        {
+            return _strategies;
+        }
     }
 }

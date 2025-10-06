@@ -597,9 +597,9 @@ namespace BlackjackWpf
                 var strategy = Strategy.Instance.Clone();
                 _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
 
-                await SearchStrategyPair(strategy, localUnit);
                 await SearchStrategySoft(strategy, localUnit);
                 await SearchStrategyHard(strategy, localUnit);
+                await SearchStrategyPair(strategy, localUnit);
             }
 
             if (button != null)
@@ -614,7 +614,7 @@ namespace BlackjackWpf
                 StrategyManager = _strategyManager
             };
 
-            var viewModel = new StrategyViewModel();
+            var viewModel = new StrategyViewModel(_strategyManager);
             strategyWindow.ViewModel = viewModel;
 
             var isAccepted = strategyWindow.ShowDialog();
