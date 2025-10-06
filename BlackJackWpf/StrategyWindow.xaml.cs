@@ -28,13 +28,9 @@ namespace BlackjackWpf
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
-            if (StrategyManager != null)
+            if (ViewModel == null)
             {
-                ViewModel = new StrategyViewModel(StrategyManager);
-            }
-            else
-            {
-                ViewModel = new StrategyViewModel();
+                ViewModel = StrategyManager != null ? new StrategyViewModel(StrategyManager) : new StrategyViewModel();
             }
             DataContext = ViewModel;
         }
@@ -46,6 +42,7 @@ namespace BlackjackWpf
 
         private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
         {
+            DataContext = ViewModel;
             e.Column.Width = new DataGridLength(50);
 
             if (e.Column is DataGridComboBoxColumn comboBoxColumn)

@@ -119,8 +119,7 @@ namespace BlackjackWpf
 
                 var progress = 30 * (float)sum.rounds / rounds;
                 progress = Math.Min(progress, 30);
-                UpdateStatus(
-                    $"[{new string('#', (int)progress)}{new string('-', (int)(30 - progress))}] {100f * sum.rounds / rounds:F1}%");
+                //UpdateStatus($"[{new string('#', (int)progress)}{new string('-', (int)(30 - progress))}] {100f * sum.rounds / rounds:F1}%");
 
             }
 
@@ -219,14 +218,21 @@ namespace BlackjackWpf
 
         private async void SearchStrategyPair_Click(object sender, RoutedEventArgs e)
         {
-            await SearchStrategyPair(Strategy.Instance);
+            for (double localUnit = Rules.Instance.LowerLimit + 0.5;
+                 localUnit < Rules.Instance.UpperLimit;
+                 localUnit += 0.5)
+            {
+                var strategy = Strategy.Instance.Clone();
+                _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
+                await SearchStrategyPair(strategy, localUnit);
+            }
         }
 
         private async Task SearchStrategyPair(Strategy strategy, double localUnit = 0)
         {
             ResultsText.Text = "Searching for optimal pair strategy...";
             SimulationProgress.Value = 0;
-            UpdateStatus("Starting search...");
+            UpdateStatus($"Starting search for split on the value {localUnit}");
             var decisions = new[] { Decision.P, Decision.N };
             List<List<CardValue>> hands =
                 [
@@ -241,14 +247,21 @@ namespace BlackjackWpf
 
         private async void SearchStrategySoft_Click(object sender, RoutedEventArgs e)
         {
-            await SearchStrategySoft(Strategy.Instance);
+            for (double localUnit = Rules.Instance.LowerLimit + 0.5;
+                 localUnit < Rules.Instance.UpperLimit;
+                 localUnit += 0.5)
+            {
+                var strategy = Strategy.Instance.Clone();
+                _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
+                await SearchStrategySoft(strategy, localUnit);
+            }
         }
 
         private async Task SearchStrategySoft(Strategy strategy, double localUnit = 0)
         {
             ResultsText.Text = "Searching for optimal soft strategy...";
             SimulationProgress.Value = 0;
-            UpdateStatus("Starting search...");
+            UpdateStatus($"Searching for soft on the value {localUnit}");
             var decisions = new[] { Decision.H, Decision.S, Decision.D };
             List<List<CardValue>> hands =
             [
@@ -268,14 +281,19 @@ namespace BlackjackWpf
 
         private async void SearchStrategyHard_Click(object sender, RoutedEventArgs e)
         {
-            await SearchStrategyHard(Strategy.Instance);
+            for (double localUnit = Rules.Instance.LowerLimit + 0.5; localUnit < Rules.Instance.UpperLimit; localUnit += 0.5)
+            {
+                var strategy = Strategy.Instance.Clone();
+                _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
+                await SearchStrategyHard(strategy, localUnit);
+            }
         }
 
         private async Task SearchStrategyHard(Strategy strategy, double localUnit = 0)
         {
             ResultsText.Text = "Searching for optimal hard strategy...";
             SimulationProgress.Value = 0;
-            UpdateStatus("Starting search...");
+            UpdateStatus($"Searching for hard on the value {localUnit}");
             var decisions = new[] { Decision.S, Decision.H, Decision.D };
             List<List<CardValue>> hands =
             [
@@ -293,9 +311,9 @@ namespace BlackjackWpf
         {
             var rows = rowsIe.ToList();
 
-            long firstPassSimulations = 10_000;
-            long secondPassSimulations = 100_000; // Fast, low-accuracy pass
-            long finalSimulations = 200_000; // High-accuracy for close results
+            long firstPassSimulations = 1_000_000;
+            long secondPassSimulations = 5_000_000; // Fast, low-accuracy pass
+            long finalSimulations = 20_000_000; // High-accuracy for close results
             double firstThreshold = 0.05; // Margin for "close" results
             double secondThreshold = 0.005;
 
@@ -316,7 +334,7 @@ namespace BlackjackWpf
             var watch = Stopwatch.StartNew();
             try
             {
-                for (int i = 0; i < rows.Count; i++)
+                for (int i = rows.Count-1; i >= 0; i--)
                 {
                     List<CardValue> cards = hands[i];
                     // Find the row in PairStrategy where Pair == pair
@@ -359,10 +377,10 @@ namespace BlackjackWpf
 
                         async Task<(Decision, double)> FindBestDecision(long simulationCount, double localUnit = 0)
                         {
-                            double maxUnits = -10;
-                            double secondMax = -10;
+                            double maxUnits = double.NegativeInfinity;
+                            double secondMax = double.NegativeInfinity;
 
-                            double minDiff = 10;
+                            double minDiff = double.PositiveInfinity;
                             Decision bestDecision = Decision.H;
                             Decision secondBest = Decision.H;
 
@@ -469,6 +487,7 @@ namespace BlackjackWpf
             {
                 int idx = i;
                 tasks[i] = Task.Run(() => simulators[idx].ForceStartingHand(playerHand, upCard, localUnits, firstMove));
+                //tasks[i] = Task.Run(() => simulators[idx].RunSimulation());
             }
             while (!tasks.All(x => x.IsCompleted))
             {
@@ -481,8 +500,7 @@ namespace BlackjackWpf
                 previousTime = stopwatch.Elapsed;
 
                 var progress = 30 * (float)sum.rounds / rounds;
-                UpdateStatus(
-                    $"[{new string('#', (int)progress)}{new string('-', (int)(30 - progress))}] {100f * sum.rounds / rounds:F1}%");
+                //UpdateStatus($"[{new string('#', (int)progress)}{new string('-', (int)(30 - progress))}] {100f * sum.rounds / rounds:F1}%");
 
             }
             await Task.WhenAll(tasks);
@@ -491,20 +509,21 @@ namespace BlackjackWpf
             var dict = sum.limitOverShoots;
 
             double kelly = 0;
-            double ev_sum = 0;
             double sigma_squared = 0;
             long sessions_sum = dict.Sum(x => x.Value);
+            double ev_sum = dict.Sum(x => x.Key*x.Value);
 
             foreach (var kvp in dict)
             {
                 if (kvp.Key < 0)
                 {
-                    ev_sum += kvp.Key * kvp.Value * (1 - Rules.Instance.Cashback);
+                    ev_sum += -kvp.Key * kvp.Value * Rules.Instance.Cashback;
+                    //ev_sum += kvp.Key * kvp.Value * (1 - Rules.Instance.Cashback);
                     sigma_squared += kvp.Value * (kvp.Key * (1 - Rules.Instance.Cashback) * kvp.Key * (1 - Rules.Instance.Cashback));
                 }
                 else
                 {
-                    ev_sum += kvp.Key * kvp.Value;
+                    //ev_sum += kvp.Key * kvp.Value;
                     sigma_squared += kvp.Key * kvp.Key * kvp.Value;
                 }
 
@@ -517,7 +536,7 @@ namespace BlackjackWpf
             kelly = ev / sigma_squared;
 
             // RTP = (units + stake) / stake
-            return (ev);
+            return (ev_sum);
 
             void UpdateResults(BlackjackSimulator sum, long previous = 0)
             {
@@ -592,13 +611,29 @@ namespace BlackjackWpf
             SimulationProgress.Value = 0;
             UpdateStatus("Starting search...");
 
+            for (double localUnit = Rules.Instance.LowerLimit + 0.5;
+                 localUnit < Rules.Instance.UpperLimit;
+                 localUnit += 0.5)
+            {
+                var strategy = Strategy.Instance.Clone();
+                _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
+
+                await SearchStrategyHard(strategy, localUnit);
+            }
+
+            for (double localUnit = Rules.Instance.LowerLimit + 0.5;
+                 localUnit < Rules.Instance.UpperLimit;
+                 localUnit += 0.5)
+            {
+                var strategy = Strategy.Instance.Clone();
+                _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
+                await SearchStrategySoft(strategy, localUnit);
+            }
             for (double localUnit = Rules.Instance.LowerLimit + 0.5; localUnit < Rules.Instance.UpperLimit; localUnit += 0.5)
             {
                 var strategy = Strategy.Instance.Clone();
                 _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
 
-                await SearchStrategySoft(strategy, localUnit);
-                await SearchStrategyHard(strategy, localUnit);
                 await SearchStrategyPair(strategy, localUnit);
             }
 

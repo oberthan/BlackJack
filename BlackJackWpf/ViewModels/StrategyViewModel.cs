@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using Blackjack;
 using System.Linq;
 
@@ -68,6 +69,7 @@ namespace BlackjackWpf.ViewModels
             );
 
             AvailableLocalUnits = new ObservableCollection<double>(allStrategies.Keys);
+            Debug.Write(AvailableLocalUnits);
             SelectedLocalUnit = AvailableLocalUnits.FirstOrDefault();
             UpdateSelectedStrategy();
         }
@@ -92,13 +94,14 @@ namespace BlackjackWpf.ViewModels
             };
 
             AvailableLocalUnits = new ObservableCollection<double> { 0.0 };
+            Debug.Write(AvailableLocalUnits);
             SelectedLocalUnit = 0.0;
             UpdateSelectedStrategy();
         }
 
         private void UpdateSelectedStrategy()
         {
-            var strategy = Strategies.FirstOrDefault(s => s.LocalUnit == SelectedLocalUnit);
+            var strategy = Strategies.FirstOrDefault(s => Math.Abs(s.LocalUnit - SelectedLocalUnit) < 0.1);
             if (strategy != null)
             {
                 PairStrategy = strategy.PairStrategy;
