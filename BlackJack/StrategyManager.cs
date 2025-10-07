@@ -19,7 +19,7 @@ namespace Blackjack
 
         public Strategy GetStrategy(double localUnit)
         {
-            return _strategies.GetValueOrDefault(localUnit, _defaultStrategy);
+            return _strategies.GetValueOrDefault(localUnit, _defaultStrategy.Clone());
         }
 
         public IEnumerable<double> GetLocalUnits()

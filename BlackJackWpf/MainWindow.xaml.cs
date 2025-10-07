@@ -472,6 +472,7 @@ namespace BlackjackWpf
         private async Task<double> SimulateRTP(Strategy strategy, long rounds, List<CardValue> playerHand, CardValue upCard, double localUnits = 0, Move? firstMove = null)
         {
             var nTasks = Environment.ProcessorCount;
+            if (nTasks < 1) nTasks = 1;
             var simulators = new BlackjackSimulator[nTasks];
             var tasks = new Task[nTasks];
 
@@ -511,7 +512,7 @@ namespace BlackjackWpf
             double kelly = 0;
             double sigma_squared = 0;
             long sessions_sum = dict.Sum(x => x.Value);
-            double ev_sum = dict.Sum(x => x.Key*x.Value);
+            double ev_sum = sum.units;
 
             foreach (var kvp in dict)
             {
