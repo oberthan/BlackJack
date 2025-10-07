@@ -311,9 +311,9 @@ namespace BlackjackWpf
         {
             var rows = rowsIe.ToList();
 
-            long firstPassSimulations = 1_000_000;
-            long secondPassSimulations = 5_000_000; // Fast, low-accuracy pass
-            long finalSimulations = 20_000_000; // High-accuracy for close results
+            long firstPassSimulations = rounds;
+            long secondPassSimulations = 5*rounds; // Fast, low-accuracy pass
+            long finalSimulations = 20*rounds; // High-accuracy for close results
             double firstThreshold = 0.05; // Margin for "close" results
             double secondThreshold = 0.005;
 
@@ -486,8 +486,8 @@ namespace BlackjackWpf
             for (int i = 0; i < nTasks; i++)
             {
                 int idx = i;
-                tasks[i] = Task.Run(() => simulators[idx].ForceStartingHand(playerHand, upCard, localUnits, firstMove));
-                //tasks[i] = Task.Run(() => simulators[idx].RunSimulation());
+                //tasks[i] = Task.Run(() => simulators[idx].ForceStartingHand(playerHand, upCard, localUnits, firstMove));
+                tasks[i] = Task.Run(() => simulators[idx].RunSimulation());
             }
             while (!tasks.All(x => x.IsCompleted))
             {
