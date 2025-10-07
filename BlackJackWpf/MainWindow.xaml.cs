@@ -615,9 +615,8 @@ namespace BlackjackWpf
                  localUnit < Rules.Instance.UpperLimit;
                  localUnit += 0.5)
             {
-                var strategy = Strategy.Instance.Clone();
+                var strategy = _strategyManager.GetStrategy(localUnit);
                 _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
-
                 await SearchStrategyHard(strategy, localUnit);
             }
 
@@ -625,13 +624,13 @@ namespace BlackjackWpf
                  localUnit < Rules.Instance.UpperLimit;
                  localUnit += 0.5)
             {
-                var strategy = Strategy.Instance.Clone();
+                var strategy = _strategyManager.GetStrategy(localUnit);
                 _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
                 await SearchStrategySoft(strategy, localUnit);
             }
             for (double localUnit = Rules.Instance.LowerLimit + 0.5; localUnit < Rules.Instance.UpperLimit; localUnit += 0.5)
             {
-                var strategy = Strategy.Instance.Clone();
+                var strategy = _strategyManager.GetStrategy(localUnit);
                 _strategyManager.AddOrUpdateStrategy(localUnit, strategy);
 
                 await SearchStrategyPair(strategy, localUnit);
