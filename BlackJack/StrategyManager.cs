@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Blackjack
 {
@@ -19,7 +20,16 @@ namespace Blackjack
 
         public Strategy GetStrategy(double localUnit)
         {
-            return _strategies.GetValueOrDefault(localUnit, _defaultStrategy.Clone());
+            if (_strategies.TryGetValue(localUnit, out var strategy))
+            {
+                return strategy;
+            }
+
+            var newStrategy = _defaultStrategy.Clone();
+
+            _strategies[localUnit] = newStrategy;
+
+            return newStrategy;
         }
 
         public IEnumerable<double> GetLocalUnits()
