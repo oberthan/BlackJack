@@ -9,7 +9,7 @@ public class Rules
     // REQUIREMENT: Blackjack pays 3:2
     public double BlackjackPayout { get; set; } = 1.5;
 
-    public double Penetration { get; set; } = 0.7; // 70% penetration
+    public double Penetration { get; set; } = 0; // 70% penetration
 
     public bool AllowSplit { get; set; } = true;
 
@@ -27,7 +27,7 @@ public class Rules
     public bool DoubleAfterSplitAces { get; set; } = false;
 
     // REQUIREMENT: Six Card Charlie – player wins if reaches 6 cards <= 21
-    public int SixCardCharlieCount { get; set; } = 6;
+    public int SixCardCharlieCount { get; set; } = 22;
 
     // Dealer peek rule: dealer checks for Blackjack when showing Ace
     public bool DealerPeeksOnAce { get; set; } = true;
@@ -38,7 +38,7 @@ public class Rules
         return (int)a == (int)b;
     }
 
-    public double UpperLimit = 3;
-    public double LowerLimit = -3;
+    public double UpperLimit = 1;
+    public double LowerLimit = -1;
     public double Cashback = 0.1; // 10% cashback on losses
 }

@@ -144,7 +144,7 @@ public class Game
     private bool InitialCheckForBlackjack(HandEval dEval, HandEval pEval, out RoundResult playOneRoundWithHand)
     {
         // REQUIREMENT: Dealer peeks for Blackjack when showing Ace
-        if (Rules.Instance.DealerPeeksOnAce && Dealer.Hand[0] == CardValue.Ace)
+        if (Rules.Instance.DealerPeeksOnAce && Dealer.Hand[0] == CardValue.Ace || Rules.Instance.DealerPeeksOnAce && Dealer.Hand[0] == CardValue.Ten)
             if (dEval.IsBlackjack)
             {
                 if (pEval.IsBlackjack)
