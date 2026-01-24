@@ -14,6 +14,8 @@ public class Player
     public bool IsSplitAces => SplitHandPlayer != null && Hand.Count == 2 && Hand[0]== CardValue.Ace;
     public bool IsOriginalAces => Hand.Count == 2 && Hand[0]== CardValue.Ace && Hand[1]== CardValue.Ace;
 
+    public int unitsAvaible = 0;
+
 
     public void Reset()
     {
@@ -47,6 +49,7 @@ public class Player
     {
         if (Hand.Count != 2 || SplitHandPlayer != null) return false;
         if (!Rules.Instance.AllowSplit) return false;
+        if (Bet > unitsAvaible) return false;
         return Rules.Instance.CanSplitPair(Hand[0], Hand[1]);
     }
 
@@ -64,6 +67,7 @@ public class Player
         // deal one new card to each
         AddCard(deck.DrawCard());
         SplitHandPlayer.AddCard(deck.DrawCard());
+        unitsAvaible -= Bet;
 
         // REQUIREMENT: Split Aces cannot be hit further (and usually not Blackjack-qualified later)
         // We don't enforce here — Game will enforce “no hits after split A” when playing.
@@ -75,6 +79,7 @@ public class Player
     public bool CanDouble(bool afterSplit, bool thisHandIsSplitAces)
     {
         if (Hand.Count != 2) return false;
+        if (Bet > unitsAvaible) return false;
         if (!Rules.Instance.AllowDouble) return false;
         if (!Rules.Instance.DoubleOnAnyTwo) return false;
         if (afterSplit && !Rules.Instance.DoubleAfterSplit) return false;
@@ -85,7 +90,9 @@ public class Player
 
     public void DoubleDown(Deck deck)
     {
+        unitsAvaible -= Bet;
         Bet *= 2;
+
         AddCard(deck.DrawCard()); // REQUIREMENT: double receives exactly one card, then stands (Game enforces stand)
     }
 

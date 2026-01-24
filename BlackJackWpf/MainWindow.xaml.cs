@@ -25,6 +25,7 @@ namespace BlackjackWpf
     {
         public MainWindow() => InitializeComponent();
         private long rounds = 10_000_000;
+        private int players = 1;
 
         private async void StartSimulation_Click(object sender, RoutedEventArgs e)
         {
@@ -81,8 +82,9 @@ namespace BlackjackWpf
             var simulators = new BlackjackSimulator[nTasks];
             for (var i = 0; i < nTasks; i++)
             {
-                simulators[i] = new BlackjackSimulator
+                simulators[i] = new BlackjackSimulator(players)
                 {
+                    players = players,
                     Rounds = (rounds / nTasks) + ((i < (rounds % nTasks)) ? 1 : 0),
                 };
             }
@@ -469,7 +471,7 @@ namespace BlackjackWpf
             var previousTime = stopwatch.Elapsed;
 
             for (int i = 0; i < nTasks; i++)
-                simulators[i] = new BlackjackSimulator { Rounds = rounds / nTasks };
+                simulators[i] = new BlackjackSimulator(players) {players = players, Rounds = rounds / nTasks };
 
             for (int i = 0; i < nTasks; i++)
             {
@@ -537,6 +539,7 @@ namespace BlackjackWpf
             var viewModel = new SettingsViewModel();
             settingsWindow.ViewModel = viewModel;
             viewModel.Rounds = rounds;
+            viewModel.Players = players;
 
             var isAccepted = settingsWindow.ShowDialog();
             if (isAccepted == true)
@@ -555,6 +558,8 @@ namespace BlackjackWpf
                 Rules.Instance.AllowSplit = viewModel.AllowSplit;
                 Rules.Instance.UpperLimit = viewModel.UpperCashback;
                 Rules.Instance.LowerLimit = viewModel.LowerCashback;
+                
+                players = viewModel.Players;
 
                 rounds = viewModel.Rounds;
 

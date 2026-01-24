@@ -24,7 +24,7 @@ public class Game
 {
     public readonly Dealer Dealer = new(); // dealer uses same Player class but different flow
     public readonly Deck Deck = new(); // 8-deck shoe with 0.7 penetration by default
-    private readonly List<Player> Players = new();
+    public readonly List<Player> Players = new();
 
 
     public Strategy strategy = Strategy.Instance;
@@ -64,6 +64,8 @@ public class Game
         var results = new List<PlayerResult>();
         List<Player> activePlayers = new();
 
+        var avaibleUnits = 4;
+
         var dEval = HandEvaluator.Evaluate(Dealer.Hand, true);
 
         Players.ForEach(p =>
@@ -87,7 +89,7 @@ public class Game
             return results;
 
         
-        Players.ForEach(p => PlayerTurn(p));
+        Players.ForEach(p => avaibleUnits = PlayerTurn(p, avaibleUnits));
 
 
         if (dEval.IsBlackjack)
@@ -158,11 +160,11 @@ public class Game
     }
 
 
-    private int PlayerTurn(Player Player)
+    private int PlayerTurn(Player Player, int remainingUnits)
     {
         var netUnits = 0;
         var afterSplit = false;
-
+        Player.unitsAvaible = remainingUnits;
         // Optional very-simple strategy:
         // - Split Aces always; otherwise split only equal 8s; no resplit allowed by design.
 
@@ -171,13 +173,14 @@ public class Game
         PlaySingleHand(Player, afterSplit, false);
         if (Player.SplitHandPlayer != null)
         {
+            Player.SplitHandPlayer.unitsAvaible = Player.unitsAvaible;
             var unitsSplit = PlaySingleHand(Player.SplitHandPlayer, true,
                 Player.SplitHandPlayer.Hand[0] == CardValue.Ace);
-            // Dealer plays once for both hands (standard shoe game): delay dealer play until both hands done.
-            netUnits += unitsSplit; // will be combined after dealer plays
+
+            Player.unitsAvaible = Player.SplitHandPlayer.unitsAvaible;
         }
 
-        return netUnits;
+        return Player.unitsAvaible;
     }
 
     private bool InitialCheckForBlackjack(HandEval dEval, HandEval pEval, Player p, out RoundResult playOneRoundWithHand)

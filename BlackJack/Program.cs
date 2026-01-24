@@ -104,7 +104,8 @@ public class Program
     public class BlackjackSimulator
     {
         public long Rounds { get; set; } = 10000000;
-        public Game Game { get; } = new();
+        public int players = 1;
+        public Game Game { get; }
 
         public long wins = 0, losses = 0, pushes = 0;
         public double units = 0;
@@ -116,6 +117,11 @@ public class Program
         public long rounds;
         public Dictionary<double, long> limitOverShoots = new();
 
+        public BlackjackSimulator(int players = 1)
+        {
+            Debug.Write(players);
+            Game = new(players);
+        }
         public static BlackjackSimulator Sum(IEnumerable<BlackjackSimulator> simulators)
         {
             var result = new BlackjackSimulator();
@@ -167,28 +173,30 @@ public class Program
         {
             var res = Game.PlayOneRound();
 
-            units += res.UnitsWonOrLost;
+            units += res.Sum(r => r.RoundResult.UnitsWonOrLost);
 
-            unitsSquared += res.UnitsWonOrLost * res.UnitsWonOrLost; // <-- Add this line
+            unitsSquared += res.Sum(r => r.RoundResult.UnitsWonOrLost) * res.Sum(r => r.RoundResult.UnitsWonOrLost); // <-- Add this line
 
-            stake += res.Stake;
-            if (res.Blackjack) Blackjacks++;
-            if (res.Split) splits++;
-            if (res.Doubled) doubles++;
+            stake += res.Sum(r => r.RoundResult.Stake);
+            Blackjacks += res.Count(x => x.RoundResult.Blackjack);
+            splits += res.Count(x => x.RoundResult.Split);
+            doubles += res.Count(x => x.RoundResult.Doubled);
 
-            switch (res.Outcome)
-            {
-                case Outcome.PlayerWin: wins++; break;
-                case Outcome.DealerBlackjack: losses++; break;
-                case Outcome.Bust: losses++; break;
-                case Outcome.PlayerBlackjack: wins++; break;
-                case Outcome.DealerBust: wins++; break;
-                case Outcome.DealerWin: losses++; break;
-                case Outcome.PlayerWinWithCharlie: wins++; break;
-                default: pushes++; break;
-            }
+            res.ForEach(rr => {
+                switch (rr.RoundResult.Outcome)
+                {
+                    case Outcome.PlayerWin: wins++; break;
+                    case Outcome.DealerBlackjack: losses++; break;
+                    case Outcome.Bust: losses++; break;
+                    case Outcome.PlayerBlackjack: wins++; break;
+                    case Outcome.DealerBust: wins++; break;
+                    case Outcome.DealerWin: losses++; break;
+                    case Outcome.PlayerWinWithCharlie: wins++; break;
+                    default: pushes++; break;
+                }
+            });
 
-            localUnits += res.UnitsWonOrLost;
+            localUnits += res.Sum(r => r.RoundResult.UnitsWonOrLost);
 
             if (localUnits <= Rules.Instance.LowerLimit || localUnits >= Rules.Instance.UpperLimit)
             {
@@ -208,38 +216,41 @@ public class Program
             double localUnits = 0;
             for (rounds = 0; rounds < Rounds; rounds++)
             {
-                Game.Player.Reset();
+                Game.Players.ForEach(p =>p.Reset());
                 Game.Dealer.Reset();
                 Game.Deck.EndOfGame();
-                Game.Player.AddCard(playerHand[0]);
-                Game.Player.AddCard(playerHand[1]);
+                Game.Players.ForEach(p => p.AddCard(playerHand[0]));
+                Game.Players.ForEach(p => p.AddCard(playerHand[1]));
 
                 Game.Dealer.AddCard(upCard);
                 Game.Dealer.AddCard(Game.Deck.DrawCard());
                 var res = Game.PlayOneRoundWithHand();
 
-                units += res.UnitsWonOrLost;
+                units += res.Sum(r => r.RoundResult.UnitsWonOrLost);
 
-                unitsSquared += res.UnitsWonOrLost * res.UnitsWonOrLost; // <-- Add this line
+                unitsSquared += res.Sum(r => r.RoundResult.UnitsWonOrLost) * res.Sum(r => r.RoundResult.UnitsWonOrLost); // <-- Add this line
 
-                stake += res.Stake;
-                if (res.Blackjack) Blackjacks++;
-                if (res.Split) splits++;
-                if (res.Doubled) doubles++;
+                stake += res.Sum(r => r.RoundResult.Stake);
+                Blackjacks += res.Count(x => x.RoundResult.Blackjack);
+                splits += res.Count(x => x.RoundResult.Split);
+                doubles += res.Count(x => x.RoundResult.Doubled);
 
-                switch (res.Outcome)
+                res.ForEach(rr =>
                 {
-                    case Outcome.PlayerWin: wins++; break;
-                    case Outcome.DealerBlackjack: losses++; break;
-                    case Outcome.Bust: losses++; break;
-                    case Outcome.PlayerBlackjack: wins++; break;
-                    case Outcome.DealerBust: wins++; break;
-                    case Outcome.DealerWin: losses++; break;
-                    case Outcome.PlayerWinWithCharlie: wins++; break;
-                    default: pushes++; break;
-                }
+                    switch (rr.RoundResult.Outcome)
+                    {
+                        case Outcome.PlayerWin: wins++; break;
+                        case Outcome.DealerBlackjack: losses++; break;
+                        case Outcome.Bust: losses++; break;
+                        case Outcome.PlayerBlackjack: wins++; break;
+                        case Outcome.DealerBust: wins++; break;
+                        case Outcome.DealerWin: losses++; break;
+                        case Outcome.PlayerWinWithCharlie: wins++; break;
+                        default: pushes++; break;
+                    }
+                });
 
-                localUnits += res.UnitsWonOrLost;
+                localUnits += res.Sum(r => r.RoundResult.UnitsWonOrLost);
 
                 if (localUnits <= Rules.Instance.LowerLimit || localUnits >= Rules.Instance.UpperLimit)
                 {

@@ -37,7 +37,7 @@ namespace BlackJackTest
         {
             var game = new Game();
             var deck = game.Deck;
-            var player = game.Player;
+            var player = game.Players[0];
             player.Reset();
             var dealer = game.Dealer;
             dealer.Reset();
@@ -51,9 +51,9 @@ namespace BlackJackTest
 
             var result = game.PlayOneRoundWithHand();
 
-            Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerBlackjack));
-            Assert.That(result.UnitsWonOrLost, Is.EqualTo(1 * Rules.Instance.BlackjackPayout));
-            Assert.That(result.Blackjack, Is.True);
+            Assert.That(result[0].RoundResult.Outcome, Is.EqualTo(Outcome.PlayerBlackjack));
+            Assert.That(result[0].RoundResult.UnitsWonOrLost, Is.EqualTo(1 * Rules.Instance.BlackjackPayout));
+            Assert.That(result[0].RoundResult.Blackjack, Is.True);
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace BlackJackTest
         {
             var game = new Game();
             var deck = game.Deck;
-            var player = game.Player;
+            var player = game.Players[0];
             player.Reset();
             var dealer = game.Dealer;
             dealer.Reset();
@@ -77,9 +77,9 @@ namespace BlackJackTest
 
 
 
-            Assert.That(result.Outcome, Is.EqualTo(Outcome.Push));
-            Assert.That(result.UnitsWonOrLost, Is.EqualTo(0));
-            Assert.That(result.Blackjack, Is.True);
+            Assert.That(result[0].RoundResult.Outcome, Is.EqualTo(Outcome.Push));
+            Assert.That(result[0].RoundResult.UnitsWonOrLost, Is.EqualTo(0));
+            Assert.That(result[0].RoundResult.Blackjack, Is.True);
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace BlackJackTest
         {
             var game = new Game();
             var deck = game.Deck;
-            var player = game.Player;
+            var player = game.Players[0];
             player.Reset();
             var dealer = game.Dealer;
             dealer.Reset();
@@ -101,9 +101,9 @@ namespace BlackJackTest
 
             var result = game.PlayOneRoundWithHand();
 
-            Assert.That(result.Outcome, Is.EqualTo(Outcome.DealerBlackjack));
-            Assert.That(result.UnitsWonOrLost, Is.EqualTo(-1));
-            Assert.That(result.Blackjack, Is.False);
+            Assert.That(result[0].RoundResult.Outcome, Is.EqualTo(Outcome.DealerBlackjack));
+            Assert.That(result[0].RoundResult.UnitsWonOrLost, Is.EqualTo(-1));
+            Assert.That(result[0].RoundResult.Blackjack, Is.False);
 
         }
 
@@ -113,7 +113,7 @@ namespace BlackJackTest
             var game = new Game();
             var deck = game.Deck;
             deck.RandomSeed(1232);
-            var player = game.Player;
+            var player = game.Players[0];
             player.Reset();
             var dealer = game.Dealer;
             dealer.Reset();
@@ -141,8 +141,8 @@ namespace BlackJackTest
 
             }
 
-            Assert.That(result.Outcome, Is.EqualTo(Outcome.Bust));
-            Assert.That(result.UnitsWonOrLost, Is.EqualTo(-1));
+            Assert.That(result[0].RoundResult.Outcome, Is.EqualTo(Outcome.Bust));
+            Assert.That(result[0].RoundResult.UnitsWonOrLost, Is.EqualTo(-1));
         }
 
         [Test]
@@ -150,7 +150,7 @@ namespace BlackJackTest
         {
             var game = new Game();
             var deck = game.Deck;
-            var player = game.Player;
+            var player = game.Players[0];
             player.Reset();
             var dealer = game.Dealer;
             dealer.Reset();
@@ -168,8 +168,8 @@ namespace BlackJackTest
             var result = game.PlayOneRoundWithHand();
 
 
-            Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerWinWithCharlie));
-            Assert.That(result.UnitsWonOrLost, Is.EqualTo(1));
+            Assert.That(result[0].RoundResult.Outcome, Is.EqualTo(Outcome.PlayerWinWithCharlie));
+            Assert.That(result[0].RoundResult.UnitsWonOrLost, Is.EqualTo(1));
         }
 
 
@@ -204,7 +204,7 @@ namespace BlackJackTest
             {
                 var game = new Game();
                 var deck = game.Deck;
-                var player = game.Player;
+                var player = game.Players[0];
                 player.Reset();
                 var dealer = game.Dealer;
                 dealer.Reset();
@@ -243,7 +243,7 @@ namespace BlackJackTest
                 }
 
                 Assert.That(player.SplitHandPlayer, shouldSplit ? Is.Not.EqualTo(null) : Is.EqualTo(null));
-                Assert.That(result.Stake, Is.EqualTo(shouldSplit ? ((player.DidDouble ? 2 : 1) + (player.SplitHandPlayer.DidDouble ? 2 : 1)) : (player.DidDouble ? 2 : 1)));
+                Assert.That(result[0].RoundResult.Stake, Is.EqualTo(shouldSplit ? ((player.DidDouble ? 2 : 1) + (player.SplitHandPlayer.DidDouble ? 2 : 1)) : (player.DidDouble ? 2 : 1)));
                 /*            Assert.That(result.Outcome, Is.EqualTo(Outcome.DealerBust));
                             Assert.That(result.UnitsWonOrLost, Is.EqualTo(3)); // Player wins both hands*/
                 i++;
@@ -256,7 +256,7 @@ namespace BlackJackTest
         {
             var game = new Game();
             var deck = game.Deck;
-            var player = game.Player;
+            var player = game.Players[0];
             player.Reset();
             var dealer = game.Dealer;
             dealer.Reset();
@@ -276,7 +276,7 @@ namespace BlackJackTest
             TestContext.WriteLine($"{player.Hand[1]}, {player.SplitHandPlayer.Hand[1]}");
 
 
-            Assert.That(result.UnitsWonOrLost, Is.EqualTo(2));
+            Assert.That(result[0].RoundResult.UnitsWonOrLost, Is.EqualTo(2));
 
         }
 
@@ -379,7 +379,7 @@ namespace BlackJackTest
         public void PlayOneRound_PlayerDoubleWin_AllRoundResultValues()
         {
             var game = new Game();
-            var player = game.Player;
+            var player = game.Players[0];
             var dealer = game.Dealer;
             player.Reset();
             dealer.Reset();
@@ -394,19 +394,19 @@ namespace BlackJackTest
 
             var result = game.PlayOneRoundWithHand();
 
-            Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerWin));
-            Assert.That(result.UnitsWonOrLost, Is.GreaterThan(0));
-            Assert.That(result.Stake, Is.EqualTo(50));
-            Assert.That(result.Blackjack, Is.False);
-            Assert.That(result.Split, Is.False);
-            Assert.That(result.Doubled, Is.True);
+            Assert.That(result[0].RoundResult.Outcome, Is.EqualTo(Outcome.PlayerWin));
+            Assert.That(result[0].RoundResult.UnitsWonOrLost, Is.GreaterThan(0));
+            Assert.That(result[0].RoundResult.Stake, Is.EqualTo(50));
+            Assert.That(result[0].RoundResult.Blackjack, Is.False);
+            Assert.That(result[0].RoundResult.Split, Is.False);
+            Assert.That(result[0].RoundResult.Doubled, Is.True);
         }
 
         [Test]
         public void PlayOneRound_SplitWin_AllRoundResultValues()
         {
             var game = new Game();
-            var player = game.Player;
+            var player = game.Players[0];
             var dealer = game.Dealer;
             player.Reset();
             dealer.Reset();
@@ -425,18 +425,18 @@ namespace BlackJackTest
 
             var result = game.PlayOneRoundWithHand();
 
-            Assert.That(result.Outcome, Is.AnyOf(Outcome.PlayerWin, Outcome.Push, Outcome.DealerWin));
-            Assert.That(result.Stake, Is.EqualTo(200));
-            Assert.That(result.Blackjack, Is.False);
-            Assert.That(result.Split, Is.True);
-            Assert.That(result.Doubled, Is.False);
+            Assert.That(result[0].RoundResult.Outcome, Is.AnyOf(Outcome.PlayerWin, Outcome.Push, Outcome.DealerWin));
+            Assert.That(result[0].RoundResult.Stake, Is.EqualTo(200));
+            Assert.That(result[0].RoundResult.Blackjack, Is.False);
+            Assert.That(result[0].RoundResult.Split, Is.True);
+            Assert.That(result[0].RoundResult.Doubled, Is.False);
         }
 
         [Test]
         public void PlayOneRound_PlayerBlackjack_AllRoundResultValues()
         {
             var game = new Game();
-            var player = game.Player;
+            var player = game.Players[0];
             var dealer = game.Dealer;
             player.Reset();
             dealer.Reset();
@@ -449,12 +449,12 @@ namespace BlackJackTest
 
             var result = game.PlayOneRoundWithHand();
 
-            Assert.That(result.Outcome, Is.EqualTo(Outcome.PlayerBlackjack));
-            Assert.That(result.UnitsWonOrLost, Is.EqualTo(75 * Rules.Instance.BlackjackPayout));
-            Assert.That(result.Stake, Is.EqualTo(75));
-            Assert.That(result.Blackjack, Is.True);
-            Assert.That(result.Split, Is.False);
-            Assert.That(result.Doubled, Is.False);
+            Assert.That(result[0].RoundResult.Outcome, Is.EqualTo(Outcome.PlayerBlackjack));
+            Assert.That(result[0].RoundResult.UnitsWonOrLost, Is.EqualTo(75 * Rules.Instance.BlackjackPayout));
+            Assert.That(result[0].RoundResult.Stake, Is.EqualTo(75));
+            Assert.That(result[0].RoundResult.Blackjack, Is.True);
+            Assert.That(result[0].RoundResult.Split, Is.False);
+            Assert.That(result[0].RoundResult.Doubled, Is.False);
         }
     }
 }
