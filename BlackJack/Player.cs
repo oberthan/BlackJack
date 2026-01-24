@@ -35,6 +35,11 @@ public class Player
         Hand.Add(card);
     }
 
+    public HandEval EvaluateHand(bool treatTwoCard21AsBlackjack)
+    {
+        return HandEvaluator.Evaluate(Hand, treatTwoCard21AsBlackjack);
+    }
+
 
     //------------- Split functionality -------------//
 

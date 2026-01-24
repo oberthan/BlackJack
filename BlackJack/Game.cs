@@ -15,47 +15,81 @@ public enum Outcome
 
 public record RoundResult(Outcome Outcome, double UnitsWonOrLost, int Stake, bool Blackjack, bool Split, bool Doubled);
 
+public record PlayerResult(
+    Player Player,
+    RoundResult RoundResult
+    );
+
 public class Game
 {
     public readonly Dealer Dealer = new(); // dealer uses same Player class but different flow
     public readonly Deck Deck = new(); // 8-deck shoe with 0.7 penetration by default
-    public readonly Player Player = new();
+    private readonly List<Player> Players = new();
+
 
     public Strategy strategy = Strategy.Instance;
+
+
+    public Game(int numberOfPlayers = 1)
+    {
+        for (var i = 0; i < numberOfPlayers; i++)
+        {
+            Players.Add(new Player());
+        }
+    }
 
     public void Reset()
     {
         Deck.SetupShoe();
         Dealer.Reset();
-        Player.Reset();
+        Players.ForEach(p => p.Reset());
     }
-    public RoundResult PlayOneRound()
+    public List<PlayerResult> PlayOneRound()
     {
-        Player.Reset();
+        Players.ForEach(p => p.Reset());
         Dealer.Reset();
         Deck.EndOfGame();
 
         // initial deal
-        Player.AddCard(Deck.DrawCard());
+        Players.ForEach(p => p.AddCard(Deck.DrawCard()));
         Dealer.AddCard(Deck.DrawCard()); // dealer upcard
-        Player.AddCard(Deck.DrawCard());
+        Players.ForEach(p => p.AddCard(Deck.DrawCard()));
         Dealer.AddCard(Deck.DrawCard()); // dealer hole card
 
         return PlayOneRoundWithHand();
     }
 
-    public RoundResult PlayOneRoundWithHand()
+    public List<PlayerResult> PlayOneRoundWithHand()
     {
-        // evaluate Blackjacks (initial only)
-        var pEval = HandEvaluator.Evaluate(Player.Hand, true);
+        var results = new List<PlayerResult>();
+        List<Player> activePlayers = new();
+
         var dEval = HandEvaluator.Evaluate(Dealer.Hand, true);
-        if (pEval.IsBlackjack) Player.DidBlackjack = true; // track for later
 
-        if (InitialCheckForBlackjack(dEval, pEval, out var playOneRoundWithHand)) return playOneRoundWithHand;
+        Players.ForEach(p =>
+        {
+            var pEval = p.EvaluateHand(true);
+            if (pEval.IsBlackjack) p.DidBlackjack = true;
+            if (InitialCheckForBlackjack(dEval, pEval, out var rr))
+            {
+                results.Add(new PlayerResult(p, rr));
+            }
+            else
+            {
+                activePlayers.Add(p);
+            }
 
 
-        // PLAYER TURN(s)
-        var netUnits = PlayerTurn();
+        });
+        // evaluate Blackjacks (initial only)
+
+        if (activePlayers.Count == 0)
+            return results;
+
+        
+        Players.ForEach(p => PlayerTurn(p));
+
+
 
         // DEALER TURN
         if (DealerTurn(dEval, out var roundResult)) return roundResult;
@@ -119,7 +153,7 @@ public class Game
         return false;
     }
 
-    private int PlayerTurn()
+    private int PlayerTurn(Player Player)
     {
         var netUnits = 0;
         var afterSplit = false;
