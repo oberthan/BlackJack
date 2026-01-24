@@ -117,10 +117,10 @@ public class Program
         public long rounds;
         public Dictionary<double, long> limitOverShoots = new();
 
-        public BlackjackSimulator(int players = 1)
+        public BlackjackSimulator(int players = 1, int availableFunds =3)
         {
             Debug.Write(players);
-            Game = new(players);
+            Game = new(players, availableFunds);
         }
         public static BlackjackSimulator Sum(IEnumerable<BlackjackSimulator> simulators)
         {

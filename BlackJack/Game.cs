@@ -28,14 +28,15 @@ public class Game
 
 
     public Strategy strategy = Strategy.Instance;
+    public int AvailableFunds;
 
-
-    public Game(int numberOfPlayers = 1)
+    public Game(int numberOfPlayers = 1, int availableFunds = 3)
     {
         for (var i = 0; i < numberOfPlayers; i++)
         {
             Players.Add(new Player());
         }
+        AvailableFunds = availableFunds;
     }
 
     public void Reset()
@@ -64,7 +65,7 @@ public class Game
         var results = new List<PlayerResult>();
         List<Player> activePlayers = new();
 
-        var avaibleUnits = 4;
+        var avaibleUnits = AvailableFunds;
 
         var dEval = HandEvaluator.Evaluate(Dealer.Hand, true);
 
@@ -186,7 +187,7 @@ public class Game
     private bool InitialCheckForBlackjack(HandEval dEval, HandEval pEval, Player p, out RoundResult playOneRoundWithHand)
     {
         // REQUIREMENT: Dealer peeks for Blackjack when showing Ace
-        if (Rules.Instance.DealerPeeksOnAce && Dealer.Hand[0] == CardValue.Ace || Rules.Instance.DealerPeeksOnAce && Dealer.Hand[0] == CardValue.Ten)
+        if (Rules.Instance.DealerPeeksOnAce && Dealer.Hand[0] == CardValue.Ace || Rules.Instance.DealerPeeksOnTen && Dealer.Hand[0] == CardValue.Ten)
             if (dEval.IsBlackjack)
             {
                 if (pEval.IsBlackjack)

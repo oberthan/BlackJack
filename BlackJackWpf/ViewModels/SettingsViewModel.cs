@@ -117,6 +117,21 @@ namespace BlackjackWpf.ViewModels
         private int _players = 1;
 
 
+        public bool DealerPeeksOnTen
+        {
+            get => _dealerPeeksOnTen;
+            set { _dealerPeeksOnTen = value; OnPropertyChanged(nameof(DealerPeeksOnTen)); }
+        }
+        private bool _dealerPeeksOnTen = Rules.Instance.DealerPeeksOnTen;
+
+
+        public int ExcessFunds
+        {
+            get => _excessFunds;
+            set { _excessFunds = value; OnPropertyChanged(nameof(ExcessFunds)); }
+        }
+        private int _excessFunds = 3;
+
         // Implement INotifyPropertyChanged
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>

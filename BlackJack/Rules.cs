@@ -31,6 +31,7 @@ public class Rules
 
     // Dealer peek rule: dealer checks for Blackjack when showing Ace
     public bool DealerPeeksOnAce { get; set; } = true;
+    public bool DealerPeeksOnTen { get; set; } = true;
 
     // REQUIREMENT: Split only on first two cards of equal value
     public bool CanSplitPair(CardValue a, CardValue b)

@@ -27,7 +27,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="178"/>
-            <ColumnDefinition Width="140"/>
+            <ColumnDefinition Width="160"/>
             <ColumnDefinition Width="160"/>
             <ColumnDefinition Width="44"/>
         </Grid.ColumnDefinitions>
@@ -40,7 +40,11 @@
         <TextBox Text="{Binding Rounds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="3" Margin="0,0,49,10"/>
 
         <TextBlock Text="Number of players:" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Height="16"/>
-        <TextBox Text="{Binding Players, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.Column="3" Margin="0,0,6,10"/>
+        <TextBox Text="{Binding Players, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center" Margin="0,5,6,5"/>
+
+        <TextBlock Text="Shared funds after initial bet:" Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" Height="16"/>
+        <TextBox Text="{Binding ExcessFunds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="3" Grid.Column="3" VerticalAlignment="Center" Margin="0,5,6,5"/>
+        
 
         <CheckBox Content="Dealer Stands On Soft 17"
                   IsChecked="{Binding DealerStandsOnSoft17, Mode=TwoWay}" Grid.Row="2" Grid.Column="0" Margin="0,0,0,4"/>
@@ -49,11 +53,11 @@
         <TextBox Text="{Binding BlackjackPayout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="3" Grid.Column="1" Margin="0,0,49,1"/>
 
         <CheckBox Content="Allow Split"
-                  IsChecked="{Binding AllowSplit, Mode=TwoWay}" Grid.Row="3" Grid.Column="2" Margin="0,5,0,10"/>
+                  IsChecked="{Binding AllowSplit, Mode=TwoWay}" Grid.Row="4" Grid.Column="2" Margin="0,5,0,10"/>
         <CheckBox Content="Allow Resplit"
                   IsChecked="{Binding AllowResplit, Mode=TwoWay}" Grid.Row="4" Grid.Column="0" Margin="0,5,0,10"/>
         <CheckBox Content="Allow Double"
-                  IsChecked="{Binding AllowDouble, Mode=TwoWay}" Grid.Row="4" Grid.Column="2" Margin="0,5,0,10"/>
+                  IsChecked="{Binding AllowDouble, Mode=TwoWay}" Grid.Row="5" Grid.Column="2" Margin="0,5,0,10"/>
         <CheckBox Content="Double On Any Two"
                   IsChecked="{Binding DoubleOnAnyTwo, Mode=TwoWay}" Grid.Row="5" Grid.Column="0" Margin="0,5,0,10"/>
         <CheckBox Content="Double After Split"
@@ -66,16 +70,18 @@
         <TextBlock Text="Six Card Charlie Count:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" Height="16"/>
         <TextBox Text="{Binding SixCardCharlieCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="7" Grid.Column="1" Margin="0,0,49,0"/>
 
-        <TextBlock Text="Cashback Limits:" Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" Height="16" Margin="0,10,0,0"/>
+        <TextBlock Text="Cashback Limits:" Grid.Row="6" Grid.Column="2" VerticalAlignment="Center" Height="16" Margin="0,10,0,0"/>
 
-        <TextBlock Text="Upper:" Grid.Row="5" Grid.Column="3" Margin="0,10,0,0"></TextBlock>
-        <TextBox Text="{Binding UpperCashback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="5" Grid.Column="3" Margin="49,10,49,0"/>
-        <TextBlock Text="Lower:" Grid.Row="6" Grid.Column="3" Margin="0,10,0,0"></TextBlock>
-        <TextBox Text="{Binding LowerCashback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="6" Grid.Column="3" Margin="49,10,49,0"/>
+        <TextBlock Text="Upper:" Grid.Row="6" Grid.Column="3" Margin="0,10,0,0"></TextBlock>
+        <TextBox Text="{Binding UpperCashback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="6" Grid.Column="3" Margin="49,10,49,0"/>
+        <TextBlock Text="Lower:" Grid.Row="7" Grid.Column="3" Margin="0,10,0,0"></TextBlock>
+        <TextBox Text="{Binding LowerCashback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="7" Grid.Column="3" Margin="49,10,49,0"/>
 
 
         <CheckBox Content="Dealer Peeks On Ace"
                   IsChecked="{Binding DealerPeeksOnAce, Mode=TwoWay}" Grid.Row="8" Grid.Column="0" Margin="0,5,0,10"/>
+        <CheckBox Content="Dealer Peeks On Ten"
+                  IsChecked="{Binding DealerPeeksOnTen, Mode=TwoWay}" Grid.Row="8" Grid.Column="1" Margin="0,5,0,10"/>
 
         <StackPanel Orientation="Horizontal" Grid.Row="9" Grid.Column="0" HorizontalAlignment="Left" Margin="0,1,0,0" Width="70">
             <Button Margin="3" IsDefault="True" Click="Button_Click">Ok</Button>
