@@ -7,7 +7,7 @@ public class Program
     private static void Main()
     {
         var game = new Game();
-        long rounds = 100000000;
+        long rounds = 10000000000;
         Console.Write($"Enter the number of simulations to run or leave blank to run {rounds} simulations: ");
         var input = Console.ReadLine();
         if (input != "")

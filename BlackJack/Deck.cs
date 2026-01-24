@@ -8,7 +8,7 @@ public class Deck
     public int[] Cards { get; private set; }
     public int CardsLeft;
 
-    public Deck(int numDecks = 8)
+    public Deck(int numDecks = 4)
     {
         this.numDecks = numDecks;
         var total = numDecks * 52;

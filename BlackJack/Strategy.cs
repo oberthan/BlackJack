@@ -61,7 +61,7 @@ public class Strategy
         new HardStrategyRow { Total = 8, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.H, Vs5 = Decision.H, Vs6 = Decision.H, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
         new HardStrategyRow { Total = 9, Vs2 = Decision.H, Vs3 = Decision.D, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
         new HardStrategyRow { Total = 10, Vs2 = Decision.D, Vs3 = Decision.D, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.D, Vs8 = Decision.D, Vs9 = Decision.D, Vs10 = Decision.H, VsA = Decision.H},
-        new HardStrategyRow { Total = 11, Vs2 = Decision.D, Vs3 = Decision.D, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.D, Vs8 = Decision.D, Vs9 = Decision.D, Vs10 = Decision.H, VsA = Decision.H},
+        new HardStrategyRow { Total = 11, Vs2 = Decision.D, Vs3 = Decision.D, Vs4 = Decision.D, Vs5 = Decision.D, Vs6 = Decision.D, Vs7 = Decision.D, Vs8 = Decision.D, Vs9 = Decision.D, Vs10 = Decision.D, VsA = Decision.H},
         new HardStrategyRow { Total = 12, Vs2 = Decision.H, Vs3 = Decision.H, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
         new HardStrategyRow { Total = 13, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
         new HardStrategyRow { Total = 14, Vs2 = Decision.S, Vs3 = Decision.S, Vs4 = Decision.S, Vs5 = Decision.S, Vs6 = Decision.S, Vs7 = Decision.H, Vs8 = Decision.H, Vs9 = Decision.H, Vs10 = Decision.H, VsA = Decision.H},
@@ -98,11 +98,6 @@ public class Strategy
         // --- Soft Totals ---
         if (isSoft)
         {
-            // six card charlie strats
-            if (cards.Count == 5 && total >= 19) return Move.Hit;
-            if (cards.Count >= 4 && total == 18 && !(upValue is >= 3 and <= 6)) return Move.Hit;
-            if (cards.Count >= 4 && total == 19 && upValue == 10) return Move.Hit;
-
 
             var row = SoftStrategy[total-softStrategyMinTotal];
             Debug.Assert(row.Total == total);
@@ -112,14 +107,6 @@ public class Strategy
         // --- Hard Totals ---
         if (!isSoft)
         {
-
-            // six card charlie strats
-            if (cards.Count >= 4 && total == 12 && upValue is >= 4 and <= 6) return Move.Hit;
-            if (cards.Count >= 4 && total == 13 && (upValue == 2 || upValue == 3)) return Move.Hit;
-            if (cards.Count == 5 && total >= 13 && total <= 15 && upValue >= 2 && upValue <= 6) return Move.Hit;
-            if (cards.Count == 5 && total == 16 && (upValue == 2 || upValue == 3)) return Move.Hit;
-            if (cards.Count == 5 && total == 17 && upValue >= 9 && upValue <= 11) return Move.Hit;
-
 
             if (total > hardStrategyMaxTotal)
                 return Move.Stand; // fallback for totals outside the strategy range
